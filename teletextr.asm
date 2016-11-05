@@ -1,0 +1,2 @@
+INCLUDE "src/main.asm"
+
