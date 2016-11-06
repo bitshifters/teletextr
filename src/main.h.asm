@@ -8,7 +8,7 @@ INCLUDE "lib/bbc_utils.h.asm"
 \ ******************************************************************
 
 \\ Our own app variables
-ORG &40
+ORG &00
 GUARD &9F							; user ZP + econet ZP
 
 
@@ -16,7 +16,15 @@ GUARD &9F							; user ZP + econet ZP
 \\ Any includes here can declare ZP vars from the pool using SKIP
 INCLUDE "lib/exomiser.h.asm"
 INCLUDE "lib/vgmplayer.h.asm"
+INCLUDE "src/3d.h.asm"
 
+.disp_buffer_addr	SKIP 1	; MSB of display buffer address
+.draw_buffer_addr	SKIP 1	; MSB of draw buffer address
+
+
+INCLUDE "src/mode7_graphics.h.asm"
+INCLUDE "src/mode7_plot_pixel.h.asm"
+INCLUDE "src/bresenham.h.asm"
 
 ORG &1100
 
@@ -27,16 +35,14 @@ ORG &1100
 \ ******************************************************************
 \ *	Code entry
 \ ******************************************************************
-INCLUDE "lib/print.asm"
+
 INCLUDE "lib/exomiser.asm"
 INCLUDE "lib/vgmplayer.asm"
-INCLUDE "lib/swr.asm"
-INCLUDE "lib/filesys.asm"
+INCLUDE "src/3d.asm"
 
-
-.bank_file_music    EQUS "music", 13
-
-MUSIC_BANK_NO = 0
+INCLUDE "src/mode7_graphics.asm"
+INCLUDE "src/mode7_plot_pixel.asm"
+INCLUDE "src/bresenham.asm"
 
 .main
 {
@@ -47,48 +53,9 @@ MUSIC_BANK_NO = 0
 	LDX #3
 	JSR osbyte			
 
-
-    jsr swr_init
-    bne swr_ok
-
-    MPRINT swr_fail_text
-    rts
-
-.swr_fail_text EQUS "No SWR banks found.", 13, 10, 0
-.swr_bank_text EQUS "Found % SWR banks.", 13, 10, 0
-.swr_bank_text2 EQUS " Bank %", 13, 10, 0
-.loading_bank_text EQUS "Loading bank", 13, 10, 0
-.loading_bank_text2 EQUS "Bank loaded", 13, 10, 0
-    .swr_ok
-
-    MPRINTAP    swr_bank_text,swr_ram_banks_count
-    ldx #0
-.swr_print_loop
-    lda swr_ram_banks,x
-    MPRINTA    swr_bank_text2
-    inx
-    cpx swr_ram_banks_count
-    bne swr_print_loop
-    
-    MPRINT loading_bank_text
-
-	\\ Initialise music player - pass in VGM_stream_data address
-	\\ parses header from stream
-
-    lda #MUSIC_BANK_NO
-    jsr swr_select_slot
-    lda #&80
-    ldx #LO(bank_file_music)
-    ldy #HI(bank_file_music)
-    jsr file_load
-
-    MPRINT loading_bank_text2
-    rts
-
-    ; runtime
-
 	JSR clear_vram
-    
+
+	
 	\\ Set MODE 7
 	LDA #22: JSR oswrch
 	LDA #7: JSR oswrch
@@ -99,9 +66,10 @@ MUSIC_BANK_NO = 0
 	LDA #32: STA &FE01
 	CLI	
 
-
-	LDX #&04
-	LDY #&80
+	\\ Initialise music player - pass in VGM_stream_data address
+	\\ parses header from stream
+	LDX #LO(VGM_stream_data)
+	LDY #HI(VGM_stream_data)
 	JSR	vgm_init_stream
 
     \\ Start our event driven fx
@@ -110,13 +78,13 @@ MUSIC_BANK_NO = 0
     JSR start_eventv
 
 
-;    jsr init_3d
+    jsr init_3d
 
 \\ can never return to OS as we use all memory
     .loop
     lda #19:jsr osbyte
 
- ;   jsr update_3d
+    jsr update_3d
 
 
     jmp loop
@@ -154,26 +122,16 @@ MUSIC_BANK_NO = 0
 	bne not_vsync
 
 	\\ Preserve registers
-	pha:txa:pha:tya:pha
-
-    lda &f4
-    tay
-
-    ; page in the music bank
-    lda #MUSIC_BANK_NO
-    jsr swr_select_slot
+	pha:TXA:PHA:TYA:PHA
 
 	\\ Poll the music player
 	jsr poll_player
     
-    ; restore previously paged ROM bank
-    tya
-    jsr swr_select_bank
 
   ;  lda#65:jsr oswrch
 
 	\\ Restore registers
-	pla:tay:pla:tax:pla
+	PLA:TAY:PLA:TAX:pla
 
 	\\ Return
     .not_vsync
@@ -237,17 +195,11 @@ MUSIC_BANK_NO = 0
 	rts
 }
 
-
+.VGM_stream_data
+INCBIN "data/music.raw.exo"
 
 
 .end
 
 PRINT "Code from", ~start, "to", ~end, ", size is", (end-start), "bytes"
 SAVE "Main", start, end, main
-
-
-
-PUTFILE "bin/music.bin", "music", &8000
-PUTFILE "bin/3d.bin", "3d", &8000
-
-
