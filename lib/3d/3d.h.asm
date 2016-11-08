@@ -12,90 +12,91 @@ CONTIGUOUS_TABLES = TRUE
 
 ; 3x3 rotation matrix
 ; 16-bit unit vectors
-m00lsb=0
-m00msb=9
-m01lsb=1
-m01msb=&A
-m02lsb=2
-m02msb=&B
-m10lsb=3
-m10msb=&C
-m11lsb=4
-m11msb=&D
-m12lsb=5
-m12msb=&E
-m20lsb=6
-m20msb=&F
-m21lsb=7
-m21msb=&10
-m22lsb=8
-m22msb=&11
+.m00lsb SKIP 1
+.m01lsb SKIP 1
+.m02lsb SKIP 1
+.m10lsb SKIP 1
+.m11lsb SKIP 1
+.m12lsb SKIP 1
+.m20lsb SKIP 1
+.m21lsb SKIP 1
+.m22lsb SKIP 1
 
-adr=&12
+.m00msb SKIP 1
+.m01msb SKIP 1
+.m02msb SKIP 1
+.m10msb SKIP 1
+.m11msb SKIP 1
+.m12msb SKIP 1
+.m20msb SKIP 1
+.m21msb SKIP 1
+.m22msb SKIP 1
 
-xr=&1A
-yr=&1C
-zr=&1E
+.adr SKIP 8
 
-product=&20
+.xr SKIP 2
+.yr SKIP 2
+.zr SKIP 2
+
+.product SKIP 2
 
 ; 8-bit rotation angles
-rx=&22
-ry=&23
-rz=&24
+.rx SKIP 1
+.ry SKIP 1
+.rz SKIP 1
 
 ; model data
-npts=&30
-nlines=&31
-nsurfs=&32
-maxvis=&33
+.npts SKIP 1
+.nlines SKIP 1
+.nsurfs SKIP 1
+.maxvis SKIP 1
 
-lhs=&40
-rhs=&42
+.lhs SKIP 2
+.rhs SKIP 2
 
-lmul0=&44
-lmul1=&46
-rmul0=&48
-rmul1=&4A
+.lmul0 SKIP 2
+.lmul1 SKIP 2
+.rmul0 SKIP 2
+.rmul1 SKIP 2
 
-surfs=&50
-oldsurfs=&52
-surfsdone=&54
-visible=&56
+.surfs SKIP 2
+.oldsurfs SKIP 2
+.surfsdone SKIP 2
+.visible SKIP 2
 
 ; ptr to the lines array for the current model
-lines=&57
+.lines SKIP 2
 
 ; 64-bit line flag array (8 bytes)
 ; set by 'hiddenlineremoval'
-line=&59
+.line SKIP 8
 
 ; temp address
-odr=&61
+.odr SKIP 2
 
-; logic vars
-space=&63
-p=&64
-f=&65
-flicker=&66
-pause=&67
-culling=&68     ; culling = 0=disabled, 255=enabled
-cullingdb=&69   ; culling key debounce
-opt_filled=&6A
-opt_filled_db=&6B
+
 
 ; line rendering coordinates, start and end
-x0=&70:y0=&71
-x1=&72:y1=&73
+.x0 SKIP 1
+.y0 SKIP 1
+.x1 SKIP 1
+.y1 SKIP 1
 
 ; logic vars
-scr=&74
-err=&76
-errs=&77
-cnt=&78
-ls=&79
-dx=&FF
-dy=&7A
-scrstrt=&7B
-c=&7C
+.scr SKIP 2
+.err SKIP 1
+.errs SKIP 1
+.cnt SKIP 1
+.ls SKIP 1
+.dx SKIP 1
+.dy SKIP 1
+.scrstrt SKIP 1
+
+.transx SKIP 1
+.transy SKIP 1
+.transz SKIP 1
+
+
+
+;.c SKIP 1
 

@@ -27,17 +27,18 @@
             },
             "args": [
                 "make.bat"
-            ]
+            ],
+            "isBuildCommand": true
         },
         {
-            "taskName": "Run '(3d) demo.ssd' in Emulator",
+            "taskName": "Run 'teletextr.ssd' in Emulator",
             "isTestCommand": true,
             "args": [
-                "BeebEm.exe (3d) demo.ssd"
+                "BeebEm.exe teletextr.ssd"
             ]
         },
         {
-            "taskName": "(3d) demo.ssd",
+            "taskName": "src/3d/demo.ssd",
             "problemMatcher": {
                 "owner": "6502",
                 "fileLocation": [
@@ -54,8 +55,7 @@
             },
             "args": [
                 "BeebAsm.exe -v -i src/3d/demo.asm -do src/3d/demo.ssd -boot Main"
-            ],
-            "isBuildCommand": true
+            ]
         }
     ]
 }

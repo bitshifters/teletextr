@@ -154,6 +154,7 @@ ENDMACRO
 
 .reset_model 
 {
+    lda #0:sta transx:sta transy:sta transz
     LDA#coordinates_start AND &FF:STA odr
     LDA#coordinates_start DIV 256:STA odr+1
 
@@ -226,3 +227,119 @@ ENDMACRO
     LDA odr+1:ADC#0:STA odr+1
     RTS
 }
+
+; set the linedraw routine for the model_draw routine
+; on entry X/Y contain the routine address lsb/msb
+.model_set_linedraw
+{
+    stx linedraw_call+1
+    sty linedraw_call+2
+    rts
+}
+
+;----------------------------------------------------------------------------------------------------------
+; present the list of visible lines for the current model to the line renderer
+;----------------------------------------------------------------------------------------------------------
+; inputs -
+;   line[] contains 64-bit array of visible lines to be rendered
+;   linestarts - points to the current models line indices array (p0)
+;   lineends - points to the current models line indices array (p1)
+;   (linestarts & lineends addresses are set by the 'load_next_model' routine)
+;----------------------------------------------------------------------------------------------------------
+; for each linestart and lineend vertex index (p0,p1) the routine fetches the transformed 2D screen coordinate
+; and submits these coordinates to the line renderer.
+; 2D screen coordinates are cached, so they are only ever transformed once, even if referenced by multiple lines
+;----------------------------------------------------------------------------------------------------------
+
+
+IF WIREFRAME
+.model_draw
+
+    ; index of current line in the line list for this model
+    LDA#0:STA lhs+1
+    ; number of lines in the line list for this model
+    LDA nlines:STA lhs
+
+    ; for each line in the linelist
+    ;  fetch low bit of the 64 bit line[] array to determine
+    ;   its visibility, draw only if marked as visible
+    .loopD
+    LSR line+7
+    ROR line+6
+    ROR line+5
+    ROR line+4
+    ROR line+3
+    ROR line+2
+    ROR line+1
+    ROR line
+    BCC nolineD
+
+    ; get the current line index
+    LDY lhs+1
+
+    ; linestarts and lineends are setup when model first loaded
+    ; they point to the line list buffer
+    .linestarts LDA &8000,Y:PHA
+    .lineends LDA &8000,Y:TAX
+    ; fetch screen coords for vertex linelist[1]
+    JSR getcoordinates
+    STA x0:STY y0
+    PLA:TAX
+    ; fetch screen coords for vertex linelist[0]
+    JSR getcoordinates
+    STA x1:STY y1
+
+    ; render the line from x0,y0 to x1,y1
+.linedraw_call
+    JSR linedraw
+
+    .nolineD
+    INC lhs+1   ; next line in list
+    DEC lhs     ; for each line in list
+    BPL loopD
+    RTS
+
+ELSE
+
+; in fill mode, the line bit array contains 2 bits per line.
+; so a maximum of 32 lines for filled objects. (non filled have 64 lines)
+.model_draw
+
+    LDA#0:STA lhs+1
+    LDA nlines:STA lhs
+    .loopD
+    ; two bits per pixel for each line, to indicate colour. 
+    LDA line:AND #3:BEQ nolineD:PHA
+    LDY lhs+1
+    .linestarts LDA &8000,Y:PHA
+    .lineends LDA &8000,Y:TAX
+    JSR getcoordinates
+    STA x0:STY y0
+    PLA:TAX
+    JSR getcoordinates
+    STA x1:STY y1
+    PLA:TAX ; line colour in X
+
+.linedraw_call    
+    JSR linedraw
+    .nolineD
+    ; shift two bits per pixel rather than one
+    LSR line+7
+    ROR line+6
+    ROR line+5
+    ROR line+4
+    ROR line+3
+    ROR line+2
+    ROR line+1
+    ROR line
+    LSR line+7
+    ROR line+6
+    ROR line+5
+    ROR line+4
+    ROR line+3
+    ROR line+2
+    ROR line+1
+    ROR line
+    INC lhs+1:DEC lhs:BPL loopD
+    RTS
+ENDIF

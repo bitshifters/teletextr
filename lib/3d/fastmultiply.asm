@@ -6,7 +6,8 @@
 ; table2 + table1 origins must be page aligned
 
 ALIGN 256
-.table_data SKIP 1536
+;.table_data SKIP 1536
+table_data = &0E00
 
 
 IF CONTIGUOUS_TABLES

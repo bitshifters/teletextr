@@ -77,12 +77,133 @@ ELSE
     LDA#&35:STA scrstrt
 ENDIF
 
+IF MODE7
+    lda#22:jsr &ffee:lda#7:jsr&ffee
+    
+    
+    lda#&7c:sta disp_buffer_addr
+    lda#&78:sta draw_buffer_addr
+
+
+
+
+ELSE
+    lda#22:jsr &ffee:lda#4:jsr&ffee
+ENDIF
     rts
 }
 .update_3d
 {
+    lda #19:jsr &FFF4
+
+IF MODE7
+	jsr mode7_copy_screen_fast
+    lda #0
+    
+	jsr mode7_clear_shadow_fast
+
+IF FALSE
+	lda #144+7	
+	jsr mode7_set_graphics_shadow_fast	
+ELSE
 
 
+    lda #157
+FOR n, 0, 24
+	sta MODE7_VRAM_SHADOW + n*40 + 1
+NEXT    
+    lda #144+7
+FOR n, 0, 24
+	sta MODE7_VRAM_SHADOW + n*40 + 2
+NEXT    
+
+
+    lda #LO(MODE7_VRAM_SHADOW)
+    sta copper_addr+1
+    lda #HI(MODE7_VRAM_SHADOW)
+    sta copper_addr+2
+
+
+
+    lda copper_id
+    pha
+
+    ldy #25
+.copper_loop
+
+
+
+
+    lda copper_id
+
+    lsr a
+    lsr a
+    lsr a
+    and #7
+    tax
+    lda copper_cycle,x
+    inc copper_id
+    clc
+    adc #128
+.copper_addr
+    sta &ffff
+    lda copper_addr+1
+    clc
+    adc #40
+    sta copper_addr+1
+    lda copper_addr+2
+    adc #0
+    sta copper_addr+2
+    dey
+    bne copper_loop
+
+    pla
+    sta copper_id
+    inc copper_id
+
+;FOR n, 0, 24
+;	sta MODE7_VRAM_SHADOW + n*40
+;NEXT
+
+
+
+ENDIF
+
+
+;	lda #0
+;	ldx draw_buffer_addr	
+;	jsr clear_screen_buffer
+	
+;	lda #145
+;	ldx draw_buffer_addr	
+;	jsr mode7_set_graphics_fast
+
+
+IF FALSE	
+	ldx #0
+	ldy #0
+	jsr move_to
+
+	ldx #PLOT_PIXEL_RANGE_X-1
+	ldy #0
+	jsr draw_to
+
+	ldx #PLOT_PIXEL_RANGE_X-1
+	ldy #PLOT_PIXEL_RANGE_Y-1
+	jsr draw_to	
+
+	ldx #0
+	ldy #PLOT_PIXEL_RANGE_Y-1
+	jsr draw_to		
+
+	ldx #0
+	ldy #0
+	jsr draw_to		
+
+    	
+ENDIF
+
+ENDIF
 
 
     ; main loop
@@ -95,6 +216,13 @@ ENDIF
     .nopress STA space
 
 
+;    LDA#&81:LDX#&9E:LDY#&FF:JSR &FFF4:TYA:BEQ skipkey1:INC transx:.skipkey1 ; 'Z'
+
+
+
+
+
+IF MODE7==FALSE
 IF WIREFRAME
     ; wireframe mode runs in 10K mode 4, 1 bit per pixel
     ; and uses a double buffer
@@ -114,6 +242,7 @@ ENDIF
 
     ; clear the draw buffer
     JSR wipe
+ENDIF
 
     ; check for "C" pressed to toggle backface culling
     LDA#&81:LDX#&AD:LDY#&FF:JSR &FFF4
@@ -164,7 +293,7 @@ ENDIF
 .noculling
 
     ; render the model
-    JSR drawlines
+    JSR model_draw
 
 IF WIREFRAME == FALSE
     ; apply shading
@@ -179,8 +308,44 @@ IF WIREFRAME == FALSE
     .filldone
 ENDIF
 
+
+
+
+
+
+
+
+
+
     rts
     JMP frame
+
+MACRO GCOLOUR n
+    EQUB n
+ENDMACRO
+.copper_id EQUB 0
+.copper_cycle 
+
+IF TRUE
+    GCOLOUR 4
+    GCOLOUR 1
+    GCOLOUR 5
+    GCOLOUR 2
+    GCOLOUR 6
+    GCOLOUR 2
+    GCOLOUR 5
+    GCOLOUR 1
+ELSE
+    GCOLOUR 4
+    GCOLOUR 4
+    GCOLOUR 5
+    GCOLOUR 1
+    GCOLOUR 3
+    GCOLOUR 3
+    GCOLOUR 1
+    GCOLOUR 5
+ENDIF    
+    
 
 }
 
@@ -196,6 +361,57 @@ ENDIF
 
     EQUB 23,0,10,32,0,0,0,0,0,0
     EQUB 255
+
+
+
+
+IF MODE7
+
+.linedraw
+{
+ ;   ldx #0
+ ;   ldy #0
+ 
+    ldx x0
+    ldy y0
+;    lda x0
+;    sec
+;    sbc #128
+;    tax
+;    lda y0
+;    sec
+;    sbc #128
+;    tay
+    jsr move_to
+;    lda x1
+;    sec
+;    sbc #128
+;    tax
+;    lda y1
+ ;   sec
+ ;   sbc #128
+ ;   tay
+    
+    ldx x1
+    ldy y1
+    jsr draw_to
+    rts
+    ldx x0
+    ldy y0
+    jsr move_to
+    ldx x1
+    ldy y1
+    jsr draw_to
+    rts
+
+;	jsr move_to
+;	ldx output_verts+2
+;	ldy output_verts+3
+;	jsr draw_to
+
+}
+
+ENDIF
 
 
 .effect_3d_end

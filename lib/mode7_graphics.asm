@@ -86,10 +86,10 @@ NEXT
 OUTPUT_CYCLES (BLIT_ITERATIONS*5+2+3)*BLIT_INTERVAL
 OUTPUT_SIZE mode7_clear_screen_fast
 
-
+; A contains clear char
 .mode7_clear_shadow_fast
 {
-	lda #0
+
 	ldx #BLIT_INTERVAL-1
 	.blit_loop
 FOR n, 0, BLIT_ITERATIONS-1		
