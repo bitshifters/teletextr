@@ -156,3 +156,46 @@ demo
 
 one big load
 &
+
+## scheme 5
+
+root/
+    lib/ 
+        contains the common code
+
+    src/ 
+        contains the demo code
+
+        src/effect*/ contains an "effect"
+
+            Each effect needs:
+                code.asm 
+                data.asm
+
+        src/main.asm 
+
+            includes all common code
+            includes all effects code
+            contains core demo player routine
+            (can be hacked for testing one effect in isolation)
+            contains effect sequencer
+            contains different routines for draw/display buffer configuration
+            loads data banks
+            compiles data banks into 16Kb SWR banks
+
+
+    teletextr contains the main ssd project
+
+
+## sequence format
+
+    
+    sequence
+        segment
+            duration (in 1/50th sec)
+            list of effect routines
+            0
+
+
+
+
