@@ -1,253 +1,165 @@
-\\ Common global defines
+
+\ ******************************************************************
+\ *	Headers
+\ ******************************************************************
+
+; Allocate vars in ZP
+.zp_start
+ORG 0
+GUARD &8f
+
+;----------------------------------------------------------------------------------------------------------
+; Common global defines
+;----------------------------------------------------------------------------------------------------------
 INCLUDE "lib/bbc.h.asm"
 INCLUDE "lib/bbc_utils.h.asm"
 
+;----------------------------------------------------------------------------------------------------------
+; Common code headers
+;----------------------------------------------------------------------------------------------------------
+; Include common code headers here - these can declare ZP vars from the pool using SKIP...
 
-\ ******************************************************************
-\ *	Define fast (zero page) runtime variables
-\ ******************************************************************
-
-\\ Our own app variables
-ORG &40
-GUARD &9F							; user ZP + econet ZP
-
-
-
-\\ Any includes here can declare ZP vars from the pool using SKIP
 INCLUDE "lib/exomiser.h.asm"
-INCLUDE "lib/vgmplayer.h.asm"
 
+
+INCLUDE "lib/mode7_graphics.h.asm"
+INCLUDE "lib/mode7_plot_pixel.h.asm"
+INCLUDE "lib/bresenham.h.asm"
+
+INCLUDE "lib/3d/3d.h.asm"
+
+.zp_end
+
+
+;----------------------------------------------------------------------------------------------------------
+; Effect code headers
+;----------------------------------------------------------------------------------------------------------
+
+
+
+\ ******************************************************************
+\ *	Code
+\ ******************************************************************
 
 ORG &1100
 
 
 .start
 
+;----------------------------------------------------------------------------------------------------------
+; Common code
+;----------------------------------------------------------------------------------------------------------
+; Include common code used by effects here...
 
-\ ******************************************************************
-\ *	Code entry
-\ ******************************************************************
 INCLUDE "lib/print.asm"
 INCLUDE "lib/exomiser.asm"
+INCLUDE "lib/vgmplayer.h.asm"
 INCLUDE "lib/vgmplayer.asm"
 INCLUDE "lib/swr.asm"
 INCLUDE "lib/filesys.asm"
 
+ALIGN 256
+WIREFRAME=TRUE
+MODE7=TRUE
+; included first to ensure page alignment
+INCLUDE "lib/3d/fastmultiply.asm"
+INCLUDE "lib/3d/sincos.asm"
+INCLUDE "lib/3d/maths.asm"
+INCLUDE "lib/3d/culling.asm"
 
-.bank_file_music    EQUS "music", 13
-
-MUSIC_BANK_NO = 0
-
-.main
-{
-\\ ***** System initialise ***** \\
-
-	\\ *FX 200,3 - clear memory on break as we use OS memory areas and can cause nasty effects
-	LDA #200
-	LDX #3
-	JSR osbyte			
-
-
-    jsr swr_init
-    bne swr_ok
-
-    MPRINT swr_fail_text
-    rts
-
-.swr_fail_text EQUS "No SWR banks found.", 13, 10, 0
-.swr_bank_text EQUS "Found % SWR banks.", 13, 10, 0
-.swr_bank_text2 EQUS " Bank %", 13, 10, 0
-.loading_bank_text EQUS "Loading bank", 13, 10, 0
-.loading_bank_text2 EQUS "Bank loaded", 13, 10, 0
-    .swr_ok
-
-    MPRINTAP    swr_bank_text,swr_ram_banks_count
-    ldx #0
-.swr_print_loop
-    lda swr_ram_banks,x
-    MPRINTA    swr_bank_text2
-    inx
-    cpx swr_ram_banks_count
-    bne swr_print_loop
-    
-    MPRINT loading_bank_text
-
-	\\ Initialise music player - pass in VGM_stream_data address
-	\\ parses header from stream
-
-    lda #MUSIC_BANK_NO
-    jsr swr_select_slot
-    lda #&80
-    ldx #LO(bank_file_music)
-    ldy #HI(bank_file_music)
-    jsr file_load
-
-    MPRINT loading_bank_text2
-    rts
-
-    ; runtime
-
-	JSR clear_vram
-    
-	\\ Set MODE 7
-	LDA #22: JSR oswrch
-	LDA #7: JSR oswrch
-
-	\\ Turn off cursor by directly poking crtc
-	SEI
-	LDA #10: STA &FE00
-	LDA #32: STA &FE01
-	CLI	
-
-
-	LDX #&04
-	LDY #&80
-	JSR	vgm_init_stream
-
-    \\ Start our event driven fx
-    ldx #LO(event_handler)
-    ldy #HI(event_handler)
-    JSR start_eventv
-
-
-;    jsr init_3d
-
-\\ can never return to OS as we use all memory
-    .loop
-    lda #19:jsr osbyte
-
- ;   jsr update_3d
-
-
-    jmp loop
-}
-
-
-\\ reset all memory from &3000 to &8000 to zero
-\\ hides unsightly mode switches
-.clear_vram
-{
-	sei
-	lda #&30
-	sta loop2+2
-	lda #0
-	ldy #&50
-.loop
-	ldx #0
-.loop2
-	sta &3000,x
-	inx
-	bne loop2
-	inc loop2+2
-	dey
-	bne loop
-	cli
-	rts
-}
+INCLUDE "lib/mode7_graphics.asm"
+INCLUDE "lib/mode7_plot_pixel.asm"
+INCLUDE "lib/bresenham.asm"
 
 
 
-.event_handler
-{
-	php
-	cmp #4
-	bne not_vsync
+INCLUDE "lib/3d/model.asm"
 
-	\\ Preserve registers
-	pha:txa:pha:tya:pha
+;----------------------------------------------------------------------------------------------------------
+; demo config
+;----------------------------------------------------------------------------------------------------------
+INCLUDE "src/config.asm"
 
-    lda &f4
-    tay
+;----------------------------------------------------------------------------------------------------------
+; Effect code
+;----------------------------------------------------------------------------------------------------------
+; Include your effects here...
 
-    ; page in the music bank
-    lda #MUSIC_BANK_NO
-    jsr swr_select_slot
 
-	\\ Poll the music player
-	jsr poll_player
-    
-    ; restore previously paged ROM bank
-    tya
-    jsr swr_select_bank
 
-  ;  lda#65:jsr oswrch
+INCLUDE "src/3d/data.asm"	; should be in a bank
 
-	\\ Restore registers
-	pla:tay:pla:tax:pla
+INCLUDE "src/effects/3dshape.asm"
+INCLUDE "src/effects/copybuffer.asm"
+INCLUDE "src/effects/greenscreen.asm"
+INCLUDE "src/effects/copperbars.asm"
 
-	\\ Return
-    .not_vsync
-	plp
-	rts
-}
 
 
 \ ******************************************************************
-\ *	Event Vector Routines
+\ *	Code entry
 \ ******************************************************************
 
-\\ System vars
-.old_eventv				SKIP 2
-
-.start_eventv				; new event handler in X,Y
-{
-	\\ Remove interrupt instructions
-	lda #NOP_OP
-	sta PSG_STROBE_SEI_INSN
-	sta PSG_STROBE_CLI_INSN
-	
-	\\ Set new Event handler
-	sei
-	LDA EVENTV
-	STA old_eventv
-	LDA EVENTV+1
-	STA old_eventv+1
-
-	stx EVENTV
-	sty EVENTV+1
-	cli
-	
-	\\ Enable VSYNC event.
-	lda #14
-	ldx #4
-	jsr osbyte
-	rts
-}
-	
-.stop_eventv
-{
-	\\ Disable VSYNC event.
-	lda #13
-	ldx #4
-	jsr osbyte
-
-	\\ Reset old Event handler
-	SEI
-	LDA old_eventv
-	STA EVENTV
-	LDA old_eventv+1
-	STA EVENTV+1
-	CLI 
-
-	\\ Insert interrupt instructions back
-	lda #SEI_OP
-	sta PSG_STROBE_SEI_INSN
-	lda #CLI_OP
-	sta PSG_STROBE_CLI_INSN
-	rts
-}
-
-
-
+INCLUDE "src/main.asm"
 
 .end
 
-PRINT "Code from", ~start, "to", ~end, ", size is", (end-start), "bytes"
+
+
 SAVE "Main", start, end, main
 
 
+\ ******************************************************************
+\ *	Data
+\ ******************************************************************
 
-PUTFILE "bin/music.bin", "music", &8000
-PUTFILE "bin/3d.bin", "3d", &8000
+;----------------------------------------------------------------------------------------------------------
+; SWR Bank 0
+;----------------------------------------------------------------------------------------------------------
+
+CLEAR &8000, &BFFF
+ORG &8000
+GUARD &BFFF
+.bank0_start
+INCBIN "src/music/data/music.raw.exo" 
+.bank0_end
+SAVE "Bank0", bank0_start, bank0_end, &8000
 
 
+;----------------------------------------------------------------------------------------------------------
+; SWR Bank 1
+;----------------------------------------------------------------------------------------------------------
+
+CLEAR &8000, &BFFF
+ORG &8000
+GUARD &BFFF
+.bank1_start
+;...
+.bank1_end
+
+;----------------------------------------------------------------------------------------------------------
+; SWR Bank 2
+;----------------------------------------------------------------------------------------------------------
+
+CLEAR &8000, &BFFF
+ORG &8000
+GUARD &BFFF
+.bank2_start
+;...
+.bank2_end
+
+;----------------------------------------------------------------------------------------------------------
+; SWR Bank 3
+;----------------------------------------------------------------------------------------------------------
+
+CLEAR &8000, &BFFF
+ORG &8000
+GUARD &BFFF
+.bank3_start
+;...
+.bank3_end
+
+PRINT "ZeroPage from", ~zp_start, "to", ~zp_end, ", size is", (zp_end-zp_start), "bytes"
+PRINT "Code from", ~start, "to", ~end, ", size is", (end-start), "bytes"
+
+PRINT "Build successful."

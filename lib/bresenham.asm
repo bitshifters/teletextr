@@ -51,7 +51,7 @@
 	.loopx
 ;			clc                 ;needed, as previous cmp could set carry. could be saved if we always count up and branch with bcc;
 			
-			PLOT_PIXEL
+			PLOT_PIXEL_CLIPPED
 
 	.errx	lda #0			; MODIFIED
 			sec
@@ -76,7 +76,7 @@
 	.loopy
 ;			clc                 ;needed, as previous cmp could set carry. could be saved if we always count up and branch with bcc;
 
-			PLOT_PIXEL
+			PLOT_PIXEL_CLIPPED
 
 	.erry 	lda #0				; MODIFIED
 			sec

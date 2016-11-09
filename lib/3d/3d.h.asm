@@ -97,6 +97,7 @@ CONTIGUOUS_TABLES = TRUE
 .transz SKIP 1
 
 
+.culling SKIP 1    ; culling = 0=disabled, 255=enabled
 
 ;.c SKIP 1
 

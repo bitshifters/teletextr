@@ -189,13 +189,35 @@ root/
 
 ## sequence format
 
-    
-    sequence
-        segment
-            duration (in 1/50th sec)
-            list of effect routines
-            0
 
+MD_SEGMENT 3.0
+    MD_EFFECT  effect_bufferclear, 0,0,TRUE
+    MD_EFFECT  effect_copper1, 0,0,TRUE
+    MD_EFFECT  effect_3dshapes, 0,0,TRUE
+
+    
+sequence:
+    segment:
+        duration (in 1/50th sec)
+        effects:
+            effect:
+                duration (0 if same as segment)
+                start (offset in 1/50th sec)
+                effect routine
+                initflag (default false)
+                interpolators?
+
+IF ASSEMBLE_HEADER
+    .. header stuff
+ENDIF
+
+IF ASSEMBLE_CODE
+    .. code stuff
+ENDIF
+
+IF ASSEMBLE_DATA
+    .. data stuff
+ENDIF
 
 
 
