@@ -11,7 +11,11 @@ ENDMACRO
 
 
 
-.myfunc
-{
-    rts
-}
+; Fade off the BBC Computer screen
+; CEEFAX page
+; bzz with TESTCARD "BITSHIFTERS TV" & 1Khz tone
+; flicker off
+; music starts
+;
+; bitshifters presents
+; 'teletextr demo'

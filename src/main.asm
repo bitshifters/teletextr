@@ -24,6 +24,7 @@ MUSIC_SLOT_NO = 0
 .swr_bank_text2 EQUS " Bank %", 13, 10, 0
 .loading_bank_text EQUS "Loading bank", 13, 10, 0
 .loading_bank_text2 EQUS "Bank loaded", 13, 10, 0
+.test_print_number EQUS "%", 13,10,0
     .swr_ok
 
     MPRINTAP    swr_bank_text,swr_ram_banks_count
@@ -51,8 +52,6 @@ MUSIC_SLOT_NO = 0
     
 
     ; runtime
-
-	JSR clear_vram
     
 	\\ Set MODE 7
 	LDA #22: JSR oswrch
@@ -74,52 +73,33 @@ MUSIC_SLOT_NO = 0
     ldy #HI(event_handler)
     JSR start_eventv
 
+;-------------------------------------------------------------
+; Main loop
+;-------------------------------------------------------------
 
-;    jsr init_3d
-
-
-
+\\ Initialise effect layers
  	jsr effect_copybuffer_init
 	jsr effect_3dshape_init
 
-\\ can never return to OS as we use all memory
     .loop
     lda #19:jsr osbyte
 
- ;   jsr update_3d
 
-
+\\ render effect layers
  	jsr effect_copybuffer_update
-	jsr effect_copperbars_update
+
 	jsr effect_greenscreen_update
+	jsr effect_linebox_update
+
+	jsr effect_copperbars_update
 	jsr effect_3dshape_update
 
 
+\\ can never return to OS as we use all memory
     jmp loop
 }
 
 
-\\ reset all memory from &3000 to &8000 to zero
-\\ hides unsightly mode switches
-.clear_vram
-{
-	sei
-	lda #&30
-	sta loop2+2
-	lda #0
-	ldy #&50
-.loop
-	ldx #0
-.loop2
-	sta &3000,x
-	inx
-	bne loop2
-	inc loop2+2
-	dey
-	bne loop
-	cli
-	rts
-}
 
 
 

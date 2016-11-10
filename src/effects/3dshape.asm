@@ -1,7 +1,7 @@
 
 EFFECT_3DSHAPE_ORG = *
 
-ORG &90
+;ORG &90
 
 ; logic vars
 .space SKIP 1
@@ -14,44 +14,13 @@ ORG &90
 .opt_filled SKIP 1
 .opt_filled_db SKIP 1
 
-ORG EFFECT_3DSHAPE_ORG
+;ORG EFFECT_3DSHAPE_ORG
 
 .effect_3dshape  EFFECT_HEADER  effect_3dshape_update,effect_3dshape_init,0
 
 .effect_3dshape_update
 {
 
-IF TRUE
-    lda #0
-    sta x0:sta y0
-    lda #64
-    sta x1:sta y1
-    jsr linedraw	
-ENDIF
-
-IF TRUE	
-	ldx #0
-	ldy #0
-	jsr move_to
-
-	ldx #PLOT_PIXEL_RANGE_X-1
-	ldy #0
-	jsr draw_to
-
-	ldx #PLOT_PIXEL_RANGE_X-1
-	ldy #PLOT_PIXEL_RANGE_Y-1
-	jsr draw_to	
-
-	ldx #0
-	ldy #PLOT_PIXEL_RANGE_Y-1
-	jsr draw_to		
-
-	ldx #0
-	ldy #0
-	jsr draw_to		
-
-    	
-ENDIF    
 
 
 
