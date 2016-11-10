@@ -27,6 +27,7 @@ INCLUDE "lib/mode7_plot_pixel.h.asm"
 INCLUDE "lib/bresenham.h.asm"
 
 INCLUDE "lib/3d/3d.h.asm"
+INCLUDE "src/main.h.asm"
 
 .zp_end
 

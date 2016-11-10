@@ -86,7 +86,11 @@ ENDIF
     LDA pause:BEQ nrot
 
     ; rotate the model
+    ldx delta_time
+.delta_loop
     JSR rotate
+    dex
+    BNE delta_loop
 
     .nrot
 

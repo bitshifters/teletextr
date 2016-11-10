@@ -1,4 +1,6 @@
 
+
+
 .bank_file_music    EQUS "Bank0", 13
 
 MUSIC_SLOT_NO = 0
@@ -84,6 +86,11 @@ MUSIC_SLOT_NO = 0
     .loop
     lda #19:jsr osbyte
 
+	; get delta time since last update
+	ldx	vsync_count
+	lda #0
+	sta vsync_count
+	stx delta_time
 
 \\ render effect layers
  	jsr effect_copybuffer_update
@@ -111,6 +118,13 @@ MUSIC_SLOT_NO = 0
 
 	\\ Preserve registers
 	pha:txa:pha:tya:pha
+
+	inc vsync_time+0	; 5
+	bne no_timehi		; 2/3
+	inc vsync_time+1	; 5
+.no_timehi 
+	inc vsync_count
+
 
     lda &f4
     tay
@@ -163,6 +177,11 @@ MUSIC_SLOT_NO = 0
 	sty EVENTV+1
 	cli
 	
+	lda #0
+	sta vsync_time+0
+	sta vsync_time+1
+	sta vsync_count
+
 	\\ Enable VSYNC event.
 	lda #14
 	ldx #4

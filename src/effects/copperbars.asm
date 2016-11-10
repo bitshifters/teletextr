@@ -62,7 +62,13 @@ NEXT
 
     pla
     sta copper_id
+
+
+    ldx delta_time
+.delta_loop
     inc copper_id
+    dex
+    bne delta_loop
 
 ;FOR n, 0, 24
 ;	sta MODE7_VRAM_SHADOW + n*40
