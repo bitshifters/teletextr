@@ -6,17 +6,22 @@
 ; table2 + table1 origins must be page aligned
 
 ALIGN 256
-;.table_data SKIP 1536
-table_data = &0E00
+
 
 
 IF CONTIGUOUS_TABLES
+.table_data SKIP 1536
+;table_data = &0E00
+
 ; specify contiguous tables
     SQUARETABLE2_LSB = table_data
     SQUARETABLE1_LSB = SQUARETABLE2_LSB+256
     SQUARETABLE2_MSB = SQUARETABLE1_LSB+512
     SQUARETABLE1_MSB = SQUARETABLE2_MSB+256
 ELSE
+
+
+
 ; msb & lsb tables can be in different memory locations
 ; enables us to move the program org down a bit
 ; as we can spread the two 768 bytes tables around the memory map 
