@@ -1,9 +1,6 @@
 
 
 
-
-.effect_linebox  EFFECT_HEADER  effect_linebox_update,0,0
-
 .effect_linebox_update
 {
 
@@ -15,7 +12,7 @@ IF TRUE
     jsr linedraw	
 ENDIF
 
-IF FALSE	
+IF TRUE	
 	ldx #0
 	ldy #0
 	jsr move_to
@@ -38,7 +35,6 @@ IF FALSE
 
     	
 ENDIF    
-
 
 
     rts    

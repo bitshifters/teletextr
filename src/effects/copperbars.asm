@@ -1,12 +1,9 @@
 
 
 
-
-.effect_copperbars  EFFECT_HEADER  effect_copperbars_update,0,0
-
 .effect_copperbars_update
 {
-CB_XOFFSET = 30
+CB_XOFFSET = 0
 
 ;bg
     lda #157

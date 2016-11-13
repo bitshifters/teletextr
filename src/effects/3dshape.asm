@@ -16,8 +16,6 @@ EFFECT_3DSHAPE_ORG = *
 
 ;ORG EFFECT_3DSHAPE_ORG
 
-.effect_3dshape  EFFECT_HEADER  effect_3dshape_update,effect_3dshape_init,0
-
 .effect_3dshape_update
 {
 

@@ -206,18 +206,3 @@ sequence:
                 effect routine
                 initflag (default false)
                 interpolators?
-
-IF ASSEMBLE_HEADER
-    .. header stuff
-ENDIF
-
-IF ASSEMBLE_CODE
-    .. code stuff
-ENDIF
-
-IF ASSEMBLE_DATA
-    .. data stuff
-ENDIF
-
-
-

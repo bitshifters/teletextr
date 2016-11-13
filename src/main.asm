@@ -22,18 +22,18 @@ MUSIC_SLOT_NO = 0
     rts
 
 .swr_fail_text EQUS "No SWR banks found.", 13, 10, 0
-.swr_bank_text EQUS "Found % SWR banks.", 13, 10, 0
-.swr_bank_text2 EQUS " Bank %", 13, 10, 0
+.swr_bank_text EQUS "Found %b", LO(swr_ram_banks_count), HI(swr_ram_banks_count), " SWR banks.", 13, 10, 0
+.swr_bank_text2 EQUS " Bank %a", 13, 10, 0
 .loading_bank_text EQUS "Loading bank", 13, 10, 0
 .loading_bank_text2 EQUS "Bank loaded", 13, 10, 0
-.test_print_number EQUS "%", 13,10,0
+.test_print_number EQUS "%a", 13,10,0
     .swr_ok
 
-    MPRINTAP    swr_bank_text,swr_ram_banks_count
+    MPRINT    swr_bank_text
     ldx #0
 .swr_print_loop
     lda swr_ram_banks,x
-    MPRINTA    swr_bank_text2
+    MPRINT    swr_bank_text2
     inx
     cpx swr_ram_banks_count
     bne swr_print_loop
@@ -70,6 +70,15 @@ MUSIC_SLOT_NO = 0
 	LDY #&80
 	JSR	vgm_init_stream
 
+
+
+	\\ init
+	lda #0
+	sta vsync_time+0
+	sta vsync_time+1
+	sta vsync_count
+
+
     \\ Start our event driven fx
     ldx #LO(event_handler)
     ldy #HI(event_handler)
@@ -79,9 +88,9 @@ MUSIC_SLOT_NO = 0
 ; Main loop
 ;-------------------------------------------------------------
 
-\\ Initialise effect layers
- 	jsr effect_copybuffer_init
-	jsr effect_3dshape_init
+	ldx #LO(demo_sequence_start)
+	ldy #HI(demo_sequence_start)
+	jsr sequencer_init
 
     .loop
     lda #19:jsr osbyte
@@ -92,15 +101,7 @@ MUSIC_SLOT_NO = 0
 	sta vsync_count
 	stx delta_time
 
-\\ render effect layers
- 	jsr effect_copybuffer_update
-
-	jsr effect_greenscreen_update
-	jsr effect_linebox_update
-
-	jsr effect_copperbars_update
-	jsr effect_3dshape_update
-
+	jsr sequencer_update
 
 \\ can never return to OS as we use all memory
     jmp loop
@@ -140,7 +141,6 @@ MUSIC_SLOT_NO = 0
     tya
     jsr swr_select_bank
 
-  ;  lda#65:jsr oswrch
 
 	\\ Restore registers
 	pla:tay:pla:tax:pla
@@ -151,63 +151,12 @@ MUSIC_SLOT_NO = 0
 	rts
 }
 
-
-\ ******************************************************************
-\ *	Event Vector Routines
-\ ******************************************************************
-
-\\ System vars
-.old_eventv				SKIP 2
-
-.start_eventv				; new event handler in X,Y
+.player_init
 {
-	\\ Remove interrupt instructions
-	lda #NOP_OP
-	sta PSG_STROBE_SEI_INSN
-	sta PSG_STROBE_CLI_INSN
-	
-	\\ Set new Event handler
-	sei
-	LDA EVENTV
-	STA old_eventv
-	LDA EVENTV+1
-	STA old_eventv+1
-
-	stx EVENTV
-	sty EVENTV+1
-	cli
-	
-	lda #0
-	sta vsync_time+0
-	sta vsync_time+1
-	sta vsync_count
-
-	\\ Enable VSYNC event.
-	lda #14
-	ldx #4
-	jsr osbyte
 	rts
 }
-	
-.stop_eventv
+
+.player_update
 {
-	\\ Disable VSYNC event.
-	lda #13
-	ldx #4
-	jsr osbyte
-
-	\\ Reset old Event handler
-	SEI
-	LDA old_eventv
-	STA EVENTV
-	LDA old_eventv+1
-	STA EVENTV+1
-	CLI 
-
-	\\ Insert interrupt instructions back
-	lda #SEI_OP
-	sta PSG_STROBE_SEI_INSN
-	lda #CLI_OP
-	sta PSG_STROBE_CLI_INSN
 	rts
 }

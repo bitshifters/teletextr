@@ -1,121 +1,200 @@
 
+.print_temp EQUB 0
 
 ; print given string with one argument value supplied in A
 ; preserves all registers
-MACRO MPRINTA    stringaddr
-    sta &9f:txa:pha:tya:pha
+MACRO MPRINT    stringaddr
+    sta print_temp:txa:pha:tya:pha
     ldx #LO(stringaddr)
     ldy #HI(stringaddr)
-    lda &9f
-    jsr print_arg
-    pla:tay:pla:tax:lda &9f
-ENDMACRO
-
-; print given string with one argument value as parameter address
-; preserves all registers
-MACRO MPRINTAP    stringaddr,valueadr
-    pha:txa:pha:tya:pha
-    ldx #LO(stringaddr)
-    ldy #HI(stringaddr)
-    lda valueadr
-    jsr print_arg
-    pla:tay:pla:tax:pla
-ENDMACRO
-
-
-
-
-
-; print given string, no arguments
-; preserves all registers
-MACRO MPRINT        stringaddr  
-    pha:txa:pha:tya:pha
-    ldx #LO(stringaddr)
-    ldy #HI(stringaddr)
+    lda print_temp
     jsr print
-    pha:txa:pha:tya:pha    
+    pla:tay:pla:tax:lda print_temp
 ENDMACRO
 
-; X/Y address of ZT string to print
-; does not process any arguments
-.print
+MACRO MPRINTMEM stringaddr, bufferaddr
+    sta print_temp:txa:pha:tya:pha
+    ldx #LO(bufferaddr)
+    ldy #HI(bufferaddr)
+    jsr print_set_output_buffer
+    ldx #LO(stringaddr)
+    ldy #HI(stringaddr)
+    lda print_temp
+    jsr print
+    jsr print_set_output_os
+    pla:tay:pla:tax:lda print_temp
+ENDMACRO
+
+
+
+
+; Select OSWRCH as the output stream
+.print_set_output_os
 {
-    stx output_chr+1
-    sty output_chr+2
-    ldx #0    
-.output_chr 
-    lda &FFFF,X
-    beq done
-    jsr oswrch
-    inx
-    jmp output_chr
-.done
+    lda #LO(oswrch)
+    sta print_char+1
+    lda #HI(oswrch)
+    sta print_char+2
+    rts
+}
+
+; Select a memory buffer as the output stream
+; X,Y is the output buffer address LSB/MSB
+.print_set_output_buffer
+{
+    lda #LO(render_char)
+    sta print_char+1
+    lda #HI(render_char)
+    sta print_char+2
+    stx render_char+1
+    sty render_char+2
     rts
 }
 
 
-; X/Y address of ZT string to print containing one 8-bit arg, where embedded % is replaced by arg value
-; A is value of argument
-; EQUS "text %"
-.print_arg
+
+; X/Y address of ZT string to print 
+; Strings may contain embedded %a which is replaced by value of A 
+; Strings may contain embedded %w which must be followed by a 16-bit address containing the 16-bit word value to be printed 
+; Strings may contain %b which must be followed by a 16-bit address containing the 8-bit value to be printed 
+; Strings may contain %v which must be followed by a 16-bit number to be printed
+; Strings may contain %% to print a % character
+; 
+; eg.
+; EQUS "text %a", 0
+; EQUS "memory address value is %w", memory_address_lsb, memory_address_msb, ".", 0
+.print
 {
-    stx output_chr+1
-    sty output_chr+2
+    stx print_fetch_char+1
+    sty print_fetch_char+2
     tay
-    ldx #0
-.output_chr 
-    lda &FFFF,X
-    beq done
+
+.loop
+    jsr print_fetch_char
+
+    cmp #0
+    bne continue
+    rts
+
+.continue
     cmp #'%'
-    bne no_arg
+    beq check_arg
 
+    jsr print_char
+    jmp loop
+
+.check_arg
+
+    jsr print_fetch_char
+    cmp #'%'
+    bne check_arg_h
+
+    jsr print_char
+    jmp loop
+
+.check_arg_h
+    cmp #'h'
+    bne check_arg_v
+
+    ; todo
+
+    jmp loop
+
+.hex2ascii EQUS "0123456789ABCDEF"
+
+
+.check_arg_v
+    cmp #'v'
+    bne check_arg_a
+
+    jsr print_fetch_char
+    sta binary_in+0
+    jsr print_fetch_char
+    sta binary_in+1
+
+    jsr bin2bcd16
+    jmp output_ascii
+
+    jmp loop
+
+
+.check_arg_a
+    cmp #'a'
+    bne check_arg_b
+
+    ; single byte argument
     ; convert binary number to decimal
-  
-
     tya
     jsr bin2bcd8
-    ; 16 bit bcd_out result
-    ; but 8 bit only needs 3 decimal chars
+    jmp output_ascii
 
-    lda bcd_out+1
-    and #&0f
-    bne no_lz
-    lda bcd_out+0
-    and #&f0
-    beq skip_lz2    
-    bne skip_lz
-.no_lz
-    clc
-    adc #48
-    jsr oswrch
-.skip_lz
-    lda bcd_out+0
-    and #&f0
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    clc
-    adc #48
-    jsr oswrch
+.check_arg_b
+    cmp #'b'
+    bne check_arg_w
 
-.skip_lz2
-    lda bcd_out+0
-    and #&0f
-    clc
-    adc #48
 
-.no_arg    
-    jsr oswrch
+    ; word address argument
+    ; convert binary number to decimal
+    jsr print_fetch_char
+    sta arg_addr8+1
+    jsr print_fetch_char
+    sta arg_addr8+2
+
+    ; copy 8-bit value stored at word address cont
+.arg_addr8
+    lda &FFFF
+    jsr bin2bcd8
+    jmp output_ascii
+
+
+
+.check_arg_w
+    cmp #'w'
+    bne loop    ; unknown so ignore and continue
+
+    ; word address argument
+    ; convert binary number to decimal
+    jsr print_fetch_char
+    sta arg_addr16+1
+    jsr print_fetch_char
+    sta arg_addr16+2
+
+    ; copy 16-bit value stored at word address cont
+    ldx #0
+.arg_addr16
+    lda &FFFF,x
+    sta binary_in,x
     inx
-    jmp output_chr
-.done
-    rts
+    cpx #2
+    bne arg_addr16
+
+    jsr bin2bcd16
+    ; 16 bit bcd_out result
+    ; 16 bit value generates max 5 decimal chars
+
+    ; falls through to output_ascii
+
+.output_ascii
+
+    ; 16 bit bcd_out result
+    ; 8 bit value generates max 3 decimal chars
+    jsr bcd2ascii
+
+    ldx #0
+.ascii_loop
+    lda ascii_out,x
+    beq ascii_done
+    jsr print_char
+    inx
+    bne ascii_loop  
+.ascii_done    
+    jmp loop
 }
 
      
-.binary_in       EQUW 0 ; value to convert (LSB first) 65536
+.binary_in      EQUW 0 ; value to convert (LSB first) 65536
 .bcd_out        SKIP 3 ; bcd_out output, input of 0xffff will become $36, $55, $06
+.ascii_out      SKIP 7 ; zero terminated ascii string output
 
 ; A contains 8-bit value to convert
 .bin2bcd8
@@ -153,5 +232,112 @@ ENDMACRO
     CLD         ; Back to binary
     PLA
     TAX
+    rts
+}
+; take a 3-byte bcd encoded number and convert to an ascii zero terminated string
+; with leading zeros stripped 
+; result placed into 'ascii_out'
+; preserves X,Y
+.bcd2ascii
+{
+    txa
+    pha
+    tya
+    pha
+
+    ; convert each BCD byte to two ascii bytes
+    ldx #0
+    ldy #2
+.bcd_loop
+    lda bcd_out,y
+    and #&f0
+    lsr a
+    lsr a
+    lsr a
+    lsr a   
+    clc
+    adc #48
+    sta ascii_out,x
+    inx
+
+    lda bcd_out,y
+    and #&0f
+    clc
+    adc #48
+    sta ascii_out,x
+    inx    
+
+    dey
+    bpl bcd_loop
+
+    ; zero terminate
+    lda #0
+    sta ascii_out,x
+
+    ; strip leading zeros by copying numeric part of string
+    ; to the front of the ascii_out array
+    ldx #0
+.lz_loop
+    lda ascii_out,x
+    cmp #48
+    bne lz_out
+    inx
+    cpx #6
+    bne lz_loop
+
+; all zeros, so make sure at least one zero is emitted
+    dex
+
+.lz_out
+    ldy #0
+.lz_loop2
+    lda ascii_out,x
+    sta ascii_out,y
+    beq lz_done
+    inx
+    iny
+    cpx #6
+    bne lz_loop2
+.lz_done
+
+    ; ??? not sure why I need this, above code should copy the ZT byte also.
+    lda #0
+    sta ascii_out,y
+
+    pla
+    tay
+    pla
+    tax
+    rts
+}
+
+
+; send A to currently selected output stream
+; set by print_set_output_buffer or print_set_output_os, defaults to OSWRCH
+.print_char
+{
+    jsr oswrch      ; MODIFIED   
+    rts
+}
+
+; send the byte in A to the current output buffer
+.render_char
+{
+    sta &FFFF         ; MODIFIED
+    inc render_char+1
+    bne done
+    inc render_char+2
+.done
+    rts
+}
+
+; fetch the next byte from the current input stream
+.print_fetch_char
+{
+    lda &FFFF       ; MODIFIED
+    inc print_fetch_char+1
+    bne done
+    inc print_fetch_char+2
+.done
     rts
 }
