@@ -1,4 +1,6 @@
 
+; hacked mode7 version of Nick Jamesons 3d renderer
+
 EFFECT_3DSHAPE_ORG = *
 
 ;ORG &90

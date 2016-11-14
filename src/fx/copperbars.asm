@@ -1,5 +1,7 @@
 
-
+; extremely dodgy scrolling bars
+; hacked together as a test for the script system
+; not really even good copperbars!
 
 .fx_copperbars_update
 {

@@ -1,5 +1,5 @@
 
-
+; fakey testcard effect
 
 .fx_testcard_text
 ;EQUS "0123456789012345678901234567890123456789"
