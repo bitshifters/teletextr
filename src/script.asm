@@ -1,17 +1,5 @@
 
-; update_routine - 0 if none, A contains number of frames to update, X/Y contain parameters
-; init_routine - 0 if none, no parameters passed
-; databank - the SWR databank containing the datafiles for this effect
-
-
-MACRO EFFECT_HEADER    update_routine, init_routine, databank
-    EQUW    init_routine
-    EQUW    update_routine
-    EQUB    databank
-ENDMACRO
-
-
-
+; Script command tokens
 SCRIPTID_SEGMENT_START=1
 SCRIPTID_SEGMENT_END=2
 
@@ -63,35 +51,35 @@ ENDMACRO
 
 
 
-.sequence_time              EQUW 0
-.sequence_ptr               EQUW 0
-.sequence_segment_ptr       EQUW 0
-.sequence_segment_time      EQUW 0
-.sequence_segment_duration  EQUW 0
-.sequence_segment_id        EQUB 0
+.script_time              EQUW 0
+.script_ptr               EQUW 0
+.script_segment_ptr       EQUW 0
+.script_segment_time      EQUW 0
+.script_segment_duration  EQUW 0
+.script_segment_id        EQUB 0
 
 
 
 
 ; X/Y contain ptr to sequence data
-.sequencer_init
+.script_init
 {
-    stx sequence_ptr+0
-    sty sequence_ptr+1
+    stx script_ptr+0
+    sty script_ptr+1
 
     lda #0
     
-    sta sequence_segment_ptr+0
-    sta sequence_segment_ptr+1
+    sta script_segment_ptr+0
+    sta script_segment_ptr+1
 
-    sta sequence_time+0
-    sta sequence_time+1
+    sta script_time+0
+    sta script_time+1
 
-    sta sequence_segment_time+0
-    sta sequence_segment_time+1
+    sta script_segment_time+0
+    sta script_segment_time+1
 
-    sta sequence_segment_duration+0
-    sta sequence_segment_duration+1
+    sta script_segment_duration+0
+    sta script_segment_duration+1
 
     rts
 }
@@ -100,11 +88,11 @@ ENDMACRO
 
 ; Get byte from sequence stream and return in A
 ; Does not advance the pointer.
-.sequence_peek_byte
+.script_peek_byte
 {
-    lda sequence_ptr+0
+    lda script_ptr+0
     sta addr+1
-    lda sequence_ptr+1
+    lda script_ptr+1
     sta addr+2
 .addr
     lda &ffff
@@ -112,30 +100,30 @@ ENDMACRO
 }
 
 ; Get byte from sequence stream and return in A
-; sequence_ptr += 1
-.sequence_fetch_byte
+; script_ptr += 1
+.script_fetch_byte
 {
-    lda sequence_ptr+0
+    lda script_ptr+0
     sta addr+1
-    lda sequence_ptr+1
+    lda script_ptr+1
     sta addr+2
 .addr    
     lda &ffff
 
-    inc sequence_ptr+0
+    inc script_ptr+0
     bne done
-    inc sequence_ptr+1
+    inc script_ptr+1
 .done    
     rts    
 }
 
 ; Get byte from sequence stream and return LSB in A,MSB in X
-; sequence_ptr += 2
-.sequence_fetch_word
+; script_ptr += 2
+.script_fetch_word
 {
-    jsr sequence_fetch_byte
+    jsr script_fetch_byte
     sta temp
-    jsr sequence_fetch_byte
+    jsr script_fetch_byte
     tax
     lda temp
     rts    
@@ -144,11 +132,11 @@ ENDMACRO
 
 ; call the routine at the current sequence ptr (word)
 ; consumes two bytes from the command stream
-.sequence_call
+.script_call
 {
-    jsr sequence_fetch_byte
+    jsr script_fetch_byte
     sta call+1
-    jsr sequence_fetch_byte
+    jsr script_fetch_byte
     sta call+2
 .call
     jmp &ffff   ; use subroutine rts
@@ -157,21 +145,21 @@ ENDMACRO
 
 
 ; Update the sequencer script
-.sequencer_text 
+.script_text 
     EQUS "DT:%w"
     EQUW delta_time
     EQUS " T:%w"
-    EQUW sequence_time
+    EQUW script_time
     EQUS " Ptr:%w"
-    EQUW sequence_ptr
+    EQUW script_ptr
     EQUS " SegP:%w"
-    EQUW sequence_segment_ptr    
+    EQUW script_segment_ptr    
     EQUS " SegT:%w"
-    EQUW sequence_segment_time  
+    EQUW script_segment_time  
     EQUS " SegD:%w"
-    EQUW sequence_segment_duration    
+    EQUW script_segment_duration    
     EQUS " SegN:%b"
-    EQUW sequence_segment_id
+    EQUW script_segment_id
 
     EQUS " Seg1:%v"
     EQUW segment1 
@@ -187,77 +175,77 @@ ENDIF
 
     EQUB 0
 
-.sequencer_update
+.script_update
 {
-    jsr sequencer_process
+    jsr script_process
 
- ;   MPRINTMEM sequencer_text,&7800
+ ;   MPRINTMEM script_text,&7800
 
     rts
 }
 
-.sequencer_process
+.script_process
 {
-    ; sequence_time += delta_time
-    lda sequence_time+0
+    ; script_time += delta_time
+    lda script_time+0
     clc
     adc delta_time
-    sta sequence_time+0
-    lda sequence_time+1
+    sta script_time+0
+    lda script_time+1
     adc #0
-    sta sequence_time+1
+    sta script_time+1
 
     ; if not currently in a segment, skip to the command processor
-    lda sequence_segment_ptr+1
+    lda script_segment_ptr+1
     beq command_loop
 
     ; we are in a segment
 
     
 
-    ; sequence_segment_time += delta_time
-    lda sequence_segment_time+0
+    ; script_segment_time += delta_time
+    lda script_segment_time+0
     clc
     adc delta_time
-    sta sequence_segment_time+0
-    lda sequence_segment_time+1
+    sta script_segment_time+0
+    lda script_segment_time+1
     adc #0
-    sta sequence_segment_time+1
+    sta script_segment_time+1
 
-    ; if sequence_segment_time >= duration
+    ; if script_segment_time >= duration
     ;   segment finished, leave sequence ptr    
     ; else
     ;   reset sequence ptr to segment start
-    lda sequence_segment_time+1
-    cmp sequence_segment_duration+1
+    lda script_segment_time+1
+    cmp script_segment_duration+1
     bcc segment_not_finished
-    lda sequence_segment_time+0
-    cmp sequence_segment_duration+0
+    lda script_segment_time+0
+    cmp script_segment_duration+0
     bcc segment_not_finished
 
     ; segment finished
 
     lda #0
-    sta sequence_segment_time+0
-    sta sequence_segment_time+1
-    sta sequence_segment_duration+0
-    sta sequence_segment_duration+1
-    sta sequence_segment_ptr+0
-    sta sequence_segment_ptr+1    
+    sta script_segment_time+0
+    sta script_segment_time+1
+    sta script_segment_duration+0
+    sta script_segment_duration+1
+    sta script_segment_ptr+0
+    sta script_segment_ptr+1    
     jmp command_loop    
 
 .segment_not_finished
-    ; so reset the sequence_ptr to the segment pointer
-    lda sequence_segment_ptr+0
-    sta sequence_ptr+0
-    lda sequence_segment_ptr+1
-    sta sequence_ptr+1
+    ; so reset the script_ptr to the segment pointer
+    lda script_segment_ptr+0
+    sta script_ptr+0
+    lda script_segment_ptr+1
+    sta script_ptr+1
 
 .command_loop
 
     ; take a look at the next command byte
     ; see if we've reached the end first.
-    jsr sequence_peek_byte
+    jsr script_peek_byte
     cmp #SCRIPTID_END
     bne command_start
 
@@ -268,20 +256,20 @@ ENDIF
 .command_start
 
     ; get the next command in the sequence
-    jsr sequence_fetch_byte
+    jsr script_fetch_byte
 
 .command_init
     cmp #SCRIPTID_CALL
     bne command_play
 
-    jsr sequence_call
+    jsr script_call
     jmp command_loop
 
 .command_play
     cmp #SCRIPTID_PLAY
     bne command_playv
 
-    jsr sequence_call
+    jsr script_call
     jmp command_loop
 
 .command_playv
@@ -290,33 +278,33 @@ ENDIF
 
     ;TODO
 
-    jsr sequence_fetch_word   ; offset
-    jsr sequence_fetch_word   ; duration
+    jsr script_fetch_word   ; offset
+    jsr script_fetch_word   ; duration
     
     ; if (time>= (time+offset)) && (time < time+offset+duration)
-    ;   jsr sequence_call
-    jsr sequence_fetch_word  ; effect routine
+    ;   jsr script_call
+    jsr script_fetch_word  ; effect routine
     jmp command_loop
 
 .command_segment_start
     cmp #SCRIPTID_SEGMENT_START
     bne command_segment_end
 
-    inc sequence_segment_id
-    jsr sequence_fetch_word   ; duration of segment
-    sta sequence_segment_duration+0
-    stx sequence_segment_duration+1
+    inc script_segment_id
+    jsr script_fetch_word   ; duration of segment
+    sta script_segment_duration+0
+    stx script_segment_duration+1
 
     ; stash the ptr to the first command in this segment
     ; so that it can be repeated for the duration of the segment
-    lda sequence_ptr+0
-    sta sequence_segment_ptr+0
-    lda sequence_ptr+1
-    sta sequence_segment_ptr+1
+    lda script_ptr+0
+    sta script_segment_ptr+0
+    lda script_ptr+1
+    sta script_segment_ptr+1
 
     lda #0
-    sta sequence_segment_time+0
-    sta sequence_segment_time+1
+    sta script_segment_time+0
+    sta script_segment_time+1
     
     jmp command_loop
 

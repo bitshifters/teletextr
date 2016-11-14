@@ -1,19 +1,10 @@
 
 
-.colours
-;    0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9
-;    7,3,6,2,5,1,4,0
 
-
-.fx_testcard_fill
-{
-    dex
-    jsr mode7_set_column
-    inx
-    lda #157
-    jsr mode7_set_column
-    rts    
-}
+.fx_testcard_text
+;EQUS "0123456789012345678901234567890123456789"
+EQUB 141
+EQUS  "    BITSHIFTERS TV                     "
 
 .fx_testcard
 {
@@ -50,6 +41,27 @@
     ldx #35
     jsr mode7_set_column
 
+    ldx #0
+.charloop
+    lda fx_testcard_text,x
+    sta &7c00+5*40,x
+    sta &7c00+6*40,x
+    inx
+    cpx #40
+    bne charloop
+    
 
     rts
+}
+
+
+
+.fx_testcard_fill
+{
+    dex
+    jsr mode7_set_column
+    inx
+    lda #157
+    jsr mode7_set_column
+    rts    
 }

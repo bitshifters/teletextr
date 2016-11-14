@@ -88,9 +88,9 @@ MUSIC_SLOT_NO = 0
 ; Main loop
 ;-------------------------------------------------------------
 
-	ldx #LO(demo_sequence_start)
-	ldy #HI(demo_sequence_start)
-	jsr sequencer_init
+	ldx #LO(demo_script_start)
+	ldy #HI(demo_script_start)
+	jsr script_init
 
     .loop
     lda #19:jsr osbyte
@@ -101,7 +101,7 @@ MUSIC_SLOT_NO = 0
 	sta vsync_count
 	stx delta_time
 
-	jsr sequencer_update
+	jsr script_update
 
 \\ can never return to OS as we use all memory
     jmp loop

@@ -17,14 +17,16 @@
 ; RGB overlapping circles sprites
 ; giphy sequences
 
-.demo_sequence_start
+.demo_script_start
 
 ; initialise routines
 SCRIPT_CALL     fx_copybuffer_init
 SCRIPT_CALL     fx_3dshape_init
 
 .segment1
-
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_testcard
+SCRIPT_SEGMENT_END
 
 ; plasma segment
 SCRIPT_CALL     fx_plasma_init
@@ -34,9 +36,7 @@ SCRIPT_SEGMENT_START    10.0
 SCRIPT_SEGMENT_END
 
 
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_testcard
-SCRIPT_SEGMENT_END
+
 
 
 
@@ -95,7 +95,7 @@ SCRIPT_CALL fx_copybuffer_update
 
 SCRIPT_END
 
-.demo_sequence_end
+.demo_script_end
 
-PRINT "Demo Sequence data from", ~demo_sequence_start, "to", ~demo_sequence_end, ", size is", (demo_sequence_end-demo_sequence_start), "bytes"
+PRINT "Demo Sequence data from", ~demo_script_start, "to", ~demo_script_end, ", size is", (demo_script_end-demo_script_start), "bytes"
 

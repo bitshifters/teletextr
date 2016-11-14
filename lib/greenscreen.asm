@@ -2,7 +2,7 @@
 
 
 
-.effect_greenscreen  EFFECT_HEADER  effect_greenscreen_update,0,0
+
 
 .effect_greenscreen_update
 {
