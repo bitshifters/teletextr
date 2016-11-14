@@ -18,3 +18,17 @@
     rts    
 }
 
+; back buffer copy only, no clear
+.fx_buffer_copy
+{
+	jsr mode7_copy_screen_fast
+    rts    
+}
+
+; clear back buffer
+.fx_buffer_clear
+{
+    lda #0
+	jsr mode7_clear_shadow_fast
+    rts    
+}

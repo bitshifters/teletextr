@@ -3,7 +3,7 @@
 
 .fx_copperbars_update
 {
-CB_XOFFSET = 0
+CB_XOFFSET = 2
 
 ;bg
     lda #157
@@ -20,7 +20,7 @@ NEXT
 
     lda #LO(MODE7_VRAM_SHADOW+CB_XOFFSET)
     sta copper_addr+1
-    lda #HI(MODE7_VRAM_SHADOW)
+    lda #HI(MODE7_VRAM_SHADOW+CB_XOFFSET)
     sta copper_addr+2
 
 

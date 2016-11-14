@@ -99,6 +99,7 @@ INCLUDE "src/fx/greenscreen.asm"
 INCLUDE "src/fx/copperbars.asm"
 INCLUDE "src/fx/linebox.asm"
 INCLUDE "src/fx/plasma.asm"
+INCLUDE "src/fx/testcard.asm"
 
 \ ******************************************************************
 \ *	Code entry

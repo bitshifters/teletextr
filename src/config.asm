@@ -25,11 +25,20 @@ SCRIPT_CALL     fx_3dshape_init
 
 .segment1
 
-; test segment
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
-    SCRIPT_PLAY fx_bitmap
+
+; plasma segment
+SCRIPT_CALL     fx_plasma_init
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_PLAY fx_plasma
 SCRIPT_SEGMENT_END
+
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_testcard
+SCRIPT_SEGMENT_END
+
+
 
 IF TRUE
 ; test segment
@@ -68,6 +77,14 @@ SCRIPT_SEGMENT_START    5.0
 ;    SCRIPT_PLAY fx_copperbars_update
     SCRIPT_PLAY fx_3dshape_update
 SCRIPT_SEGMENT_END
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_PLAY fx_copperbars_update
+    SCRIPT_PLAY fx_greenscreen_update
+    SCRIPT_PLAY fx_3dshape_update
+SCRIPT_SEGMENT_END
+
 ENDIF
 
 ; clear the screen
