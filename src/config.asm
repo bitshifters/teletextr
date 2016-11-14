@@ -25,6 +25,12 @@ SCRIPT_CALL     effect_3dshape_init
 
 .segment1
 
+; test segment
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY effect_copybuffer_update
+    SCRIPT_PLAY effect_bitmap
+SCRIPT_SEGMENT_END
+
 IF TRUE
 ; test segment
 SCRIPT_SEGMENT_START    5.0
@@ -50,7 +56,7 @@ SCRIPT_SEGMENT_START    5.0
 SCRIPT_SEGMENT_END
 ENDIF
 
-IF FALSE
+IF TRUE
 .segment3
 
 

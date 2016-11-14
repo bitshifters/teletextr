@@ -98,7 +98,7 @@ INCLUDE "src/effects/copybuffer.asm"
 INCLUDE "src/effects/greenscreen.asm"
 INCLUDE "src/effects/copperbars.asm"
 INCLUDE "src/effects/linebox.asm"
-
+INCLUDE "src/effects/bitmap.asm"
 
 \ ******************************************************************
 \ *	Code entry

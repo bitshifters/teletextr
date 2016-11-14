@@ -216,6 +216,18 @@ NEXT
 \\ cycles = 25*4 = 100 cycles = 0.05ms
 }
 
+; A contains graphics code to be stored
+; X contains column offset
+.mode7_set_column_shadow_fast
+{
+FOR n, 0, 24
+	sta MODE7_VRAM_SHADOW + n*40,x
+NEXT
+	rts
+
+\\ cycles = 25*4 = 100 cycles = 0.05ms
+}
+
 
 ; Hacky timing bar - will write a BG command code to the RHS column of the screen
 ; depending on where the raster is when this is done will indicate how much frame time is used

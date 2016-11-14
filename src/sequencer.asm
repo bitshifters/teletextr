@@ -191,7 +191,7 @@ ENDIF
 {
     jsr sequencer_process
 
-    MPRINTMEM sequencer_text,&7800
+ ;   MPRINTMEM sequencer_text,&7800
 
     rts
 }
