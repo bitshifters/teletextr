@@ -21,3 +21,16 @@
 	rts
 }
 
+.hide_vram
+{
+	LDA #19:LDX #0:JSR osbyte
+	SEI:LDA #6:STA &FE00:LDA #0:STA &FE01:CLI
+	rts	
+}
+
+.show_vram
+{
+	LDA #19:LDX #0:JSR osbyte
+	SEI:LDA #6:STA &FE00:LDA #25:STA &FE01:CLI
+	rts		
+}

@@ -6,8 +6,25 @@
 EQUB 141
 EQUS  "    BITSHIFTERS TV                     "
 
+FREQ = 1000
+SNV = 4000000 / (2.0 * FREQ * 16.0 )
+.fx_testcard_init
+{
+	LDA #&9F: JSR psg_strobe    ; ch0 zero vol
+	LDA #&80 + (SNV AND 15): JSR psg_strobe    ; ch0 tone bits 0-4
+	LDA #SNV/16: JSR psg_strobe    ; ch0 tone bits 5-10
+	LDA #&90: JSR psg_strobe    ; ch0 max vol
+    rts
+}
+
 .fx_testcard
 {
+
+    
+
+
+
+
     lda #157
     ldx #0
     jsr mode7_set_column

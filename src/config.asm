@@ -7,20 +7,36 @@
 ;   set timed offsets within segments
 ;   animated memory variables for effect inputs (simple interpolators etc.)
 ;   set specific start times for segments (so effects can be timed to the music track) 
+;   wait command?
 
 .demo_script_start
 
 ; initialise routines
-SCRIPT_CALL     fx_copybuffer_init
-SCRIPT_CALL     fx_3dshape_init
+SCRIPT_CALL fx_music_init
+SCRIPT_CALL fx_copybuffer_init
+SCRIPT_CALL fx_3dshape_init
 
 .segment1
+SCRIPT_CALL fx_testcard_init
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_PLAY fx_testcard
 SCRIPT_SEGMENT_END
 
+
+
+SCRIPT_SEGMENT_START    1.0
+    SCRIPT_CALL hide_vram
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL fx_music_start
+
+SCRIPT_SEGMENT_START    3.0
+    SCRIPT_CALL hide_vram
+SCRIPT_SEGMENT_END
+
 ; plasma segment
-SCRIPT_CALL     fx_plasma_init
+SCRIPT_CALL fx_plasma_init
+SCRIPT_CALL show_vram
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_buffer_copy
     SCRIPT_PLAY fx_plasma
@@ -81,7 +97,7 @@ SCRIPT_SEGMENT_END
 ; clear the screen on finish
 SCRIPT_CALL fx_copybuffer_update
 SCRIPT_CALL fx_copybuffer_update
-
+SCRIPT_CALL fx_music_stop
 .segment_end
 
 SCRIPT_END

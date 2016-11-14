@@ -66,9 +66,7 @@ MUSIC_SLOT_NO = 0
 	CLI	
 
 
-	LDX #&00
-	LDY #&80
-	JSR	vgm_init_stream
+
 
 
 
@@ -135,19 +133,7 @@ MUSIC_SLOT_NO = 0
 
 
 
-    lda &f4
-    tay
-
-    ; page in the music bank
-    lda #MUSIC_SLOT_NO
-    jsr swr_select_slot
-
-	\\ Poll the music player
-	jsr poll_player
-    
-    ; restore previously paged ROM bank
-    tya
-    jsr swr_select_bank
+	jsr fx_music_irq
 
 	dec re_entrant
 .skip_update

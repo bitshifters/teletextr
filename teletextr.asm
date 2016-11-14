@@ -60,6 +60,7 @@ INCLUDE "lib/vgmplayer.asm"
 INCLUDE "lib/swr.asm"
 INCLUDE "lib/filesys.asm"
 INCLUDE "lib/irq.asm"
+INCLUDE "lib/vram.asm"
 
 ALIGN 256
 WIREFRAME=TRUE
@@ -88,10 +89,10 @@ INCLUDE "src/config.asm"
 ; Effect code
 ;----------------------------------------------------------------------------------------------------------
 ; Include your effects here...
+INCLUDE "src/fx/music.asm"
 
 
-
-INCLUDE "src/3d/data.asm"	; should be in a bank
+INCLUDE "src/3d/data.asm"	; should be in a bank!!
 
 INCLUDE "src/fx/3dshape.asm"
 INCLUDE "src/fx/copybuffer.asm"
