@@ -2,15 +2,13 @@
 ; Script command tokens
 SCRIPTID_SEGMENT_START=1
 SCRIPTID_SEGMENT_END=2
-
 SCRIPTID_CALL=3
 SCRIPTID_PLAY=4
 SCRIPTID_PLAYV=5
-
 SCRIPTID_END=255
 
 
-; Call a routine
+; Calls a routine directly
 MACRO SCRIPT_CALL    effect_addr
     EQUB    SCRIPTID_CALL
     EQUW    effect_addr
@@ -23,7 +21,7 @@ MACRO SCRIPT_SEGMENT_START    duration
     EQUW    duration*50
 ENDMACRO
 
-; Indicate the end of a segment
+; Indicate the end of a segment - MUST be paired with a SCRIPT_SEGMENT_START
 MACRO SCRIPT_SEGMENT_END
     EQUB    SCRIPTID_SEGMENT_END
 ENDMACRO
@@ -37,6 +35,7 @@ ENDMACRO
 
 ; Play an effect within a segment, started at T+offset and for the given duration
 ; If duration is 0, the effect will play until the end of the segment
+; NOT YET IMPLEMENTED!
 MACRO SCRIPT_PLAYV   effect_ptr, offset, duration
     EQUB    SCRIPTID_PLAYV
     EQUW    offset*50
@@ -51,17 +50,17 @@ ENDMACRO
 
 
 
-.script_time              EQUW 0
-.script_ptr               EQUW 0
-.script_segment_ptr       EQUW 0
-.script_segment_time      EQUW 0
-.script_segment_duration  EQUW 0
-.script_segment_id        EQUB 0
+.script_time              EQUW 0    ; elapsed time in 1/50th secs
+.script_ptr               EQUW 0    ; current command ptr in the script
+.script_segment_ptr       EQUW 0    ; ptr to the first command in the current segment that is processing
+.script_segment_time      EQUW 0    ; elapsed time in the current segment
+.script_segment_duration  EQUW 0    ; duration of the current segment
+.script_segment_id        EQUB 0    ; id of the current segment (was mainly for debugging)
 
 
 
-
-; X/Y contain ptr to sequence data
+; Setup new script to run
+; On entry, X/Y contain ptr to sequence data (lsb/msb)
 .script_init
 {
     stx script_ptr+0
@@ -143,8 +142,7 @@ ENDMACRO
 }
 
 
-
-; Update the sequencer script
+; Debug text
 .script_text 
     EQUS "DT:%w"
     EQUW delta_time
@@ -175,8 +173,11 @@ ENDIF
 
     EQUB 0
 
+
+; Update the sequencer script
 .script_update
 {
+    ; separated for easier reading
     jsr script_process
 
  ;   MPRINTMEM script_text,&7800
@@ -276,7 +277,7 @@ ENDIF
     cmp #SCRIPTID_PLAYV
     bne command_segment_start
 
-    ;TODO
+    ;TODO!
 
     jsr script_fetch_word   ; offset
     jsr script_fetch_word   ; duration

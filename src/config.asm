@@ -1,21 +1,12 @@
+; Config script for the demo
+; Makes things a bit more data driven and easier to fine tune
 
-; Fade off the BBC Computer screen
-; CEEFAX page
-; bzz with TESTCARD "BITSHIFTERS TV" & 1Khz tone
-; flicker off
-; music starts
-;
-; bitshifters presents
-; 'teletextr demo'
-
-; plasma demo with hold/block graphics
-; do lazy initialization using init bytes
-; no need for init routines this way.
-
-; use separated graphics as a half brite effect
-
-; RGB overlapping circles sprites
-; giphy sequences
+; Things to improve:
+;   control over vsync
+;   control over loading
+;   set timed offsets within segments
+;   animated memory variables for effect inputs (simple interpolators etc.)
+;   set specific start times for segments (so effects can be timed to the music track) 
 
 .demo_script_start
 
@@ -40,7 +31,7 @@ SCRIPT_SEGMENT_END
 
 
 
-IF TRUE
+
 ; test segment
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_PLAY fx_copybuffer_update
@@ -49,10 +40,10 @@ SCRIPT_SEGMENT_START    5.0
 ;    SCRIPT_PLAY fx_copperbars_update
 ;    SCRIPT_PLAY fx_3dshape_update    
 SCRIPT_SEGMENT_END
-ENDIF
 
 
-IF TRUE
+
+
 .segment2
 
 ; test segment
@@ -63,9 +54,9 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_PLAY fx_copperbars_update
 ;    SCRIPT_PLAY fx_3dshape_update
 SCRIPT_SEGMENT_END
-ENDIF
 
-IF TRUE
+
+
 .segment3
 
 
@@ -85,9 +76,9 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_PLAY fx_3dshape_update
 SCRIPT_SEGMENT_END
 
-ENDIF
 
-; clear the screen
+
+; clear the screen on finish
 SCRIPT_CALL fx_copybuffer_update
 SCRIPT_CALL fx_copybuffer_update
 
@@ -99,3 +90,25 @@ SCRIPT_END
 
 PRINT "Demo Sequence data from", ~demo_script_start, "to", ~demo_script_end, ", size is", (demo_script_end-demo_script_start), "bytes"
 
+
+
+; IDEAS
+
+
+; Fade off the BBC Computer screen
+; CEEFAX page
+; bzz with TESTCARD "BITSHIFTERS TV" & 1Khz tone
+; flicker off
+; music starts
+;
+; bitshifters presents
+; 'teletextr demo'
+
+; plasma demo with hold/block graphics
+; do lazy initialization using init bytes
+; no need for init routines this way.
+
+; use separated graphics as a half brite effect
+
+; RGB overlapping circles sprites
+; giphy sequences
