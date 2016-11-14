@@ -1,7 +1,7 @@
 
 
 
-.effect_linebox_update
+.fx_linebox_update
 {
 
 IF TRUE

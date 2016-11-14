@@ -20,25 +20,25 @@
 .demo_sequence_start
 
 ; initialise routines
-SCRIPT_CALL     effect_copybuffer_init
-SCRIPT_CALL     effect_3dshape_init
+SCRIPT_CALL     fx_copybuffer_init
+SCRIPT_CALL     fx_3dshape_init
 
 .segment1
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY effect_copybuffer_update
-    SCRIPT_PLAY effect_bitmap
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_PLAY fx_bitmap
 SCRIPT_SEGMENT_END
 
 IF TRUE
 ; test segment
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY effect_copybuffer_update
-    SCRIPT_PLAY effect_greenscreen_update
-    SCRIPT_PLAY effect_linebox_update
-;    SCRIPT_PLAY effect_copperbars_update
-;    SCRIPT_PLAY effect_3dshape_update    
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_PLAY fx_greenscreen_update
+    SCRIPT_PLAY fx_linebox_update
+;    SCRIPT_PLAY fx_copperbars_update
+;    SCRIPT_PLAY fx_3dshape_update    
 SCRIPT_SEGMENT_END
 ENDIF
 
@@ -48,11 +48,11 @@ IF TRUE
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY effect_copybuffer_update
-;    SCRIPT_PLAY effect_greenscreen_update
-;    SCRIPT_PLAY effect_linebox_update
-    SCRIPT_PLAY effect_copperbars_update
-;    SCRIPT_PLAY effect_3dshape_update
+    SCRIPT_PLAY fx_copybuffer_update
+;    SCRIPT_PLAY fx_greenscreen_update
+;    SCRIPT_PLAY fx_linebox_update
+    SCRIPT_PLAY fx_copperbars_update
+;    SCRIPT_PLAY fx_3dshape_update
 SCRIPT_SEGMENT_END
 ENDIF
 
@@ -62,17 +62,17 @@ IF TRUE
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY effect_copybuffer_update
-    SCRIPT_PLAY effect_greenscreen_update
- ;   SCRIPT_PLAY effect_linebox_update
-;    SCRIPT_PLAY effect_copperbars_update
-    SCRIPT_PLAY effect_3dshape_update
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_PLAY fx_greenscreen_update
+ ;   SCRIPT_PLAY fx_linebox_update
+;    SCRIPT_PLAY fx_copperbars_update
+    SCRIPT_PLAY fx_3dshape_update
 SCRIPT_SEGMENT_END
 ENDIF
 
 ; clear the screen
-SCRIPT_CALL effect_copybuffer_update
-SCRIPT_CALL effect_copybuffer_update
+SCRIPT_CALL fx_copybuffer_update
+SCRIPT_CALL fx_copybuffer_update
 
 .segment_end
 

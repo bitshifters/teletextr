@@ -93,12 +93,12 @@ INCLUDE "src/config.asm"
 
 INCLUDE "src/3d/data.asm"	; should be in a bank
 
-INCLUDE "src/effects/3dshape.asm"
-INCLUDE "src/effects/copybuffer.asm"
-INCLUDE "src/effects/greenscreen.asm"
-INCLUDE "src/effects/copperbars.asm"
-INCLUDE "src/effects/linebox.asm"
-INCLUDE "src/effects/bitmap.asm"
+INCLUDE "src/fx/3dshape.asm"
+INCLUDE "src/fx/copybuffer.asm"
+INCLUDE "src/fx/greenscreen.asm"
+INCLUDE "src/fx/copperbars.asm"
+INCLUDE "src/fx/linebox.asm"
+INCLUDE "src/fx/plasma.asm"
 
 \ ******************************************************************
 \ *	Code entry

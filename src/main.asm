@@ -127,6 +127,14 @@ MUSIC_SLOT_NO = 0
 	inc vsync_count
 
 
+	; prevent re-entry
+	lda re_entrant
+	bne skip_update
+
+	inc re_entrant
+
+
+
     lda &f4
     tay
 
@@ -141,6 +149,8 @@ MUSIC_SLOT_NO = 0
     tya
     jsr swr_select_bank
 
+	dec re_entrant
+.skip_update
 
 	\\ Restore registers
 	pla:tay:pla:tax:pla
@@ -149,6 +159,7 @@ MUSIC_SLOT_NO = 0
     .not_vsync
 	plp
 	rts
+.re_entrant EQUB 0
 }
 
 .player_init

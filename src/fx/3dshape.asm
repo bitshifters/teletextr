@@ -16,7 +16,7 @@ EFFECT_3DSHAPE_ORG = *
 
 ;ORG EFFECT_3DSHAPE_ORG
 
-.effect_3dshape_update
+.fx_3dshape_update
 {
 
 
@@ -141,7 +141,7 @@ ENDIF
 }
 
 
-.effect_3dshape_init
+.fx_3dshape_init
 {
     ; initialise variables
     LDX#0

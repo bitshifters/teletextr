@@ -1,7 +1,7 @@
 
 
 
-.effect_copperbars_update
+.fx_copperbars_update
 {
 CB_XOFFSET = 0
 

@@ -1,4 +1,5 @@
 
+;http://www.pygame.org/pcr/numpy_plasma/index.php
 
 
 .random
@@ -17,7 +18,7 @@
 .random_seed EQUB 59    
 .random_seed2 EQUB 59
 
-.effect_bitmap
+.fx_bitmap
 {
     lda random_seed2
     sta random_seed
