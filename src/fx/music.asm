@@ -1,15 +1,47 @@
+MUSICA_SLOT_NO = 0
+MUSICB_SLOT_NO = 1
 
-
+\\ Initialise music player - pass in VGM_stream_data address
+\\ parses header from stream
 .fx_music_init
 {
+    jsr fx_music_stop
+    lda #19:jsr osbyte
+    
+    sei
+    lda #MUSICA_SLOT_NO
+    sta fx_music_slot
+    jsr swr_select_slot
+    cli
+
+	LDX #&00
+	LDY #&80
+	JSR	vgm_init_stream
+    rts
+}
+\\ Initialise music player - pass in VGM_stream_data address
+\\ parses header from stream
+.fx_music_initb
+{
+    jsr fx_music_stop
+    lda #19:jsr osbyte
+
+
+    sei
+    lda #MUSICB_SLOT_NO
+    sta fx_music_slot
+    jsr swr_select_slot
+    cli
+
 	LDX #&00
 	LDY #&80
 	JSR	vgm_init_stream
     rts
 }
 
-.fx_music_on    EQUB 0
 
+.fx_music_on    EQUB 0
+.fx_music_slot  EQUB 0
 
 .fx_music_start
 {
@@ -36,7 +68,7 @@
     tay
 
     ; page in the music bank
-    lda #MUSIC_SLOT_NO
+    lda fx_music_slot
     jsr swr_select_slot
 
 	\\ Poll the music player

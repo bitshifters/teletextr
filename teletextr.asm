@@ -101,6 +101,8 @@ INCLUDE "src/fx/copperbars.asm"
 INCLUDE "src/fx/linebox.asm"
 INCLUDE "src/fx/plasma.asm"
 INCLUDE "src/fx/testcard.asm"
+INCLUDE "src/fx/teletext.asm"
+
 
 \ ******************************************************************
 \ *	Code entry
@@ -140,8 +142,10 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank1_start
+INCBIN "src/music/data/test.raw.exo" 
 ;...
 .bank1_end
+SAVE "Bank1", bank1_start, bank1_end, &8000
 
 ;----------------------------------------------------------------------------------------------------------
 ; SWR Bank 2
@@ -152,7 +156,9 @@ ORG &8000
 GUARD &BFFF
 .bank2_start
 ;...
+;INCBIN "data/edittf.bin"
 .bank2_end
+SAVE "Bank2", bank2_start, bank2_end, &8000
 
 ;----------------------------------------------------------------------------------------------------------
 ; SWR Bank 3
@@ -163,7 +169,9 @@ ORG &8000
 GUARD &BFFF
 .bank3_start
 ;...
+
 .bank3_end
+SAVE "Bank3", bank3_start, bank3_end, &8000
 
 PRINT "ZeroPage from", ~zp_start, "to", ~zp_end, ", size is", (zp_end-zp_start), "bytes"
 PRINT "Code from", ~start, "to", ~end, ", size is", (end-start), "bytes"

@@ -13,8 +13,15 @@
 
 ; initialise routines
 SCRIPT_CALL fx_music_init
+SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_teletext
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL fx_music_stop
 
 .segment1
 SCRIPT_CALL fx_testcard_init
@@ -28,6 +35,7 @@ SCRIPT_SEGMENT_START    1.0
     SCRIPT_CALL hide_vram
 SCRIPT_SEGMENT_END
 
+SCRIPT_CALL fx_music_init
 SCRIPT_CALL fx_music_start
 
 SCRIPT_SEGMENT_START    3.0

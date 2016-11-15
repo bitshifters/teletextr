@@ -1,9 +1,12 @@
 
 
 
-.bank_file_music    EQUS "Bank0", 13
+.bank_file0    EQUS "Bank0", 13
+.bank_file1    EQUS "Bank1", 13
+.bank_file2    EQUS "Bank2", 13
+.bank_file3    EQUS "Bank3", 13
 
-MUSIC_SLOT_NO = 0
+
 
 .main
 {
@@ -40,18 +43,47 @@ MUSIC_SLOT_NO = 0
     
     MPRINT loading_bank_text
 
-	\\ Initialise music player - pass in VGM_stream_data address
-	\\ parses header from stream
 
-    lda #MUSIC_SLOT_NO
+	\\ load all banks
+    lda #0
+	sei
     jsr swr_select_slot
+	cli
     lda #&80
-    ldx #LO(bank_file_music)
-    ldy #HI(bank_file_music)
+    ldx #LO(bank_file0)
+    ldy #HI(bank_file0)
     jsr file_load
-
     MPRINT loading_bank_text2
-    
+
+    lda #1
+	sei
+    jsr swr_select_slot
+	cli
+    lda #&80
+    ldx #LO(bank_file1)
+    ldy #HI(bank_file1)
+    jsr file_load
+    MPRINT loading_bank_text2
+
+    lda #2
+	sei
+    jsr swr_select_slot
+	cli
+    lda #&80
+    ldx #LO(bank_file2)
+    ldy #HI(bank_file2)
+    jsr file_load
+    MPRINT loading_bank_text2
+
+    lda #3
+	sei
+    jsr swr_select_slot
+	cli
+    lda #&80
+    ldx #LO(bank_file3)
+    ldy #HI(bank_file3)
+    jsr file_load
+    MPRINT loading_bank_text2
 
     ; runtime
     
