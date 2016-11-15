@@ -8,6 +8,9 @@ oswrch = &FFEE
 osasci = &FFE3
 osbyte = &FFF4
 osword = &FFF1
+osfind = &FFCE
+osgbpb = &FFD1
+osargs = &FFDA
 EVENTV = &0220
 
 \\ Internal Key Number not INKEY!

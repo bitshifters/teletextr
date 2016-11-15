@@ -78,8 +78,8 @@
     tax
     lda swr_ram_banks,X
     bmi bad_socket
-    sta &fe30
     sta &f4
+    sta &fe30
     sta swr_slot_selected
 .bad_socket
     rts
@@ -88,7 +88,7 @@
 ; A contains ROM bank to be selected
 .swr_select_bank
 {
-    sta &fe30
     sta &f4
+    sta &fe30
     rts
 }

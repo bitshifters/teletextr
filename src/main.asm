@@ -45,6 +45,51 @@
 
 
 	\\ load all banks
+IF TRUE
+
+    lda #0
+	sei
+    jsr swr_select_slot
+	cli
+    lda #&80
+    ldx #LO(bank_file0)
+    ldy #HI(bank_file0)
+    jsr file_stream
+    MPRINT loading_bank_text2
+
+    lda #1
+	sei
+    jsr swr_select_slot
+	cli
+    lda #&80
+    ldx #LO(bank_file1)
+    ldy #HI(bank_file1)
+    jsr file_stream
+    MPRINT loading_bank_text2
+
+    lda #2
+	sei
+    jsr swr_select_slot
+	cli
+    lda #&80
+    ldx #LO(bank_file2)
+    ldy #HI(bank_file2)
+    jsr file_stream
+    MPRINT loading_bank_text2
+
+    lda #3
+	sei
+    jsr swr_select_slot
+	cli
+    lda #&80
+    ldx #LO(bank_file3)
+    ldy #HI(bank_file3)
+    jsr file_stream
+    MPRINT loading_bank_text2
+
+
+ELSE
+
     lda #0
 	sei
     jsr swr_select_slot
@@ -84,6 +129,8 @@
     ldy #HI(bank_file3)
     jsr file_load
     MPRINT loading_bank_text2
+ENDIF
+
 
     ; runtime
     
