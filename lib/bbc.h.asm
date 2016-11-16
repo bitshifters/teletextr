@@ -82,79 +82,20 @@ MODE7_alpha_black = 128
 MODE7_graphic_black = 144
 MODE7_contiguous = 153
 MODE7_separated = 154
+MODE7_black_bg = 156
+MODE7_new_bg = 157
 
 \\ Macro to reset any mapped characters
 \\ since BeebASM doesn't have any feature for this
+\\ Actually it does :)
 MACRO RESET_MAPCHAR
 
-	MAPCHAR 'A', 'A' 
-	MAPCHAR 'B', 'B'
-	MAPCHAR 'C', 'C'
-	MAPCHAR 'D', 'D'
-	MAPCHAR 'E', 'E'
-	MAPCHAR 'F', 'F'
-	MAPCHAR 'G', 'G'
-	MAPCHAR 'H', 'H'
-	MAPCHAR 'I', 'I'
-	MAPCHAR 'J', 'J'
-	MAPCHAR 'K', 'K'
-	MAPCHAR 'L', 'L'
-	MAPCHAR 'M', 'M'
- 	MAPCHAR 'N', 'N'
-	MAPCHAR 'O', 'O'
-	MAPCHAR 'P', 'P'
-	MAPCHAR 'Q', 'Q'
-	MAPCHAR 'R', 'R'
-	MAPCHAR 'S', 'S'
-	MAPCHAR 'T', 'T'
-	MAPCHAR 'U', 'U'
-	MAPCHAR 'V', 'V'
-	MAPCHAR 'W', 'W'
-	MAPCHAR 'X', 'X'
-	MAPCHAR 'Y', 'Y'
-	MAPCHAR 'Z', 'Z'
-	
-	MAPCHAR 'a', 'a'
-	MAPCHAR 'b', 'b'
-	MAPCHAR 'c', 'c'
-	MAPCHAR 'd', 'd'
-	MAPCHAR 'e', 'e'
-	MAPCHAR 'f', 'f'
-	MAPCHAR 'g', 'g'
-	MAPCHAR 'h', 'h'
-	MAPCHAR 'i', 'i'
-	MAPCHAR 'j', 'j'
-	MAPCHAR 'k', 'k'
-	MAPCHAR 'l', 'l'
-	MAPCHAR 'm', 'm'
- 	MAPCHAR 'n', 'n'
-	MAPCHAR 'o', 'o'
-	MAPCHAR 'p', 'p'
-	MAPCHAR 'q', 'q'
-	MAPCHAR 'r', 'r'
-	MAPCHAR 's', 's'
-	MAPCHAR 't', 't'
-	MAPCHAR 'u', 'u'
-	MAPCHAR 'v', 'v'
-	MAPCHAR 'w', 'w'
-	MAPCHAR 'x', 'x'
-	MAPCHAR 'y', 'y'
-	MAPCHAR 'z', 'z'
-                 
-	MAPCHAR '0', '0'
-	MAPCHAR '1', '1'
-	MAPCHAR '2', '2'
-	MAPCHAR '3', '3'
-	MAPCHAR '4', '4'
-	MAPCHAR '5', '5'
-	MAPCHAR '6', '6'
-	MAPCHAR '7', '7'
-	MAPCHAR '8', '8'
-	MAPCHAR '9', '9'
+	MAPCHAR 'A', 'Z', 'A' 
+	MAPCHAR 'a', 'z', 'z'
+	MAPCHAR '0', '9', '0'
 	MAPCHAR '?', '?'
 	MAPCHAR '!', '!'
 	MAPCHAR '.', '.'
-                
 	MAPCHAR ' ', ' '
 
 ENDMACRO
