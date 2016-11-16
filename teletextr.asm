@@ -92,7 +92,7 @@ INCLUDE "src/config.asm"
 INCLUDE "src/fx/music.asm"
 
 
-INCLUDE "src/3d/data.asm"	; should be in a bank!!
+INCLUDE "src/fx/data.asm"	; should be in a bank!!
 
 INCLUDE "src/fx/3dshape.asm"
 INCLUDE "src/fx/copybuffer.asm"

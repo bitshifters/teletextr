@@ -107,7 +107,7 @@
     inc t4
 
     inx
-    inx
+;    inx        ; extra inx if you want square 'pixels' since teletext chars are rectangular
     cpx #39
     bne xloop
 
