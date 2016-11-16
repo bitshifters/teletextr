@@ -102,6 +102,7 @@ INCLUDE "src/fx/linebox.asm"
 INCLUDE "src/fx/plasma.asm"
 INCLUDE "src/fx/testcard.asm"
 INCLUDE "src/fx/teletext.asm"
+INCLUDE "src/fx/rasterbars.asm"
 
 
 \ ******************************************************************
