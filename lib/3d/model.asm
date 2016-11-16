@@ -80,6 +80,16 @@ MACRO FIX_MODEL    model_data, vert_data, surfs_data
     jsr fix_verts    
 ENDMACRO
 
+; use this macros for models with only vertex data (ie. no surfaces)
+MACRO FIX_MODEL_VERTS    model_data, vert_data
+    lda model_data+0    ; npts
+    clc
+    adc #1
+    ldx #LO(vert_data)
+    ldy #HI(vert_data)
+    jsr fix_verts
+ENDMACRO
+
 
 ; models comprise:
 ;   header
@@ -148,6 +158,10 @@ MACRO MD_INDEX  p0, p1
     EQUB p1
 ENDMACRO
 
+
+
+
+
 ;----------------------------------------------------------------------------------------------------------
 ; Reset to the first model, then fall into the load model data routine
 ;----------------------------------------------------------------------------------------------------------
@@ -155,9 +169,21 @@ ENDMACRO
 .reset_model 
 {
     lda #0:sta transx:sta transy:sta transz
-    LDA#coordinates_start AND &FF:STA odr
-    LDA#coordinates_start DIV 256:STA odr+1
+    ldx #coordinates_start AND &FF
+    ldy #coordinates_start DIV 256
+    ; falls through to select_model
+}
 
+;----------------------------------------------------------------------------------------------------------
+; Select a model by providing its memory location
+;----------------------------------------------------------------------------------------------------------
+; on entry
+; X/Y point to address of the model (lsb/msb)
+.select_model
+{
+    stx odr
+    sty odr+1
+    ; falls through to load_next_model    
 }
 
 ;----------------------------------------------------------------------------------------------------------
@@ -189,6 +215,15 @@ ENDMACRO
     LDA odr+1:ADC#0:STA odr+1:STA y+2
     LDA odr:SEC:ADC npts:STA odr:STA z+1
     LDA odr+1:ADC#0:STA odr+1:STA z+2
+
+    ; if num surfs is 0 then we only have verts so exit
+    ; DO NOT CALL HIDDEN SURFACE OR OTHER SURFACE BASED MODEL RENDERING ROUTINES IN THIS SCENARIO
+    ; only the transform routines are valid
+    lda nsurfs
+    bne has_surfaces
+    rts
+
+.has_surfaces
 
     ; setup clockwisetest routine 
     ; - load ptrs to surfaces for this model 
