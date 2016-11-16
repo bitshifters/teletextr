@@ -17,6 +17,16 @@ SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
+; point cube effect
+SCRIPT_CALL fx_vectorballs_init
+SCRIPT_SEGMENT_START    30.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_vectorballs
+SCRIPT_SEGMENT_END
+
+
+
+; teletext intro
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_teletext
 SCRIPT_SEGMENT_END
