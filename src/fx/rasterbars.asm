@@ -1,4 +1,7 @@
 
+; extremely dodgy raster bars
+; copied from Kieran's mode7-sprites cracktro wip
+; uses way too much memory for the quality of the effect!
 
 MODE7_shadow_addr = &7800
 
