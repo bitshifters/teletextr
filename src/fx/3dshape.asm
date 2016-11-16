@@ -228,6 +228,14 @@ ENDIF
 
 .initialise_models
 {
+    ; lazy static initialise - only do this routine once per app lifecycle since it juggles mem
+    lda init_done
+    beq do_init
+    rts
+.do_init
+    lda #1
+    sta init_done
+
 IF WIREFRAME
     FIX_MODEL   model_data_tetra, verts_data_tetra, surfs_data_tetra
 ENDIF
@@ -244,4 +252,5 @@ ENDIF
     FIX_MODEL   model_data_viper, verts_data_viper, surfs_data_viper
     FIX_MODEL   model_data_cobra, verts_data_cobra, surfs_data_cobra
     rts
+.init_done EQUB 0
 }

@@ -1,8 +1,14 @@
 
 .fx_vectorballs_init
 {
+    ; lazy static initialise - only do this routine once per app lifecycle since it juggles mem
+    lda init_done
+    bne do_init
+    lda #1
+    sta init_done
     ; sort the verts mem layout
     FIX_MODEL_VERTS   fx_vectorballs_model, fx_vectorballs_model_verts
+.do_init
 
     ; select the cube point cloud
     ldx #LO(fx_vectorballs_model)
@@ -13,6 +19,7 @@
     LDA#&7B:STA ry
     LDA#&C3:STA rz    
     rts
+.init_done EQUB 0    
 }
 
 .fx_vectorballs

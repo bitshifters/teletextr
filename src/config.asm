@@ -17,14 +17,35 @@ SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
-; point cube effect
-SCRIPT_CALL fx_vectorballs_init
-SCRIPT_SEGMENT_START    30.0
+
+
+
+
+
+
+\\ Test cheapo rasterbars effect 
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_PLAY fx_rasterbars_update
+    SCRIPT_PLAY fx_rasterbars_write_shadow
+SCRIPT_SEGMENT_END
+
+\\ And now combine with 3D shape
+SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
-    SCRIPT_CALL fx_vectorballs
+    SCRIPT_PLAY fx_rasterbars_update
+    SCRIPT_PLAY fx_rasterbars_write_shadow
+    SCRIPT_PLAY fx_3dshape_update
 SCRIPT_SEGMENT_END
 
 
+; point cube effect
+SCRIPT_CALL fx_vectorballs_init
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_vectorballs
+SCRIPT_SEGMENT_END
+SCRIPT_CALL fx_3dshape_init
 
 ; teletext intro
 SCRIPT_SEGMENT_START    5.0
