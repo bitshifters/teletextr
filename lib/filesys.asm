@@ -39,7 +39,7 @@ FILESYS_DEBUG=FALSE
     \\ Issue osfile call
     ldx #LO(osfile_params)
     ldy #HI(osfile_params)
-    lda #&FF
+    lda #&FF    ; loadfile
     jsr osfile
 
     rts
