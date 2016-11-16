@@ -129,7 +129,8 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank0_start
-INCBIN "src/music/data/music.raw.exo" 
+.music_en
+INCBIN "data/music_en.raw.exo" ; 16362 bytes
 .bank0_end
 SAVE "Bank0", bank0_start, bank0_end, &8000
 
@@ -142,7 +143,10 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank1_start
-INCBIN "src/music/data/test.raw.exo" 
+.music_exception
+INCBIN "data/music_exception.raw.exo"   ; 4297 
+.music_reg
+INCBIN "data/music_reg.raw.exo"         ; 1548
 ;...
 .bank1_end
 SAVE "Bank1", bank1_start, bank1_end, &8000

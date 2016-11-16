@@ -106,7 +106,7 @@
     inc t4
     inc t4
 
-
+    inx
     inx
     cpx #39
     bne xloop

@@ -14,8 +14,8 @@ MUSICB_SLOT_NO = 1
     jsr swr_select_slot
     cli
 
-	LDX #&00
-	LDY #&80
+	LDX #LO(music_exception)
+	LDY #HI(music_exception)
 	JSR	vgm_init_stream
     rts
 }
@@ -33,8 +33,8 @@ MUSICB_SLOT_NO = 1
     jsr swr_select_slot
     cli
 
-	LDX #&00
-	LDY #&80
+	LDX #LO(music_reg)
+	LDY #HI(music_reg)
 	JSR	vgm_init_stream
     rts
 }
