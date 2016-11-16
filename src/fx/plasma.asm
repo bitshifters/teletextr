@@ -1,7 +1,7 @@
 
 ; cheezy plasma demo
 ; achieves single-colour-character "pixels" by abusing hold graphics
-
+; doesn't seem to work in jsbeeb for some reason
 
 ; plasma animation vars
 .pnt_tab EQUD 0
@@ -17,6 +17,7 @@
     NEXT
 
 ; rainbow-ish palette
+; could easily be optimized to used less memory but slower to render
 .fx_plasma_colour
     FOR i, 0, 32:EQUB 144+1:NEXT
     FOR i, 0, 32:EQUB 144+1:NEXT
