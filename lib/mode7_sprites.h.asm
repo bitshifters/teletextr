@@ -4,16 +4,28 @@
 
 .mode7_sprites_data_ptr	SKIP 2
 
+mode7_sprites_base_addr_HI = draw_buffer_addr
+
 \ ******************************************************************
-\ *	Fast small sprite plot - fixed 4x3 chars = 7x7 pixels
-\ * Coordinates plot_x, plot_y assume 4 char boundary
-\ * Call with X = plot_x, Y = plot_y
+\ *	Fast small masked sprite plot routine
+\ *
+\ * .mode7_sprites_plot_centred
+\ * .mode7_sprites_plot_masked
+\ *
+\ * Call with X = pixel x-coordinate, Y = pixel y-coordinate and
+\ * mode7_sprites_data_ptr = address of sprite + mask data (preserved)
 \ * No clipping but safe to call outside of visible area
-\ * Probably fairly simple to adapt this to 8x6 chars = 15x16 pixels
+\ *
+\ * Dimensions of sprite are determined in code so must be set by
+\ * changing code at run-time but macros exist to automate this.
 \ ******************************************************************
 
-
-
+\ ******************************************************************
+\ * Sprite sizes as defined:
+\ * .mode7_sprites_set_size_8 - actually 7x7 pixels (4x3 chars)
+\ * .mode7_sprites_set_size_12 - actually 11x12 pixels (6x5 chars)
+\ * .mode7_sprites_set_size_16 - actually 15x16 pixels (8x6 chars)
+\ ******************************************************************
 
 
 MACRO SPRITE_PLOT_INDEX_TABLE char_width, char_height

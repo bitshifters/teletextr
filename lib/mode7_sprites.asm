@@ -3,224 +3,18 @@
 \\ Relies on tables in mode7_plot_pixel.asm
 
 \ ******************************************************************
-\ *	Fast small sprite plot - fixed 4x3 chars = 7x7 pixels
-\ * Coordinates plot_x, plot_y assume 4 char boundary
-\ * Call with X = plot_x, Y = plot_y
+\ *	Fast small masked sprite plot routine
+\ *
+\ * .mode7_sprites_plot_centred
+\ * .mode7_sprites_plot_masked
+\ *
+\ * Call with X = pixel x-coordinate, Y = pixel y-coordinate and
+\ * mode7_sprites_data_ptr = address of sprite + mask data (preserved)
 \ * No clipping but safe to call outside of visible area
-\ * Probably fairly simple to adapt this to 8x6 chars = 15x16 pixels
+\ *
+\ * Dimensions of sprite are determined in code so must be set by
+\ * changing code at run-time but macros exist to automate this.
 \ ******************************************************************
-
-IF 0
-.mode7_sprites_plot_masked_8e
-{
-    TXA:SEC:SBC #4:TAX
-    TYA:SEC:SBC #4:TAY
-
-	cpx #PLOT_PIXEL_RANGE_X
-	bcs sprite_not_visible
-	\\ If X char outside edge of screen then return
-	cpx #PLOT_PIXEL_RANGE_X - 8
-	bcs sprite_not_visible
-    
-	cpy #PLOT_PIXEL_RANGE_Y
-	bcs sprite_not_visible
-	cpy #PLOT_PIXEL_RANGE_Y - 9
-	bcc sprite_is_visible
-
-	.sprite_not_visible
-	RTS
-
-	\\ X coordinate to char
-    .sprite_is_visible
-	TXA									; 2c
-	LSR A								; 2c
-
-	STA plot_char_x + 1					; 2c
-
-	\\ Where are we reading data from?
-
-	TXA									; 2c
-	AND #&1								; 2c x_offset
-	ORA mod3_table, Y					; 4c y_offset
-	LSR A								; 2c shift down
-	BCC no_x_offset						; 3c if x_offset falls into carry
-	ORA #&10							; 2c add it back (shifted down)
-	CLC									; 2c
-	.no_x_offset
-
-	\\ Could simplify this if assuming sprite data is page aligned
-
-	ADC mode7_sprites_data_ptr					; 3c
-	STA sprite_data_addr + 1			; 4c
-	LDA mode7_sprites_data_ptr+1					; 3c
-	ADC #0								; 2c
-	STA sprite_data_addr + 2			; 4c
-
-	\\ Can now claim X register as finished with plot_x
-
-	\\ Y coordinate to char
-	LDX div3_table, Y					; 4c
-
-	\\ Where are we writing to?
-	\\ Carry clear after addition above
-	LDA mode7_row_addr_LO, X			; 4c
-    .plot_char_x
-	ADC #0						        ; 2c
-	STA screen_load_addr + 1			; 4c
-	STA screen_write_addr + 1			; 4c
-	LDA mode7_row_addr_HI, X			; 4c
-	ADC #0								; 2c
-	STA screen_load_addr + 2			; 4c
-	STA screen_write_addr + 2			; 4c
-	
-	\\ Could simplify this if assuming sprite data is page aligned
-
-	\\ Mask data lies after sprite data
-	\\ Carry clear after addition above
-	LDA sprite_data_addr + 1			; 4c
-	ADC #96								; 2c
-	STA sprite_mask_addr + 1			; 4c
-	LDA sprite_data_addr + 2			; 4c
-	ADC #0								; 2c
-	STA sprite_mask_addr + 2			; 4c
-
-	LDY #0								; 2c
-	LDX #0								; 2c
-
-	\\ Setup overhead = 114c
-
-	\\ Write 12 bytes...
-	\\ 4 bytes per row x 3 rows
-
-	.loop
-	.screen_load_addr
-	LDA &7C00, X						; 4c
-	.sprite_mask_addr
-	AND &1000, Y				    	; 4c
-	.sprite_data_addr
-	ORA &2000, Y					    ; 4c
-	.screen_write_addr
-	STA &7C00, X						; 5c
-
-	INY									; 2c
-	LDX fast_plot_index_8e, Y			; 4c
-	BPL loop							; 3c
-
-	\\ Total for write = 12 x 26c = 312c
-	\\ Overall = 114c + 312c = 426c
-
-	.return
-	RTS
-}
-
-
-.mode7_sprites_plot_masked_16e
-{
-    TXA:SEC:SBC #8:TAX
-    TYA:SEC:SBC #8:TAY
-
-	cpx #PLOT_PIXEL_RANGE_X
-	bcs sprite_not_visible
-	\\ If X char outside edge of screen then return
-	cpx #PLOT_PIXEL_RANGE_X - 16
-	bcs sprite_not_visible
-    
-	cpy #PLOT_PIXEL_RANGE_Y
-	bcs sprite_not_visible
-	cpy #PLOT_PIXEL_RANGE_Y - 18
-	bcc sprite_is_visible
-
-	.sprite_not_visible
-	RTS
-
-	\\ X coordinate to char
-    .sprite_is_visible
-	TXA									; 2c
-	LSR A								; 2c
-	STA plot_char_x + 1					; 4c
-
-	\\ Where are we reading data from?
-
-	TXA									; 2c
-	AND #&1								; 2c x_offset
-	ORA mod3_table, Y					; 4c y_offset
-	LSR A								; 2c shift down
-	BCC no_x_offset						; 3c if x_offset falls into carry
-	ORA #&10							; 2c add it back (shifted down)
-	CLC									; 2c
-	.no_x_offset
-	LSR A: LSR A: LSR A:LSR A			; 8c shift down so is lookup - could simplify this
-
-	TAX									; 2c
-	LDA fast_plot_mult_48, X			; 4c lookup * 48
-
-	\\ Could simplify this if assuming sprite data is page aligned
-
-	ADC mode7_sprites_data_ptr					; 3c
-	STA sprite_data_addr + 1			; 4c
-	LDA mode7_sprites_data_ptr+1					; 3c
-	ADC #0								; 2c
-	STA sprite_data_addr + 2			; 4c
-
-	\\ Can now claim X register as finished with plot_x
-
-	\\ Y coordinate to char
-	LDX div3_table, Y					; 4c
-
-	\\ Where are we writing to?
-	\\ Carry clear after addition above
-	LDA mode7_row_addr_LO, X			; 4c
-    .plot_char_x
-	ADC #0      						; 2c
-	STA screen_load_addr + 1			; 4c
-	STA screen_write_addr + 1			; 4c
-	LDA mode7_row_addr_HI, X			; 4c
-	ADC #0								; 2c
-	STA screen_load_addr + 2			; 4c
-	STA screen_write_addr + 2			; 4c
-	
-	\\ Could simplify this if assuming sprite data is page aligned
-
-	\\ Mask data lies after sprite data
-	\\ Carry clear after addition above
-	LDA sprite_data_addr + 1			; 4c
-	ADC #LO(8 * 6 * 6)					; 2c
-	STA sprite_mask_addr + 1			; 4c
-	LDA sprite_data_addr + 2			; 4c
-	ADC #HI(8 * 6 * 6)					; 2c
-	STA sprite_mask_addr + 2			; 4c
-
-	LDY #0								; 2c
-	LDX #0								; 2c
-
-	\\ Setup overhead = 128c
-
-	\\ Write 48 bytes...
-	\\ 8 bytes per row x 6 rows
-
-	.loop
-	.screen_load_addr
-	LDA &7C00, X						; 4c
-	.sprite_mask_addr
-	AND &2000, Y					; 4c
-	.sprite_data_addr
-	ORA &3000, Y					; 4c
-	.screen_write_addr
-	STA &7C00, X						; 5c
-
-	INY									; 2c
-	LDX fast_plot_index_16e, Y			; 4c
-	CPX #&FF							; 2c
-	BNE loop							; 3c
-
-	\\ Total for write = 48 x 28c = 1344c
-	\\ Overall = 128c + 1344c = 1472c
-
-	.return
-	RTS
-}
-ENDIF
-
 
 .mode7_sprites_plot_centred
 \\{
@@ -240,36 +34,53 @@ ENDIF
 .mode7_sprites_plot_masked
 \\{
 	\\ If right edge of sprite beyond right edge of screen don't plot
+
 	.mode7_sprites_right_clip
-	cpx #PLOT_PIXEL_RANGE_X - 1
-	bcs sprite_not_visible
+	cpx #PLOT_PIXEL_RANGE_X - 1			; 2c
+	bcs mode7_sprites_not_visible		; 2c
+
+	\\ If bottom edge of sprite beyond bottom edge of screen don't plot
     
 	.mode7_sprites_bottom_clip
-	cpy #PLOT_PIXEL_RANGE_Y - 1
-	bcc sprite_is_visible
+	cpy #PLOT_PIXEL_RANGE_Y - 1			; 2c
+	bcs mode7_sprites_not_visible		; 3c
 
-	.sprite_not_visible
-	RTS
+	\\ Where are we writing to?
 
 	\\ X coordinate to char
-    .sprite_is_visible
+	STX mode7_sprites_plot_x + 1		; 4c
 	TXA									; 2c
 	LSR A								; 2c
 
-	STA sprite_plot_char_x + 1			; 4c
+	\\ Can use X now as have saved it
+
+	\\ Y coordinate to char
+	LDX mode7_sprites_div3_table, Y		; 4c
+
+	\\ Calculate screen address
+	CLC									; 2c
+	ADC mode7_sprites_row_addr_LO, X	; 4c
+	STA screen_load_addr + 1			; 4c
+	STA screen_write_addr + 1			; 4c
+	LDA mode7_sprites_row_addr_HI, X	; 4c
+	ADC mode7_sprites_base_addr_HI		; 3c
+	STA screen_load_addr + 2			; 4c
+	STA screen_write_addr + 2			; 4c
 
 	\\ Where are we reading data from?
 
-	TXA									; 2c
+	\\ Calculate offset 0 - 5
+	.mode7_sprites_plot_x
+	LDA #0								; 2c
 	AND #&1								; 2c x_offset
-	ORA mode7_sprite_mod3_table, Y		; 4c y_offset
+	ORA mode7_sprites_mod3_table, Y		; 4c y_offset
 
 	\\ Multiply by our offset to locate sprite data
 	TAX									; 2c
 	.mode7_sprites_data_size
-	LDA &1000, X			; 4c lookup * 48
+	LDA &1000, X						; 4c
 
-	\\ Could simplify this if assuming sprite data is page aligned
+	\\ Could simplify this if assuming sprite data is page aligned?
 
 	CLC
 	ADC mode7_sprites_data_ptr			; 3c
@@ -278,24 +89,8 @@ ENDIF
 	ADC #0								; 2c
 	STA sprite_data_addr + 2			; 4c
 
-	\\ Can now claim X register as finished with plot_x
-
-	\\ Y coordinate to char
-	LDX div3_table, Y					; 4c
-
-	\\ Where are we writing to?
-	\\ Carry clear after addition above
-	LDA mode7_row_addr_LO, X			; 4c
-    .sprite_plot_char_x
-	ADC #0						        ; 2c
-	STA screen_load_addr + 1			; 4c
-	STA screen_write_addr + 1			; 4c
-	LDA mode7_row_addr_HI, X			; 4c
-	ADC #0								; 2c
-	STA screen_load_addr + 2			; 4c
-	STA screen_write_addr + 2			; 4c
 	
-	\\ Could simplify this if assuming sprite data is page aligned
+	\\ Could simplify this if assuming sprite data is page aligned?
 
 	\\ Mask data lies after sprite data
 	\\ Carry clear after addition above
@@ -311,7 +106,7 @@ ENDIF
 	LDY #0								; 2c
 	LDX #0								; 2c
 
-	\\ Setup overhead = XXXX
+	\\ Setup overhead = 106c
 
 	\\ Write sprite bytes...
 
@@ -328,17 +123,23 @@ ENDIF
 	INY									; 2c
 	.mode7_sprites_screen_lookup
 	LDX &4000, Y						; 4c
-	CPX #&FF							; this can be omitted for sprites < 3 rows in size
+	CPX #&FF							; 2c this can be omitted for sprites < 3 rows in size and BPL instead
 	BNE mode7_sprites_plot_masked_loop	; 3c
 
-	\\ Total for write = XXXX
-	\\ Overall = XXXX
+	\\ Total for write = 28c per byte = 336c / 840c / 1344c (for size 8 / 12 / 16)
+	\\ Overall = 444c / 946c / 1450c (6.17c / 5.26c / 5.03c per pixel)
 
-	.mode7_sprites_plot_masked_return
+	.mode7_sprites_not_visible
 	RTS
 \\}
 
-\\ Generate functions to set sprite size in general routine
+
+\ ******************************************************************
+\ * Sprite sizes as defined:
+\ * .mode7_sprites_set_size_8 - actually 7x7 pixels (4x3 chars)
+\ * .mode7_sprites_set_size_12 - actually 11x12 pixels (6x5 chars)
+\ * .mode7_sprites_set_size_16 - actually 15x16 pixels (8x6 chars)
+\ ******************************************************************
 
 .mode7_sprites_set_size_8
 {
@@ -380,24 +181,25 @@ SPRITE_PLOT_MULT_TABLE 8, 6
 
 \\ General lookups needed for sprite routine
 
-.mode7_sprite_mod3_table
+.mode7_sprites_mod3_table
 FOR n, 0, PLOT_PIXEL_RANGE_Y-1, 1
 	EQUB (n MOD 3) << 1						; shift this up as bottom bit is our x offset
 NEXT
 
-\\ Sure we can share these with the pixel plot routine
+\\ Sure we can share these with the pixel plot routine somehow?  :)
+\\ These tables take up less space (75 + 25 + 25) than just having LO & HI addresses for all pixels (75 + 75) 
 
-.mode7_row_addr_LO
-FOR n, 0, MODE7_char_height-1, 1
-EQUB LO(&7800 + n * MODE7_char_width)
-NEXT
-
-.mode7_row_addr_HI
-FOR n, 0, MODE7_char_height-1, 1
-EQUB HI(&7800 + n * MODE7_char_width)
-NEXT
-
-.div3_table
+.mode7_sprites_div3_table
 FOR n, 0, PLOT_PIXEL_RANGE_Y-1, 1
 	EQUB (n DIV 3)
+NEXT
+
+.mode7_sprites_row_addr_LO
+FOR n, 0, MODE7_char_height-1, 1
+EQUB LO(n * MODE7_char_width + 1)
+NEXT
+
+.mode7_sprites_row_addr_HI
+FOR n, 0, MODE7_char_height-1, 1
+EQUB HI(n * MODE7_char_width + 1)
 NEXT
