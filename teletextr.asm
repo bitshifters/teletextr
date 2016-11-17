@@ -25,6 +25,7 @@ INCLUDE "lib/exomiser.h.asm"
 
 INCLUDE "lib/mode7_graphics.h.asm"
 INCLUDE "lib/mode7_plot_pixel.h.asm"
+INCLUDE "lib/mode7_sprites.h.asm"
 INCLUDE "lib/bresenham.h.asm"
 
 INCLUDE "lib/3d/3d.h.asm"
@@ -73,6 +74,7 @@ INCLUDE "lib/3d/culling.asm"
 
 INCLUDE "lib/mode7_graphics.asm"
 INCLUDE "lib/mode7_plot_pixel.asm"
+INCLUDE "lib/mode7_sprites.asm"
 INCLUDE "lib/bresenham.asm"
 
 
