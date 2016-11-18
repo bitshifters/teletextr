@@ -19,7 +19,11 @@ SCRIPT_CALL fx_3dshape_init
 
 
 
-
+\\ Test cheapo rotozoom effect 
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_PLAY fx_rotozoom
+SCRIPT_SEGMENT_END
 
 
 

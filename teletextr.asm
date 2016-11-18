@@ -104,6 +104,7 @@ INCLUDE "src/fx/testcard.asm"
 INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/rasterbars.asm"
 INCLUDE "src/fx/vectorballs.asm"
+INCLUDE "src/fx/rotozoom.asm"
 
 
 \ ******************************************************************
