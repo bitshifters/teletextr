@@ -35,7 +35,7 @@ MACRO SPRITE_PLOT_INDEX_TABLE char_width, char_height
 	EQUB (y * MODE7_char_width) + x
 	NEXT
 	NEXT
-	EQUB 255
+	EQUB 0
 }
 ENDMACRO
 

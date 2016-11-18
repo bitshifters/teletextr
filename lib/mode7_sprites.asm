@@ -123,7 +123,6 @@
 	INY									; 2c
 	.mode7_sprites_screen_lookup
 	LDX &4000, Y						; 4c
-	CPX #&FF							; 2c this can be omitted for sprites < 3 rows in size and BPL instead
 	BNE mode7_sprites_plot_masked_loop	; 3c
 
 	\\ Total for write = 28c per byte = 336c / 840c / 1344c (for size 8 / 12 / 16)
