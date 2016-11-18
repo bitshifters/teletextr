@@ -125,8 +125,8 @@
 	LDX &4000, Y						; 4c
 	BNE mode7_sprites_plot_masked_loop	; 3c
 
-	\\ Total for write = 28c per byte = 336c / 840c / 1344c (for size 8 / 12 / 16)
-	\\ Overall = 444c / 946c / 1450c (6.17c / 5.26c / 5.03c per pixel)
+	\\ Total for write = 26c per byte = 312c / 780c / 1248c (for size 8 / 12 / 16)
+	\\ Overall = 418c / 886c / 1354c (~5c per pixel)
 
 	.mode7_sprites_not_visible
 	RTS
