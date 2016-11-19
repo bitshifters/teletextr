@@ -22,12 +22,43 @@
 .init_done EQUB 0    
 }
 
-.fx_vectorballs
+
+.fx_vectorballs_set_small
+{
+    JSR mode7_sprites_set_size_8
+	LDA #LO(ball7_data)
+	STA mode7_sprites_data_ptr
+	LDA #HI(ball7_data)
+	STA mode7_sprites_data_ptr+1
+    RTS
+}
+
+.fx_vectorballs_set_medium
+{
+    JSR mode7_sprites_set_size_12
+	LDA #LO(ball11_data)
+	STA mode7_sprites_data_ptr
+	LDA #HI(ball11_data)
+	STA mode7_sprites_data_ptr+1
+    RTS
+}
+
+.fx_vectorballs_set_large
+{
+    JSR mode7_sprites_set_size_16
+	LDA #LO(ball15_data)
+	STA mode7_sprites_data_ptr
+	LDA #HI(ball15_data)
+	STA mode7_sprites_data_ptr+1
+    RTS
+}
+
+
+.fx_vectorballs_update
 {
 	lda #144+7
     ldx #0
 	jsr mode7_set_column_shadow_fast
-
 
     ; compute rotation matrix
     JSR matrix
@@ -44,7 +75,8 @@
     ; also would be good to get screen Z too for sorting...TODO
     tax
 
-    PLOT_PIXEL
+;    PLOT_PIXEL
+	JSR mode7_sprites_plot_centred
     
     pla
     tax
@@ -88,3 +120,8 @@ FOR ZC, -1.0, 1.0, VCUBE_STEP
     NEXT
 NEXT
 
+
+\\ Sprite data
+INCLUDE "src\sprites\ball7.asm"
+INCLUDE "src\sprites\ball11.asm"
+INCLUDE "src\sprites\ball15.asm"

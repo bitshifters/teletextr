@@ -5,11 +5,13 @@
 
 MODE7_shadow_addr = &7800
 
-RASTER_centre_row = 11
-RASTER_wave_rows = 6
-RASTER_table_inc = 64
+FX_RASTERBAR_TABLE_SIZE = 64
+FX_RASTER_BAR_GAP = 9
 
 .raster_idx
+EQUB 0
+
+.fx_rasterbars_colour
 EQUB 0
 
 .fx_rasterbars_write_shadow
@@ -55,118 +57,85 @@ EQUB 0
 	RTS
 }
 
+.fx_rasterbars_reset_bg
+{
+	LDA #0
+	LDY #MODE7_char_height - 1
+	.loop1
+	STA teletext_bg_col, Y
+	DEY
+	BNE loop1
+
+	LDA #MODE7_contiguous
+	LDY #MODE7_char_height - 1
+	.loop2
+	STA teletext_fx, Y
+	DEY
+	BNE loop2
+
+	.return
+	RTS
+}
+
 .fx_rasterbars_update
 {
-	\\ Clear our old bar
-	LDX raster_idx
-	LDY raster_y_table, X
-
-	LDA #0
-	STA teletext_bg_col, Y
-	STA teletext_bg_col+1, Y
-	STA teletext_bg_col+2, Y
-
-    LDA #MODE7_contiguous
-	STA teletext_fx, Y
-	STA teletext_fx+1, Y
-	STA teletext_fx+2, Y
-
-	TXA
-	CLC
-	ADC #RASTER_table_inc
-	TAX
-	LDY raster_y_table, X
-
-	LDA #0
-	STA teletext_bg_col, Y
-	STA teletext_bg_col+1, Y
-	STA teletext_bg_col+2, Y
-
-    LDA #MODE7_contiguous
-	STA teletext_fx, Y
-	STA teletext_fx+1, Y
-	STA teletext_fx+2, Y
-	
-	TXA
-	CLC
-	ADC #RASTER_table_inc
-	TAX
-	LDY raster_y_table, X
-
-	LDA #0
-	STA teletext_bg_col, Y
-	STA teletext_bg_col+1, Y
-	STA teletext_bg_col+2, Y
-
-    LDA #MODE7_contiguous
-	STA teletext_fx, Y
-	STA teletext_fx+1, Y
-	STA teletext_fx+2, Y
+	\\ Clear our old bars - simpler to just blat the whole lot
+	\\ Unless we want this effect to work with other bg effects
+	JSR fx_rasterbars_reset_bg
 
     \\ Update raster index into table
-	LDX raster_idx
-	INX
-	INX
-	STX raster_idx
+	CLC
+	LDA raster_idx
+	ADC delta_time					; move delta_time entries forward each update
+	AND #(FX_RASTERBAR_TABLE_SIZE - 1)
+	STA raster_idx
+	TAX
 	
-    \\ Write our new colour values
-	LDY raster_y_table, X
+	\\ Start with colour bit 1
+
 	LDA #1
+	STA fx_rasterbars_colour
+
+    \\ Do this as a loop as not so time critical
+	.loop
+
+	\\ Load charater row Y from table
+	LDY raster_y_table, X
+
+	\\ Update colour for this row + 2 more
+	LDA fx_rasterbars_colour
 	ORA teletext_bg_col, Y
 	STA teletext_bg_col, Y
-	LDA #1
+	LDA fx_rasterbars_colour
 	ORA teletext_bg_col+1, Y
 	STA teletext_bg_col+1, Y
-	LDA #1
+	LDA fx_rasterbars_colour
 	ORA teletext_bg_col+2, Y
 	STA teletext_bg_col+2, Y
 
+	\\ Set these rows to separated gfx
     LDA #MODE7_separated
 	STA teletext_fx, Y
 	STA teletext_fx+1, Y
 	STA teletext_fx+2, Y
 
+	\\ Next colour bit
+	LDA fx_rasterbars_colour
+	ASL A
+
+	\\ Until done all 3 bits
+	CMP #8
+	BCS return
+	STA fx_rasterbars_colour
+
+	\\ Next bar is offset in our table
 	TXA
 	CLC
-	ADC #RASTER_table_inc
+	ADC #FX_RASTER_BAR_GAP					; move 16 entries forward for each bar
+	AND #(FX_RASTERBAR_TABLE_SIZE - 1)
 	TAX
-	LDY raster_y_table, X
 
-	LDA #2
-	ORA teletext_bg_col, Y
-	STA teletext_bg_col, Y
-	LDA #2
-	ORA teletext_bg_col+1, Y
-	STA teletext_bg_col+1, Y
-	LDA #2
-	ORA teletext_bg_col+2, Y
-	STA teletext_bg_col+2, Y
-
-    LDA #MODE7_separated
-	STA teletext_fx, Y
-	STA teletext_fx+1, Y
-	STA teletext_fx+2, Y
-	
-	TXA
-	CLC
-	ADC #RASTER_table_inc
-	TAX
-	LDY raster_y_table, X
-
-	LDA #4
-	ORA teletext_bg_col, Y
-	STA teletext_bg_col, Y
-	LDA #4
-	ORA teletext_bg_col+1, Y
-	STA teletext_bg_col+1, Y
-	LDA #4
-	ORA teletext_bg_col+2, Y
-	STA teletext_bg_col+2, Y
-
-    LDA #MODE7_separated
-	STA teletext_fx, Y
-	STA teletext_fx+1, Y
-	STA teletext_fx+2, Y
+	JMP loop
 
 	.return
 	RTS
@@ -174,8 +143,8 @@ EQUB 0
 
 
 .raster_y_table				; don't need 256 entries but easier for now
-FOR n, 0, 255, 1
-	EQUB RASTER_centre_row + RASTER_wave_rows * SIN(PI * n / 128)
+FOR n, 0, FX_RASTERBAR_TABLE_SIZE - 1, 1
+	EQUB 12 + 6.9 * SIN(PI * n / (FX_RASTERBAR_TABLE_SIZE / 2))
 NEXT
   
 \\ Teletext screen = bg col + black/new bg + fx + fg col
