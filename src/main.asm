@@ -1,10 +1,20 @@
 
 
 
+IF 0
 .bank_file0    EQUS "Bank0", 13
 .bank_file1    EQUS "Bank1", 13
 .bank_file2    EQUS "Bank2", 13
 .bank_file3    EQUS "Bank3", 13
+.myfile EQUS "Bank0  $"
+ENDIF
+
+; disk loader uses hacky filename format (same as catalogue) 
+.bank_file0a   EQUS "Bank0  $"
+.bank_file1a   EQUS "Bank1  $"
+.bank_file2a   EQUS "Bank2  $"
+.bank_file3a   EQUS "Bank3  $"
+
 
 
 
@@ -30,6 +40,8 @@
 .loading_bank_text EQUS "Loading bank", 13, 10, 0
 .loading_bank_text2 EQUS "Bank loaded", 13, 10, 0
 .test_print_number EQUS "%a", 13,10,0
+
+
     .swr_ok
 
     MPRINT    swr_bank_text
@@ -43,18 +55,47 @@
     
     MPRINT loading_bank_text
 
+IF 0
+    ; cat info
+    ldx #&00
+    ldy #&0e
+    jsr disksys_read_catalogue
+
+    jsr disksys_get_numfiles
+
+    MPRINT test_print_number
+    tax
+    dex
+.cloop
+    jsr disksys_get_filename
+    dex
+    bpl cloop
+
+    ldx #LO(myfile)
+    ldy #HI(myfile)
+    jsr disksys_find_file
+    MPRINT test_print_number
+
+    lda #&80
+    ldx #LO(myfile)
+    ldy #HI(myfile)
+    jsr disksys_load_file
+ENDIF
+
+
 
 	\\ load all banks
-IF TRUE
+IF 1
+
 
     lda #0
 	sei
     jsr swr_select_slot
 	cli
     lda #&80
-    ldx #LO(bank_file0)
-    ldy #HI(bank_file0)
-    jsr file_stream
+    ldx #LO(bank_file0a)
+    ldy #HI(bank_file0a)
+    jsr disksys_load_file
     MPRINT loading_bank_text2
 
     lda #1
@@ -62,9 +103,9 @@ IF TRUE
     jsr swr_select_slot
 	cli
     lda #&80
-    ldx #LO(bank_file1)
-    ldy #HI(bank_file1)
-    jsr file_stream
+    ldx #LO(bank_file1a)
+    ldy #HI(bank_file1a)
+    jsr disksys_load_file
     MPRINT loading_bank_text2
 
     lda #2
@@ -72,9 +113,9 @@ IF TRUE
     jsr swr_select_slot
 	cli
     lda #&80
-    ldx #LO(bank_file2)
-    ldy #HI(bank_file2)
-    jsr file_stream
+    ldx #LO(bank_file2a)
+    ldy #HI(bank_file2a)
+    jsr disksys_load_file
     MPRINT loading_bank_text2
 
     lda #3
@@ -82,12 +123,11 @@ IF TRUE
     jsr swr_select_slot
 	cli
     lda #&80
-    ldx #LO(bank_file3)
-    ldy #HI(bank_file3)
-    jsr file_stream
+    ldx #LO(bank_file3a)
+    ldy #HI(bank_file3a)
+    jsr disksys_load_file
     MPRINT loading_bank_text2
-
-
+    
 ELSE
 
     lda #0
@@ -97,7 +137,7 @@ ELSE
     lda #&80
     ldx #LO(bank_file0)
     ldy #HI(bank_file0)
-    jsr file_load
+    jsr file_stream
     MPRINT loading_bank_text2
 
     lda #1
@@ -107,7 +147,7 @@ ELSE
     lda #&80
     ldx #LO(bank_file1)
     ldy #HI(bank_file1)
-    jsr file_load
+    jsr file_stream
     MPRINT loading_bank_text2
 
     lda #2
@@ -117,7 +157,7 @@ ELSE
     lda #&80
     ldx #LO(bank_file2)
     ldy #HI(bank_file2)
-    jsr file_load
+    jsr file_stream
     MPRINT loading_bank_text2
 
     lda #3
@@ -127,8 +167,10 @@ ELSE
     lda #&80
     ldx #LO(bank_file3)
     ldy #HI(bank_file3)
-    jsr file_load
+    jsr file_stream
     MPRINT loading_bank_text2
+
+
 ENDIF
 
 

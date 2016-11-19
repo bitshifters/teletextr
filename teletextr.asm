@@ -25,6 +25,7 @@ INCLUDE "lib/exomiser.h.asm"
 
 INCLUDE "lib/mode7_graphics.h.asm"
 INCLUDE "lib/mode7_plot_pixel.h.asm"
+INCLUDE "lib/mode7_sprites.h.asm"
 INCLUDE "lib/bresenham.h.asm"
 
 INCLUDE "lib/3d/3d.h.asm"
@@ -61,6 +62,7 @@ INCLUDE "lib/swr.asm"
 INCLUDE "lib/filesys.asm"
 INCLUDE "lib/irq.asm"
 INCLUDE "lib/vram.asm"
+INCLUDE "lib/disksys.asm"
 
 ALIGN 256
 WIREFRAME=TRUE
@@ -73,6 +75,7 @@ INCLUDE "lib/3d/culling.asm"
 
 INCLUDE "lib/mode7_graphics.asm"
 INCLUDE "lib/mode7_plot_pixel.asm"
+INCLUDE "lib/mode7_sprites.asm"
 INCLUDE "lib/bresenham.asm"
 
 
@@ -105,6 +108,8 @@ INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/rasterbars.asm"
 INCLUDE "src/fx/vectorballs.asm"
 INCLUDE "src/fx/rotozoom.asm"
+INCLUDE "src/fx/mirrorfloor.asm"
+
 
 
 \ ******************************************************************

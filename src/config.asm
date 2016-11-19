@@ -19,12 +19,36 @@ SCRIPT_CALL fx_3dshape_init
 
 
 
+
 \\ Test cheapo rotozoom effect 
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_PLAY fx_rotozoom
 SCRIPT_SEGMENT_END
 
+
+; point cube effect
+SCRIPT_CALL fx_vectorballs_init
+SCRIPT_CALL fx_vectorballs_set_small
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_vectorballs_update
+SCRIPT_SEGMENT_END
+
+
+
+SCRIPT_CALL fx_vectorballs_set_medium
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_vectorballs_update
+SCRIPT_SEGMENT_END
+
+
+SCRIPT_CALL fx_vectorballs_set_large
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_vectorballs_update
+SCRIPT_SEGMENT_END
 
 
 \\ Test cheapo rasterbars effect 
@@ -35,21 +59,13 @@ SCRIPT_SEGMENT_START    10.0
 SCRIPT_SEGMENT_END
 
 \\ And now combine with 3D shape
+SCRIPT_CALL fx_3dshape_init
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_PLAY fx_rasterbars_update
     SCRIPT_PLAY fx_rasterbars_write_shadow
     SCRIPT_PLAY fx_3dshape_update
 SCRIPT_SEGMENT_END
-
-
-; point cube effect
-SCRIPT_CALL fx_vectorballs_init
-SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_copybuffer_update
-    SCRIPT_CALL fx_vectorballs
-SCRIPT_SEGMENT_END
-SCRIPT_CALL fx_3dshape_init
 
 ; teletext intro
 SCRIPT_SEGMENT_START    5.0
