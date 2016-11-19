@@ -61,6 +61,7 @@ INCLUDE "lib/swr.asm"
 INCLUDE "lib/filesys.asm"
 INCLUDE "lib/irq.asm"
 INCLUDE "lib/vram.asm"
+INCLUDE "lib/disksys.asm"
 
 ALIGN 256
 WIREFRAME=TRUE
