@@ -1,11 +1,15 @@
 
 
 
+IF 0
 .bank_file0    EQUS "Bank0", 13
 .bank_file1    EQUS "Bank1", 13
 .bank_file2    EQUS "Bank2", 13
 .bank_file3    EQUS "Bank3", 13
 .myfile EQUS "Bank0  $"
+ENDIF
+
+; disk loader uses hacky filename format (same as catalogue) 
 .bank_file0a   EQUS "Bank0  $"
 .bank_file1a   EQUS "Bank1  $"
 .bank_file2a   EQUS "Bank2  $"

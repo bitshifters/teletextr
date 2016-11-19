@@ -1,4 +1,5 @@
 ; DFS/ADFS Disk op routines
+; helpful for streaming, faster loading to SWR etc.
 ; http://chrisacorns.computinghistory.org.uk/docs/Acorn/Manuals/Acorn_DiscSystemUGI2.pdf
 
 DISKSYS_DEBUG = FALSE
@@ -26,7 +27,9 @@ EQUB 0				; returned error value
     rts
 }
 
-
+;--------------------------------------------------------------
+; set disk head position for next read operation
+;--------------------------------------------------------------
 ; on entry
 ; X = track number (0-79)
 ; Y = sector number (0-9)
@@ -40,7 +43,9 @@ EQUB 0				; returned error value
 
 
 
-
+;--------------------------------------------------------------
+; Load sectors from disk to memory
+;--------------------------------------------------------------
 ; on entry
 ; A = number of sectors to read (0-31)
 ; X = destination memory address LSB
@@ -69,7 +74,9 @@ EQUB 0				; returned error value
 
 .disksys_catalogue_addr     EQUW 0
 
+;--------------------------------------------------------------
 ; set the memory address where the disk catalogue will be stored
+;--------------------------------------------------------------
 ; on entry
 ; X = catalogue memory address LSB
 ; Y = catalogue memory address MSB
@@ -80,6 +87,9 @@ EQUB 0				; returned error value
     rts
 }
 
+;--------------------------------------------------------------
+; Fetch the 512 byte catalogue from the disk to memory
+;--------------------------------------------------------------
 ; on entry
 ; X = destination memory address LSB
 ; Y = destination memory address MSB
@@ -100,7 +110,7 @@ EQUB 0				; returned error value
 }
 
 
-
+IF 0
 ; on entry
 ; X is ID of the file
 ; Assumes disksys_read_catalogue has been called prior
@@ -136,8 +146,13 @@ EQUB 0				; returned error value
     tax
     rts
 }
+ENDIF
 
-; Returns number of files on the disk
+
+
+;--------------------------------------------------------------
+; Returns number of files on the disk in A
+;--------------------------------------------------------------
 ; X/Y preserved
 .disksys_get_numfiles
 {
@@ -158,19 +173,19 @@ EQUB 0				; returned error value
 }
 
 
+;--------------------------------------------------------------
+; Find a file on the disk by filename
+;--------------------------------------------------------------
 ; Returns id of a file on the disk (0-31)
 ; returns 255 if not found
 ; X = filename address LSB
 ; Y = filename address MSB
 ; filename must be an 8 byte format where D is directory "NNNNNNND"
 ; filename IS case sensitive.
-; clobbers &9c-&9f ZP
 .disksys_find_file
 {
     stx comp_addr2+1
     sty comp_addr2+2
- ;   stx comp_addr3+1
- ;   sty comp_addr3+2
 
     lda disksys_catalogue_addr+0
     clc
@@ -190,14 +205,9 @@ EQUB 0				; returned error value
     ldy #7
 .comp_loop
 
-;.comp_addr3
-;    lda &ffff,y
-;    MPRINT   ftxt3  
-
 .comp_addr
     lda &ffff,y     ; modified
 
-  
 .comp_addr2
     cmp &ffff,y     ; modified
 
@@ -206,15 +216,10 @@ EQUB 0				; returned error value
     bpl comp_loop
     ; found it, return id
     txa
-;    MPRINT   ftxt  
     rts
-;.ftxt EQUS "Found it %a",13,10,0
-;.ftxt2 EQUS "Checking %a",13,10,0
-;.ftxt3 EQUS "With %a",13,10,0
-;.ftxt4 EQUS "NO MATCH", 13,10,0
+
 
 .failed
-;    MPRINT   ftxt4  
 
     lda comp_addr+1
     clc
@@ -235,7 +240,9 @@ EQUB 0				; returned error value
 }
 
 
-
+;--------------------------------------------------------------
+; Fetch file attributes
+;--------------------------------------------------------------
 ; returns file attributes for given file id
 ; on entry
 ; A=file id (0-31)
@@ -257,7 +264,10 @@ EQUB 0				; returned error value
     rts
 }
 
-
+;--------------------------------------------------------------
+; Load a file from disk to memory (SWR supported)
+; Loads in sector granularity so will always write to page aligned address
+;--------------------------------------------------------------
 ; A=memory address MSB (page aligned)
 ; X=filename address LSB
 ; Y=filename address MSB
@@ -273,7 +283,7 @@ EQUB 0				; returned error value
 
     txa:pha:tya:pha
 
-    ; load disk catalogue
+    ; load 512 byte disk catalogue to &0E00-&0FFF
     ldx #&00
     ldy #&0e
     jsr disksys_read_catalogue
@@ -287,13 +297,16 @@ EQUB 0				; returned error value
 .file_length    EQUB 0,0,0
 .file_sector    EQUB 0,0
 .file_sectors   EQUW 0
-;.file_addr      EQUB 0
+
+IF DISKSYS_DEBUG
 .txt_sector EQUS "sector %w", LO(file_sector), HI(file_sector), 13,10,0
 .txt_length EQUS "length %w", LO(file_length), HI(file_length), 13,10,0
 .txt_sectors EQUS "sectors %w", LO(file_sectors), HI(file_sectors), 13,10,0
 .txt_t1 EQUS "Track %a", 13,10,0
 .txt_s1 EQUS "Sector %a", 13,10,0
 .txt_l1 EQUS "Loading to %a", 13,10,0
+ENDIF
+
 
 .continue
     ; get attributes
@@ -303,6 +316,7 @@ EQUB 0				; returned error value
     stx &9e
     sty &9f
 
+    ; get file length in bytes
     ldy #4
     lda (&9e),y
     sta file_length+0
@@ -318,6 +332,7 @@ EQUB 0				; returned error value
     and #3
     sta file_length+2
 
+    ; get sector offset (10 bits)
     lda (&9e),y
     and #3
     sta file_sector+1
@@ -325,6 +340,7 @@ EQUB 0				; returned error value
     lda (&9e),y
     sta file_sector+0    
 
+    ; round up file length to total sector count
     lda file_length+1
     sta file_sectors+0
     lda file_length+2
@@ -336,13 +352,13 @@ EQUB 0				; returned error value
     inc file_sectors+1
 .pagea
 
+IF DISKSYS_DEBUG
     MPRINT txt_sector
     MPRINT txt_length
     MPRINT txt_sectors
+ENDIF 
 
-    ; seek to start of file
-
-;   div sector offset by 10 to get track/sector
+;  divide sector offset by 10 to get track & sector
     lda file_sector+1
     ldx #8
     asl file_sector+0
@@ -359,11 +375,14 @@ EQUB 0				; returned error value
     dex
     bne l1    
 
-    MPRINT txt_s1
     sta file_sector+1   ; now contains sector
-    
+
+IF DISKSYS_DEBUG
     lda file_sector+0   ; now contains track
     MPRINT txt_t1
+    lda file_sector+1   ; now contains sector
+    MPRINT txt_s1
+ENDIF
     
 
 
@@ -374,32 +393,25 @@ EQUB 0				; returned error value
     ldy file_sector+1   ; sector
     jsr disksys_seek
 
-    ; move to next sector
-    inc file_sector+1
-    lda file_sector+1
-    cmp #10
-    bne same_track
-    ; move to next track
-    lda #0
-    sta file_sector+1
-    inc file_sector+0
-.same_track
-
+    ; see if any sectors left to load
     lda file_sectors+0
     bne fetch
     lda file_sectors+1
     bne fetch
 
-    MPRINT txt_sectors    
+IF DISKSYS_DEBUG
+    MPRINT txt_sectors
+ENDIF    
     ; finished
     rts
 .fetch
 
+IF DISKSYS_DEBUG
     lda transfer_addr+2
     MPRINT txt_l1
+ENDIF
 
-
-    ; load the sector
+    ; load a single sector to 256 byte memory buffer &1000
     lda #1
     ldx #0
     ldy #&10
@@ -411,7 +423,7 @@ EQUB 0				; returned error value
     lda #&FF            ; MODIFIED
     jsr swr_select_bank
 
-
+    ; copy from the memory buffer to destination address
     ldx #0
 .transfer
     lda &1000,x
@@ -421,10 +433,21 @@ EQUB 0				; returned error value
     bne transfer
     cli
 
-
+    ; advance destination memory address by one page 
     inc transfer_addr+2
 
+    ; advance disk head to next sector
+    inc file_sector+1
+    lda file_sector+1
+    cmp #10
+    bne same_track
+    ; move to next track
+    lda #0
+    sta file_sector+1
+    inc file_sector+0
+.same_track
 
+    ; decrease the number of sectors remaining
     lda file_sectors+0
     sec
     sbc #1
@@ -432,16 +455,12 @@ EQUB 0				; returned error value
     lda file_sectors+1
     sbc #0
     sta file_sectors+1
+
     jmp load_loop
-
-    rts
-
-
-.addr
-    sta &ff00,x     ; modified
-
 }
 
+; DFS DISK FORMAT
+; 
 ; Sector 00
 ; &00 to &07 First eight bytes of the 13-byte disc title
 ; &08 to &0E First file name
