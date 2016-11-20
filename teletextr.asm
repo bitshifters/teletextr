@@ -108,6 +108,7 @@ INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/rasterbars.asm"
 INCLUDE "src/fx/vectorballs.asm"
 INCLUDE "src/fx/mirrorfloor.asm"
+INCLUDE "src/fx/dotscroller.asm"
 
 
 \ ******************************************************************
