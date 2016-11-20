@@ -7,6 +7,8 @@ DOTSCROLL_shadow_addr = &7800
 DOTSCROLL_num_columns = 32
 DOTSCROLL_num_rows = 8
 
+_DOTSCROLL_SMOOTH = TRUE			; don't like this effect
+
 \ ******************************************************************
 \ *	Mirror FX
 \ ******************************************************************
@@ -20,7 +22,7 @@ EQUB 0
 
 \\ Bits in A, column# in X
 .fx_dotscroller_plot_column
-{
+\\{
 	STA fx_dotscroller_byte
 
 	\\ X column to table index
@@ -29,16 +31,18 @@ EQUB 0
 	TAX
 
 	\\ How many times round the loop?
-	.loop
+	.fx_dotscroller_plot_column_loop
 	LDA fx_dotscroller_byte
-	BEQ return
+	BEQ fx_dotscroller_plot_column_return
 
 	ASL A						; I pllanned this to be the other way up but fine for now!
 	STA fx_dotscroller_byte
-	BCC skip_plot
+	BCC fx_dotscroller_plot_column_skip_plot
 
-	STX temp_x+1
+	STX fx_dotscroller_plot_column_temp_x+1
+	.fx_dotscroller_plot_column_table_x
 	LDA fx_dotscroll_x, X
+	.fx_dotscroller_plot_column_table_y
 	LDY fx_dotscroll_y, X
 	TAX
 	
@@ -46,16 +50,16 @@ EQUB 0
 		PLOT_PIXEL
 	}
 
-	.temp_x
+	.fx_dotscroller_plot_column_temp_x
 	LDX #0
 
-	.skip_plot
+	.fx_dotscroller_plot_column_skip_plot
 	INX
-	BNE loop
+	BNE fx_dotscroller_plot_column_loop
 
-	.return
+	.fx_dotscroller_plot_column_return
 	RTS
-}
+\\}
 
 .fx_dotscroller_msg
 EQUS "HELLO WORLD! This is a dot scroller which seems pretty unreadable to begin with... 0123456789    "
@@ -79,9 +83,38 @@ EQUB 0
 	LDA fx_dotscroller_char_idx
 	STA char_idx + 1
 
+IF _DOTSCROLL_SMOOTH
+	LDA fx_dotscroller_col_idx
+	LSR A
+	STA first_col + 1
+	BCC use_table_2
+
+	\\ Use table 1
+	LDA #LO(fx_dotscroll_x)
+	STA fx_dotscroller_plot_column_table_x + 1
+	LDA #HI(fx_dotscroll_x)
+	STA fx_dotscroller_plot_column_table_x + 2
+	LDA #LO(fx_dotscroll_y)
+	STA fx_dotscroller_plot_column_table_y + 1
+	LDA #HI(fx_dotscroll_y)
+	STA fx_dotscroller_plot_column_table_y + 2
+	JMP start
+
+	.use_table_2
+	LDA #LO(fx_dotscroll_x2)
+	STA fx_dotscroller_plot_column_table_x + 1
+	LDA #HI(fx_dotscroll_x2)
+	STA fx_dotscroller_plot_column_table_x + 2
+	LDA #LO(fx_dotscroll_y2)
+	STA fx_dotscroller_plot_column_table_y + 1
+	LDA #HI(fx_dotscroll_y2)
+	STA fx_dotscroller_plot_column_table_y + 2
+ELSE
 	LDA fx_dotscroller_col_idx
 	STA first_col + 1
+ENDIF
 
+	.start
 	LDX #0
 	STX fx_dotscroller_cur_col
 
@@ -138,7 +171,12 @@ EQUB 0
 
 	\\ Next column next time
 	INX
+IF _DOTSCROLL_SMOOTH
+	CPX #16
+ELSE
 	CPX #8
+ENDIF
+
 	BCC same_char
 
 	\\ Next char next time
@@ -256,6 +294,7 @@ ALIGN &100
 	NEXT
 }
 
+IF _DOTSCROLL_SMOOTH
 .fx_dotscroll_x2
 {
 	FOR c, 0, DOTSCROLL_num_columns-1, 1
@@ -291,3 +330,4 @@ ALIGN &100
 	NEXT
 	NEXT
 }
+ENDIF
