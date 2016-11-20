@@ -4,6 +4,8 @@
 
 .mode7_sprites_data_ptr	SKIP 2
 
+.dots_ptr SKIP 2
+
 mode7_sprites_base_addr_HI = draw_buffer_addr
 
 \ ******************************************************************

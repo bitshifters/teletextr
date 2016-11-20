@@ -245,3 +245,189 @@ MIRROR_write_row2_addr = (MIRROR_shadow_addr + ((MIRROR_write_row+2) * MODE7_cha
 	.return
 	RTS
 }
+
+
+
+\\ Super lazy put code at bottom of this file ZOMG
+
+_DOTS_ALT = TRUE
+
+.fx_test_draw_dots
+{
+	LDA #LO(&7800)
+	STA dots_ptr
+	LDA #HI(&7800)
+	STA dots_ptr+1
+
+	LDX #0
+	LDY #0
+
+	.loop
+	IF _DOTS_ALT
+	LDA dots_alt_data, X		; 4c
+	ELSE
+	LDA dots_data, X			; 4c
+	ENDIF
+	\\ LO byte is offset
+
+	CLC							; 2c
+	ADC dots_ptr				; 3c
+	STA dots_ptr				; 3c
+
+	IF _DOTS_ALT
+	{
+		BCC no_carry
+		INC dots_ptr+1
+		.no_carry
+	}
+	ELSE
+	INX							; 2c
+	LDA dots_data, X			; 4c
+
+	\\ HI byte has offset in lowest 2 bits
+	AND #&3						; 2c
+	ADC dots_ptr+1				; 3c
+	STA dots_ptr+1				; 3c
+	ENDIF
+
+	\\ HI byte has screen bits in to 6 bits
+
+	\\ Decode pixels into MODE 7 byte (6 bits)
+	\\ 00X1 1111
+	\\ 0X01 1111
+	\\ 0X11 1111
+
+	IF _DOTS_ALT
+	INX 
+	LDA dots_alt_data, X			; 4c
+	BEQ skip
+	ELSE
+	LDA dots_data, X			; 4c
+	AND #128					; 2c - top bit 7
+	LSR A						; 2c - shift down to bit 6
+	STA shifted_bit + 1			; 4c
+
+	LDA dots_data, X			; 4c
+	LSR A						; 2c
+	LSR A						; 2c - shift down twice
+	ORA #32						; 2c - always need 32 for MODE 7
+	.shifted_bit
+	ORA #0						; 2c - mask in bit 6
+	ENDIF
+
+	\\ Write to screen! (do this without indirect write?)
+	ORA (dots_ptr),Y			; 5c
+	STA (dots_ptr),Y			; 6c
+	
+	INX							; 2c
+	IF _DOTS_ALT
+	.skip
+	CPX dots_alt_count
+	ELSE
+	CPX dots_count				; 4c
+	ENDIF
+	BCC loop					; 3c
+
+	\\ 70c per char to draw - obviously more pixels is better!
+	\\ 74c per char to erase (2x EOR to flip bits)
+
+	\\ Using 3 bytes per char would save lots of cycles..
+	\\ Could use 2 bytes per char and just have zero pads
+	\\ Comes out at 45c per char for 2 bytes (offset + gfx char) encode
+	\\ Can only plot at whole character offset not pixel
+	\\ But could be useful as basis of animation engine...
+
+	\\ Simon's plot pixel macro (using X&Y registers) is 41c
+	\\ Sprite plot routine is 26c per char with ~4 char setup overhead
+
+	\\ This is better for groups of sparse pixels! (video codec)
+
+	\\ Use 0 offset as terminator as can't have zero offset
+	\\ Use hi-byte offset as first byte in stream
+
+	.return
+	RTS
+}
+
+.fx_test_erase_dots
+{
+	LDA #LO(&7800)
+	STA dots_ptr
+	LDA #HI(&7800)
+	STA dots_ptr+1
+
+	LDX #0
+	LDY #0
+
+	.loop
+	IF _DOTS_ALT
+	LDA dots_alt_data, X			; 4c
+	ELSE
+	LDA dots_data, X			; 4c
+	ENDIF
+	\\ LO byte is offset
+
+	CLC
+	ADC dots_ptr
+	STA dots_ptr
+
+	IF _DOTS_ALT
+	{
+		BCC no_carry
+		INC dots_ptr+1
+		.no_carry
+	}
+	ELSE
+	INX							; 2c
+	LDA dots_data, X			; 4c
+
+	\\ HI byte has offset in lowest 2 bits
+	AND #&3						; 2c
+	ADC dots_ptr+1				; 3c
+	STA dots_ptr+1				; 3c
+	ENDIF
+
+	\\ HI byte has screen bits in to 6 bits
+
+	\\ Decode pixels into MODE 7 byte (6 bits)
+	\\ 00X1 1111
+	\\ 0X01 1111
+	\\ 0X11 1111
+
+	IF _DOTS_ALT
+	INX 
+	LDA dots_alt_data, X			; 4c
+	EOR #&DF
+	ELSE
+	LDA dots_data, X
+	AND #128					; top bit 7
+	EOR #128
+	LSR A						; shift down to bit 6
+	STA shifted_bit + 1
+
+	LDA dots_data, X
+	EOR #&FC
+	LSR A
+	LSR A						; shift down twice
+	ORA #32						; always need 32 for MODE 7
+	.shifted_bit
+	ORA #0						; mask in bit 6
+	ENDIF
+
+	\\ Write to screen!
+	AND (dots_ptr),Y
+	STA (dots_ptr),Y
+	
+	INX
+	IF _DOTS_ALT
+	CPX dots_alt_count
+	ELSE
+	CPX dots_count				; 4c
+	ENDIF
+	BCC loop
+
+	.return
+	RTS
+}
+
+INCLUDE "src\sprites\dots_alt.asm"

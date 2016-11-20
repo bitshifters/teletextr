@@ -28,7 +28,7 @@ SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALL fx_vectorballs_update
 SCRIPT_SEGMENT_END
 
-
+IF 0
 SCRIPT_CALL fx_vectorballs_set_medium
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
@@ -41,9 +41,18 @@ SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_CALL fx_vectorballs_update
 SCRIPT_SEGMENT_END
+ENDIF
 
+SCRIPT_CALL fx_test_draw_dots
 
 \\ Test cheapo rasterbars effect 
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_PLAY fx_rasterbars_update
+    SCRIPT_PLAY fx_rasterbars_write_shadow
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL fx_test_erase_dots
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_buffer_copy
     SCRIPT_PLAY fx_rasterbars_update
