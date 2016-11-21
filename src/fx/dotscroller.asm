@@ -1,13 +1,17 @@
 
-; quick & dirty mirrored floor effect
-; copied from Kieran's mode7-sprites cracktro wip
-; hardcoded to only take top row of pixels from a row
+; quick & dirty dot scroller
+; written to try out Simon's fast PLOT_PIXEL macro
+; was thinking about a fixed position (sparse) sprite plot routine for interesting scrollers
+; but figured I would get it working with dots first to see if I like it
+; uses OSWORD to get char definitions at runtime so clearly not optimal!
+; need a 8x8 font but can't be bothered to convert one
+; could also just convert the entire BBC font at initialisation time
 
 DOTSCROLL_shadow_addr = &7800
 DOTSCROLL_num_columns = 32
 DOTSCROLL_num_rows = 8
 
-_DOTSCROLL_SMOOTH = TRUE			; don't like this effect
+_DOTSCROLL_SMOOTH = FALSE			; don't like this effect
 
 \ ******************************************************************
 \ *	Mirror FX
@@ -18,6 +22,18 @@ _DOTSCROLL_SMOOTH = TRUE			; don't like this effect
 EQUB 0
 
 .fx_dotscroller_byte
+EQUB 0
+
+.fx_dotscroller_cx
+EQUB 0
+
+.fx_dotscroller_cy
+EQUB -10
+
+.fx_dotscroller_vx
+EQUB 2
+
+.fx_dotscroller_vy
 EQUB 0
 
 \\ Bits in A, column# in X
@@ -35,7 +51,7 @@ EQUB 0
 	LDA fx_dotscroller_byte
 	BEQ fx_dotscroller_plot_column_return
 
-	ASL A						; I pllanned this to be the other way up but fine for now!
+	ASL A						; I planned this to be the other way up but fine for now!
 	STA fx_dotscroller_byte
 	BCC fx_dotscroller_plot_column_skip_plot
 
@@ -45,7 +61,53 @@ EQUB 0
 	.fx_dotscroller_plot_column_table_y
 	LDY fx_dotscroll_y, X
 	TAX
-	
+
+	\\ New centre
+	{
+		TXA
+		CLC
+		ADC fx_dotscroller_cx
+		TAX
+
+		TYA
+		CLC
+		ADC fx_dotscroller_cy
+		TAY
+	}
+
+	\\ Clipping
+	{
+		CPX #(128 - 38)
+		BCS left_ok
+		LDX #(128 - 38)
+		.left_ok
+		CPX #(128 + 38)
+		BCC right_ok
+		LDX #(128 + 38)
+		.right_ok
+		CPY #(128 - 36)
+		BCS top_ok
+		LDY #(128 - 36)
+		.top_ok
+		CPY #(128 + 29)
+		BCC bottom_ok
+		LDY #(128 + 29)
+		.bottom_ok
+	}
+
+	\\ Adjust to screen
+	{
+		TXA
+		SEC
+		SBC #(128 - 38)
+		TAX
+
+		TYA
+		SEC
+		SBC #(128 - 36)
+		TAY
+	}
+
 	{
 		PLOT_PIXEL
 	}
@@ -62,7 +124,7 @@ EQUB 0
 \\}
 
 .fx_dotscroller_msg
-EQUS "HELLO WORLD! This is a dot scroller which seems pretty unreadable to begin with... 0123456789    "
+EQUS "HELLO WORLD! THIS IS A BOUNCING DOT SCROLLER WHICH IS ALSO PRETTY UNREADABLE BUT BETTER IN UPPERCASE!... 0123456789    "
 EQUB 0
 
 .fx_dotscroller_char_idx
@@ -74,11 +136,104 @@ EQUB 0
 .fx_dotscroller_col_idx
 EQUB 0
 
+.fx_dotscroller_update_centre
+{
+	\\ Update velocity
+	CLC
+	LDA fx_dotscroller_vy
+	ADC #1						; gravity
+	STA fx_dotscroller_vy
+
+	\\ Update position
+	CLC
+	LDA fx_dotscroller_cx
+	ADC fx_dotscroller_vx		; should be times delta
+	STA fx_dotscroller_cx
+
+	CLC
+	LDA fx_dotscroller_cy
+	ADC fx_dotscroller_vy		; should be times delta
+	STA fx_dotscroller_cy
+
+	\\ Collision detection
+	LDA fx_dotscroller_cy
+	BMI check_top
+
+	\\ Check bottom
+	CMP #30						; 10 lines below centre
+	BCC y_ok
+
+	\\ Flip velocity for bounce
+	CLC
+	LDA	fx_dotscroller_vy
+	ADC #1
+	EOR #&FF
+	ADC #1 						; otherwise lose momentum
+	STA fx_dotscroller_vy
+
+	\\ Clamp y bottom
+	LDA #30
+	STA fx_dotscroller_cy
+	JMP y_ok
+
+	.check_top
+	CMP #&DC		; -36
+	BCS y_ok
+
+	\\ Clamp y top
+	LDA #&DC			; -36
+	STA fx_dotscroller_cy
+
+	.y_ok
+	LDA fx_dotscroller_cx
+	BMI check_left
+
+	\\ Check right
+	CMP #36						; 10 lines below centre
+	BCC x_ok
+
+	\\ Flip velocity for bounce
+	CLC
+	LDA	fx_dotscroller_vx
+	EOR #&FF
+	ADC #1 
+	STA fx_dotscroller_vx
+
+	\\ Clamp x right
+	LDA #36
+	STA fx_dotscroller_cx
+	JMP x_ok
+	
+	.check_left
+	CMP #&DC			; -36
+	BCS x_ok
+
+	\\ Flip velocity for bounce
+	CLC
+	LDA	fx_dotscroller_vx
+	EOR #&FF
+	ADC #1 
+	STA fx_dotscroller_vx
+
+	\\ Clamp x left
+	LDA #&DC			; -36
+	STA fx_dotscroller_cx
+
+	.x_ok
+
+	.return
+	RTS
+}
+
 .fx_dotscroller_update
 {
 	lda #144+7
     ldx #0
 	jsr mode7_set_column_shadow_fast
+
+\\ Update centre
+
+	JSR fx_dotscroller_update_centre
 
 	LDA fx_dotscroller_char_idx
 	STA char_idx + 1
@@ -263,13 +418,13 @@ ALIGN &100
 	FOR c, 0, DOTSCROLL_num_columns-1, 1
 	FOR r, 0, DOTSCROLL_num_rows-1, 1
 
-	centre_x = 38
-	centre_y = 60
-	inner = 10
-	outer = 30
+	centre_x = 128
+	centre_y = 128
+	inner = 4
+	outer = 20
 	distance = inner + (outer - inner) * r / DOTSCROLL_num_rows
 
-	angle = PI/2 + 1 * PI * c / DOTSCROLL_num_columns
+	angle = PI/4 + (12*PI/8) * c / DOTSCROLL_num_columns
 	EQUB centre_x - distance * SIN(angle) 
 
 	NEXT
@@ -281,13 +436,13 @@ ALIGN &100
 	FOR c, 0, DOTSCROLL_num_columns-1, 1
 	FOR r, 0, DOTSCROLL_num_rows-1, 1
 
-	centre_x = 38
-	centre_y = 60
-	inner = 14
-	outer = 36
+	centre_x = 128
+	centre_y = 128
+	inner = 6
+	outer = 22
 	distance = inner + (outer - inner) * r / DOTSCROLL_num_rows
 
-	angle = PI/2 + 1 * PI * c / DOTSCROLL_num_columns
+	angle = PI/4 + (12*PI/8) * c / DOTSCROLL_num_columns
 	EQUB centre_y + distance * COS(angle) 
 
 	NEXT
