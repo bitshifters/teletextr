@@ -188,4 +188,16 @@ SAVE "Bank3", bank3_start, bank3_end, &8000
 PRINT "ZeroPage from", ~zp_start, "to", ~zp_end, ", size is", (zp_end-zp_start), "bytes"
 PRINT "Code from", ~start, "to", ~end, ", size is", (end-start), "bytes"
 
+
+PUTFILE "data/pages/holdtest.txt.bin", "HOLD", &7C00
+PUTFILE "data/pages/testpage.txt.bin", "TEST", &7C00
+PUTFILE "data/pages/Channl4","Channl4", &7C00
+PUTFILE "data/pages/owl","owl", &7C00
+PUTFILE "data/pages/TESTPAGE","TESTPAG", &7C00
+PUTFILE "data/pages/TVB","TVB", &7C00
+PUTFILE "data/pages/TVGuide","TVGuide", &7C00
+PUTFILE "data/pages/Yorks","Yorks", &7C00
+
+
+
 PRINT "Build successful."

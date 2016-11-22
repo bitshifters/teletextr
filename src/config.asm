@@ -18,7 +18,12 @@ SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
 
-
+; plasma segment
+SCRIPT_CALL fx_plasma_init
+SCRIPT_SEGMENT_START    30.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_PLAY fx_plasma
+SCRIPT_SEGMENT_END
 
 \\ Test cheapo rotozoom effect 
 SCRIPT_SEGMENT_START    10.0

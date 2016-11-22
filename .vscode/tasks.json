@@ -34,7 +34,7 @@
             "taskName": "Run 'teletextr.ssd' in Emulator",
             "isTestCommand": true,
             "args": [
-                "BeebEm.exe teletextr.ssd"
+                "B-Em.exe teletextr.ssd"
             ]
         },
         {

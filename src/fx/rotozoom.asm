@@ -17,7 +17,9 @@ CANVAS_W = 39
 CANVAS_H = 25
 CANVAS_ADDR = &7c01
 
-PIXEL_PERFECT = TRUE
+PIXEL_PERFECT = FALSE    ; uses teletext pixels if TRUE, characters if false
+PIXEL_FULL = TRUE       ; uses 2x3 teletext pixels if TRUE, 2x2 teletext pixels if FALSE
+PIXEL_THIRD = FALSE      ; forces 6845 to show 2x2 teletext pixels
 
 ; 8 bits of fraction is useful enough, means that high byte is the integer part of the texture coordinate 
 PRECISION_BITS = 8
@@ -120,6 +122,11 @@ rz_py = rz_py0
 
 .fx_rotozoom
 {
+IF PIXEL_THIRD
+    lda #9:sta &fe00
+    lda #9:sta &fe01       ; normally 18
+ENDIF
+
 	lda #144+7
     ldx #0
 ;	jsr mode7_set_column_shadow_fast
@@ -127,11 +134,17 @@ rz_py = rz_py0
 
     ldx delta_time
 .uloop
-    inc zrot
+;    inc zrot
     inc zrot
 
     dex
 ;    bne uloop  ; too slow atm
+
+ ;   lda #LO(ONE):sta xoff+0:lda #HI(ONE):sta xoff+1
+ ;   lda #LO(ONE):sta yoff+0:lda #HI(ONE):sta yoff+1
+    
+    inc xoff+1
+    inc yoff+1
 
     ; sx = xoff
     ; sy = yoff
@@ -191,10 +204,13 @@ IF PIXEL_PERFECT
     SUBOFFSET rz_px0,rz_dy,rz_px1
     ADDOFFSET rz_py0,rz_dx,rz_py1
 
+IF PIXEL_FULL
     ; px2 = px1-dy
     ; py2 = py1+dx
     SUBOFFSET rz_px1,rz_dy,rz_px2
     ADDOFFSET rz_py1,rz_dx,rz_py2
+ENDIF
+
 ENDIF
 
     ldx #0
@@ -225,7 +241,6 @@ ENDMACRO
 
 IF PIXEL_PERFECT    
     LOADTEXTUREADDR rz_px1,rz_py1,read_addr1
-    LOADTEXTUREADDR rz_px2,rz_py2,read_addr2
 
     ; px = px+dx
     ; py = py+dy
@@ -235,12 +250,18 @@ IF PIXEL_PERFECT
     ADDOFFSET rz_px1,rz_dx,rz_px1
     ADDOFFSET rz_py1,rz_dy,rz_py1
 
+    LOADTEXTUREADDR rz_px0,rz_py0,read_addr3
+    LOADTEXTUREADDR rz_px1,rz_py1,read_addr4
+
+IF PIXEL_FULL    
+    LOADTEXTUREADDR rz_px2,rz_py2,read_addr2
+
     ADDOFFSET rz_px2,rz_dx,rz_px2
     ADDOFFSET rz_py2,rz_dy,rz_py2
 
-    LOADTEXTUREADDR rz_px0,rz_py0,read_addr3
-    LOADTEXTUREADDR rz_px1,rz_py1,read_addr4
     LOADTEXTUREADDR rz_px2,rz_py2,read_addr5
+ENDIF
+
 ENDIF    
 
 IF PIXEL_PERFECT
@@ -261,12 +282,22 @@ IF 0
     ora zero
     
 ELSE
+
+IF PIXEL_FULL
 .read_addr0 lda &ffff:and #1:ora #128+32:sta rz_c
 .read_addr1 lda &ffff:and #4:ora rz_c:sta rz_c
 .read_addr2 lda &ffff:and #16:ora rz_c:sta rz_c
 .read_addr3 lda &ffff:and #2:ora rz_c:sta rz_c
 .read_addr4 lda &ffff:and #8:ora rz_c:sta rz_c
 .read_addr5 lda &ffff:and #64:ora rz_c ;:sta rz_c
+ELSE
+.read_addr0 lda &ffff:and #1:ora #128+32:sta rz_c
+.read_addr1 lda &ffff:and #4:ora rz_c:sta rz_c
+.read_addr3 lda &ffff:and #2:ora rz_c:sta rz_c
+.read_addr4 lda &ffff:and #8:ora rz_c
+
+ENDIF
+
 ENDIF
     
 ELSE
@@ -293,8 +324,10 @@ IF PIXEL_PERFECT
     ADDOFFSET rz_px1,rz_dx,rz_px1
     ADDOFFSET rz_py1,rz_dy,rz_py1
 
+IF PIXEL_FULL
     ADDOFFSET rz_px2,rz_dx,rz_px2
     ADDOFFSET rz_py2,rz_dy,rz_py2
+ENDIF
 ENDIF
 
     jmp xloop
@@ -318,9 +351,11 @@ ENDIF
     SUBOFFSET   rz_sx,rz_dy,rz_sx
     ADDOFFSET   rz_sy,rz_dx,rz_sy
 
+IF PIXEL_FULL
     SUBOFFSET   rz_sx,rz_dy,rz_sx
     ADDOFFSET   rz_sy,rz_dx,rz_sy
-    
+ENDIF
+
     ldy &9f
     dey
     beq done

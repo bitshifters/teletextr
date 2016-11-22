@@ -29,6 +29,9 @@
     FOR i, 0, 32:EQUB 144+5:NEXT
     
 
+.fx_plasma_counter EQUB 0
+.fx_plasma_char EQUB 160
+
 ; call once before the animation routine
 .fx_plasma_init
 {
@@ -45,13 +48,21 @@
 	jsr mode7_set_column_shadow_fast
 
 
-    lda #255    ; full block (used as control character for rest of line)
+;    lda #160+1+2+4+8+16+64    ; full block (used as control character for rest of line)
+;    lda #160+1+8+16    ; full block (used as control character for rest of line)
+    lda #160+1+2+4+8    ; top quarter block (used as control character for rest of line)
+
+
     ldx #2
 	jsr mode7_set_column_shadow_fast    
 
-    lda #144+7  ; white block 
-    ldx #39
-	jsr mode7_set_column_shadow_fast      
+;    lda #144+7  ; white block 
+;    ldx #39
+;	jsr mode7_set_column_shadow_fast   
+
+
+    lda #0
+    sta fx_plasma_counter
     rts
 }
 
@@ -62,6 +73,10 @@
 {
 ;    jsr fx_plasma_rand
 ;   rts
+
+    lda fx_plasma_char
+    ldx #2
+	jsr mode7_set_column_shadow_fast    
 
 
 
@@ -82,9 +97,19 @@
     lda pnt_tab+3
     sta t4
 
-    ldx #3
     tya
     pha
+
+
+; first pixel rendered manually
+
+
+
+
+
+
+
+    ldx #1
 .xloop
     ldy t1
     lda fx_plasma_cos,y
@@ -106,10 +131,16 @@
     inc t3
     inc t4
     inc t4
+    inc t4
+
+    cpx #1
+    bne skip_first
+    inx
+.skip_first
 
     inx
 ;    inx        ; extra inx if you want square 'pixels' since teletext chars are rectangular
-    cpx #39
+    cpx #40
     bne xloop
 
 
@@ -132,21 +163,49 @@
     cpy #25
     bne yloop
 
-
+    ldx delta_time
+.delta_loop
     inc pnt_tab+0
     inc pnt_tab+1
-    inc pnt_tab+1
+;    inc pnt_tab+1
     inc pnt_tab+2
-    inc pnt_tab+2
-    inc pnt_tab+2
+;    inc pnt_tab+2
+;    inc pnt_tab+2
     inc pnt_tab+3
-    inc pnt_tab+3
-    inc pnt_tab+3
-    inc pnt_tab+3
+;    inc pnt_tab+3
+;    inc pnt_tab+3
+;    inc pnt_tab+3
 
 
+IF 0
+    inc fx_plasma_counter
+    lda fx_plasma_counter
+    lsr a:lsr a:lsr a:lsr a:lsr a   ; /32
+    and #7:tay
+    lda fx_plasma_chrs,y
+    sta fx_plasma_char
+ENDIF
+
+
+
+
+    dex
+    bne delta_loop
 
     rts
+.fx_plasma_chrs 
+    EQUB 160+1
+    EQUB 160+1+16
+    EQUB 160+1+64
+    EQUB 160+4+8
+    EQUB 160+1+8+16
+    EQUB 160+1+2+16+64
+    EQUB 160+2+4+8+16
+    EQUB 160+1+2+4+8+16+64
+
+
+
+
 }
 
 
@@ -173,20 +232,23 @@
     sta random_seed
 ;    inc random_seed2
 
-	lda #144+7
-    ldx #1
-	jsr mode7_set_column_shadow_fast
+    ; hold graphics control works differently on beeb to standard teletext
+    ; 
 
-    lda #158
+    lda #158    ; hold
     ldx #0
 	jsr mode7_set_column_shadow_fast
 
-    lda #255
+	lda #144+7  ; colour
+    ldx #1
+	jsr mode7_set_column_shadow_fast
+
+    lda #160+1+2+4+8+16+64    ; graphics code used for hold char
     ldx #2
 	jsr mode7_set_column_shadow_fast    
 
     lda #144+7
-    ldx #39
+   ldx #39
 	jsr mode7_set_column_shadow_fast  
 
     lda #LO(MODE7_VRAM_SHADOW)
