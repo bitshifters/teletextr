@@ -64,19 +64,23 @@ MUSICB_SLOT_NO = 1
     lda fx_music_on
     beq exit
 
+    SEI
     lda &f4
-    tay
+    PHA
 
     ; page in the music bank
     lda fx_music_slot
     jsr swr_select_slot
+    CLI
 
 	\\ Poll the music player
 	jsr poll_player
     
     ; restore previously paged ROM bank
-    tya
+    SEI
+    PLA
     jsr swr_select_bank
+    CLI
 .exit
     rts    
 }

@@ -18,6 +18,10 @@ SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
 
+SCRIPT_SEGMENT_START    100.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_interference_update
+SCRIPT_SEGMENT_END
 
 
 ; point cube effect

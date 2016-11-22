@@ -45,7 +45,7 @@ INCLUDE "src/main.h.asm"
 \ ******************************************************************
 
 ORG &1100
-
+GUARD &7800
 
 .start
 
@@ -108,6 +108,7 @@ INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/rasterbars.asm"
 INCLUDE "src/fx/vectorballs.asm"
 INCLUDE "src/fx/mirrorfloor.asm"
+INCLUDE "src/fx/interference.asm"
 
 
 \ ******************************************************************
@@ -167,6 +168,7 @@ GUARD &BFFF
 .bank2_start
 ;...
 ;INCBIN "data/edittf.bin"
+INCLUDE "src\sprites\circles.asm"
 .bank2_end
 SAVE "Bank2", bank2_start, bank2_end, &8000
 
