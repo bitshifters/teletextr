@@ -1,34 +1,29 @@
 
-; quick & dirty mirrored floor effect
-; copied from Kieran's mode7-sprites cracktro wip
-; hardcoded to only take top row of pixels from a row
+; classic circle interference pattern
+; uses large sprite of concentric circles drawn in two layers
+; requires 6x versions of sprite in all offsets i.e. lots of memory
 
-INTERFERENCE_shadow_addr = &7800 + 4
-INTERFERENCE_slot_no = 2
+INTERFERENCE_shadow_addr = &7800 + 4	; currently writing 36x22 character screen
+INTERFERENCE_slot_no = 2				; SWRAM bank containing sprite data
+
+INTERFERENCE_sprite_width = 54
+INTERFERENCE_sprite_height = 33
+
+INTERFERENCE_screen_width = 36
+INTERFERENCE_screen_height = 22
+
+INTERFERENCE_max_x = (INTERFERENCE_sprite_width - INTERFERENCE_screen_width) * 2	; in pixels
+INTERFERENCE_max_y = (INTERFERENCE_sprite_height - INTERFERENCE_screen_height) * 3	; in pixels
+
+INTERFERENCE_table_size = 64			; sin table for X
+
 
 \ ******************************************************************
-\ *	Mirror FX
+\ *	Interference FX
 \ ******************************************************************
 
-.fx_interference_table_LO
-{
-	EQUB LO(circles_data_00)
-	EQUB LO(circles_data_10)
-	EQUB LO(circles_data_01)
-	EQUB LO(circles_data_11)
-	EQUB LO(circles_data_02)
-	EQUB LO(circles_data_12)
-}
-
-.fx_interference_table_HI
-{
-	EQUB HI(circles_data_00)
-	EQUB HI(circles_data_10)
-	EQUB HI(circles_data_01)
-	EQUB HI(circles_data_11)
-	EQUB HI(circles_data_02)
-	EQUB HI(circles_data_11)
-}
+\\ Local variables - could probably get rid of most of these
+\\ or use a temp ZP variable for speed
 
 .fx_interference_plot_x
 EQUB 0
@@ -99,6 +94,7 @@ EQUB 0
 	ADC fx_interference_table_HI, X						; 4c
 	STA readptr+1
 
+	\\ Set our write pointer
 	LDA #LO(INTERFERENCE_shadow_addr)
 	STA writeptr
 	LDA #HI(INTERFERENCE_shadow_addr)
@@ -108,125 +104,137 @@ EQUB 0
 	RTS
 }
 
+
+\\ Draw our sprite with offset X,Y in pixels to entire screen
+
 .fx_interference_draw_screen
 {
+	\\ Calculate our read pointer based on X,Y
+	\\ Write pointer is always start of screen
 	JSR fx_interference_set_ptrs
 
 	LDX #0
 	.y_loop
+
+	\\ Copy a row of characters
 
 	LDY #0
 	.x_loop
 	LDA (readptr), Y
 	STA (writeptr), Y
 	INY
-	CPY #36
+	CPY #INTERFERENCE_screen_width
 	BNE x_loop
+
+	\\ Next row of sprite data
 
 	CLC
 	LDA readptr
-	ADC #54
+	ADC #INTERFERENCE_sprite_width
 	STA readptr
 	LDA readptr+1
 	ADC #0
 	STA readptr+1
 
+	\\ Next row of screen
+
 	CLC
 	LDA writeptr
-	ADC #40
+	ADC #MODE7_char_width
 	STA writeptr
 	LDA writeptr+1
 	ADC #0
 	STA writeptr+1
 
+	\\ Until done
+
 	INX
-	CPX #22
+	CPX #INTERFERENCE_screen_height
 	BNE y_loop
 
 	.return
 	RTS
 }
 
-.fx_interference_eor_screen
-{
+
+\\ Draw our sprite with offset X,Y in pixels to entire screen
+
+.fx_interference_blend_screen
+\\{
+	\\ Calculate our read pointer based on X,Y
+	\\ Write pointer is always start of screen
 	JSR fx_interference_set_ptrs
 
 	LDX #0
-	.y_loop
+	.fx_interference_blend_screen_y_loop
+
+	\\ Copy a row of characters
 
 	LDY #0
-	.x_loop
+	.fx_interference_blend_screen_x_loop
 	LDA (readptr), Y
+	
+	\\ Can poke in different blend instruction here - e.g. ORA
+	.fx_interference_blend_screen_blend_instruction
 	EOR (writeptr), Y
-	ORA #32
+
+	ORA #32					; always need 32!
+
 	STA (writeptr), Y
 	INY
-	CPY #36
-	BNE x_loop
+	CPY #INTERFERENCE_screen_width
+	BNE fx_interference_blend_screen_x_loop
+
+	\\ Next row of sprite data
 
 	CLC
 	LDA readptr
-	ADC #54
+	ADC #INTERFERENCE_sprite_width
 	STA readptr
 	LDA readptr+1
 	ADC #0
 	STA readptr+1
 
+	\\ Next row of screen
+
 	CLC
 	LDA writeptr
-	ADC #40
+	ADC #MODE7_char_width
 	STA writeptr
 	LDA writeptr+1
 	ADC #0
 	STA writeptr+1
 
+	\\ Until done
+
 	INX
-	CPX #22
-	BNE y_loop
+	CPX #INTERFERENCE_screen_height
+	BNE fx_interference_blend_screen_y_loop
 
-	.return
+	.fx_interference_blend_screen_return
 	RTS
-}
+\\}
 
-.fx_interference_ora_screen
+\\ Set our blend mode
+.fx_interference_set_blend_ora
 {
-	JSR fx_interference_set_ptrs
-
-	LDX #0
-	.y_loop
-
-	LDY #0
-	.x_loop
-	LDA (readptr), Y
-	ORA (writeptr), Y
-	STA (writeptr), Y
-	INY
-	CPY #36
-	BNE x_loop
-
-	CLC
-	LDA readptr
-	ADC #54
-	STA readptr
-	LDA readptr+1
-	ADC #0
-	STA readptr+1
-
-	CLC
-	LDA writeptr
-	ADC #40
-	STA writeptr
-	LDA writeptr+1
-	ADC #0
-	STA writeptr+1
-
-	INX
-	CPX #22
-	BNE y_loop
+	LDA #OPCODE_ora_indirect_Y
+	STA fx_interference_blend_screen_blend_instruction
 
 	.return
 	RTS
 }
+
+.fx_interference_set_blend_eor
+{
+	LDA #OPCODE_eor_indirect_Y
+	STA fx_interference_blend_screen_blend_instruction
+
+	.return
+	RTS
+}
+
+\\ Local variables for motion
 
 .fx_interference_x
 EQUB 0
@@ -243,10 +251,8 @@ EQUB 1
 .fx_interference_x_idx
 EQUB 0
 
-.fx_interference_sin_table_x
-FOR n, 0, 63, 1
-EQUB 18 + 17 * SIN(2 * PI * n / 64)
-NEXT
+
+\\ Main update function
 
 .fx_interference_update
 {
@@ -263,14 +269,18 @@ NEXT
     jsr swr_select_slot
     cli
 
+	\\ Draw base layer to screen
+
 	LDX fx_interference_x
 	LDY fx_interference_y
 	JSR fx_interference_draw_screen
 
+	\\ Draw top layer to screen with EOR
+
 	LDY fx_interference_x_idx
 	LDX fx_interference_sin_table_x, Y
 	LDY #16
-	JSR fx_interference_eor_screen
+	JSR fx_interference_blend_screen
 
     ; restore previously paged ROM bank
     sei
@@ -278,18 +288,22 @@ NEXT
     jsr swr_select_bank
 	cli
 
+	\\ Update motion for both layers
+
+	\\ Currently base layer just bounces x,y linearly around available area
+
 	CLC
 	lda fx_interference_x
 	ADC fx_interference_dx
 	BMI x_hit_left
 
-	CMP #36
+	CMP #INTERFERENCE_max_x
 	BCC x_ok
 	
 	\\ X hit right
-	LDA #&FF
+	LDA #&FF					; -1
 	STA fx_interference_dx
-	LDA #36
+	LDA #INTERFERENCE_max_x
 	JMP x_ok
 
 	.x_hit_left
@@ -305,13 +319,13 @@ NEXT
 	ADC fx_interference_dy
 	BMI y_hit_top
 
-	CMP #33
+	CMP #INTERFERENCE_max_y
 	BCC y_ok
 	
 	\\ Y hit bottom
-	LDA #&FF
+	LDA #&FF					; -1
 	STA fx_interference_dy
-	LDA #33
+	LDA #INTERFERENCE_max_y
 	JMP y_ok
 
 	.y_hit_top
@@ -322,22 +336,57 @@ NEXT
 	.y_ok
 	STA fx_interference_y
 
+	\\ Top layer is lookup into sine table
+
 	CLC
 	LDA fx_interference_x_idx
 	ADC #&1
-	AND #63
+	AND #INTERFERENCE_table_size-1
 	STA fx_interference_x_idx
 
 	.return
 	RTS
 }
 
+
+\ ******************************************************************
+\ *	Lookup tables
+\ ******************************************************************
+
+\\ This assumes data is compiled by BeebAsm at correct address for SWRAM
+\\ i.e. &8000 onwards
+
+.fx_interference_table_LO
+{
+	EQUB LO(circles_data_00)
+	EQUB LO(circles_data_10)
+	EQUB LO(circles_data_01)
+	EQUB LO(circles_data_11)
+	EQUB LO(circles_data_02)
+	EQUB LO(circles_data_12)
+}
+
+.fx_interference_table_HI
+{
+	EQUB HI(circles_data_00)
+	EQUB HI(circles_data_10)
+	EQUB HI(circles_data_01)
+	EQUB HI(circles_data_11)
+	EQUB HI(circles_data_02)
+	EQUB HI(circles_data_11)
+}
+
+.fx_interference_sin_table_x
+FOR n, 0, INTERFERENCE_table_size-1, 1
+EQUB 18 + 17 * SIN(2 * PI * n / INTERFERENCE_table_size)
+NEXT
+
 .fx_interference_mult_LO
-FOR n, 0, 24, 1
-EQUB LO(54 * n)				; sprite width
+FOR n, 0, MODE7_char_height-1, 1
+EQUB LO(INTERFERENCE_sprite_width * n)				; sprite pitch
 NEXT
 
 .fx_interference_mult_HI
-FOR n, 0, 24, 1
-EQUB HI(54 * n)				; sprite width
+FOR n, 0, MODE7_char_height-1, 1
+EQUB HI(INTERFERENCE_sprite_width * n)				; sprite pitch
 NEXT
