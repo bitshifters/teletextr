@@ -1,32 +1,44 @@
 
-; quick & dirty mirrored floor effect
-; copied from Kieran's mode7-sprites cracktro wip
-; hardcoded to only take top row of pixels from a row
+; vertical credits scroller
+; somewhat generalised so will scroll all MODE 7 characters up by one pixel at a time
+; then adds new row of pixels at the bottom from a fixed array
 
+; separate routine fills the new line buffer with font data from an array of text
+
+\\ Change these to adjust window that is scrolled
 CREDITS_shadow_addr = &7800
-CREDITS_end_addr = CREDITS_shadow_addr + (25 * 40)
+CREDITS_end_addr = CREDITS_shadow_addr + (MODE7_char_width * MODE7_char_height)
+CREDITS_first_char = 4
+CREDITS_last_char = MODE7_char_width
 
-_CREDITS_NARROW_FONT = TRUE
+_CREDITS_NARROW_FONT = TRUE		; don't get many glyphs on screen at 8x8 teletext pixels
+
 
 \ ******************************************************************
 \ *	Credit Scroll FX
 \ ******************************************************************
 
+\\ Scrolls entire screen up by one pixel adding new pixels from array
+
 .fx_creditscroll_scroll_up
 {
+	\\ Start by updating the top line
 	LDA #LO(CREDITS_shadow_addr)
 	STA writeptr
 	LDA #HI(CREDITS_shadow_addr)
 	STA writeptr+1
 
-	LDA #LO(CREDITS_shadow_addr + 40)
+	\\ But we'll also be reading from the next line
+	LDA #LO(CREDITS_shadow_addr + MODE7_char_width)
 	STA readptr
-	LDA #HI(CREDITS_shadow_addr + 40)
+	LDA #HI(CREDITS_shadow_addr + MODE7_char_width)
 	STA readptr+1
 
+	\\ For each character row
 	.y_loop
 
-	LDY #4
+	\\ First char in row
+	LDY #CREDITS_first_char
 	.x_loop
 
 	\\ Get top pixels from row below
@@ -55,7 +67,7 @@ _CREDITS_NARROW_FONT = TRUE
 	\\ Full width
 	.skip
 	INY
-	CPY #40
+	CPY #CREDITS_last_char
 	BCC x_loop
 
 	\\ Move down a row
@@ -67,7 +79,7 @@ _CREDITS_NARROW_FONT = TRUE
 
 	CLC
 	LDA readptr
-	ADC #40
+	ADC #MODE7_char_width
 	STA readptr
 	LDA readptr+1
 	ADC #0
@@ -81,9 +93,9 @@ _CREDITS_NARROW_FONT = TRUE
 	CMP #HI(CREDITS_end_addr)
 	BNE y_loop
 
-	\\ Do last line!
+	\\ Do last line separately
 
-	LDY #4
+	LDY #CREDITS_first_char
 	.last_loop
 
 	\\ Load last line bottom pixels
@@ -93,7 +105,7 @@ _CREDITS_NARROW_FONT = TRUE
 	\\ Mask in top pixesl from our new line
 	ORA fx_creditscroll_new_line, Y
 
-	\\ Always 32
+	\\ Always add 32...
 	ORA #32
 
 	\\ Rotate them
@@ -105,12 +117,32 @@ _CREDITS_NARROW_FONT = TRUE
 
 	\\ Entire row
 	INY
-	CPY #40
+	CPY #CREDITS_last_char
 	BCC last_loop
 
 	.return
 	RTS
 }
+
+
+\\ Main update function
+
+.fx_creditscroll_update
+{
+	\\ Write new line of text to array
+	JSR fx_creditscroll_write_text_line
+
+	\\ Scroll everything up
+	JSR fx_creditscroll_scroll_up
+
+	.return
+	RTS
+}
+
+
+\ ******************************************************************
+\ *	Credit Text FX
+\ ******************************************************************
 
 .fx_creditscroll_text_ptr
 EQUW fx_creditscroll_text
@@ -120,18 +152,6 @@ EQUB 0
 
 .fx_creditscroll_text_idx
 EQUB 0
-
-.fx_creditscroll_update
-{
-	\\ Write new line of text
-	JSR fx_creditscroll_write_text_line
-
-	\\ Scroll everything up
-	JSR fx_creditscroll_scroll_up
-
-	.return
-	RTS
-}
 
 .fx_creditscroll_write_text_line
 {
@@ -389,6 +409,17 @@ EQUB 0
 	RTS
 }
 
+
+\ ******************************************************************
+\ *	Credit Font FX
+\ ******************************************************************
+
+\\ Uses system font definition
+\\ Needlessly calls OSWORD each time character referenced
+\\ Should use a fixed predefined font
+\\ Most likely the 5x5 font from BeebTracker
+\\ But would need some juggling of routine above
+
 .fx_creditscroll_get_char
 {
 	\\ Set up OSWORD call to obtain character definition
@@ -419,6 +450,11 @@ EQUB 0
 	e = n AND 16
 	f = n AND 64
 	
+	; Pixel pattern becomes
+	;  1  2  ->  a b  ->  c d
+	;  4  8  ->  c d  ->  e f 
+	; 64 16  ->  e f  ->  a b
+
 	IF (n AND 32)
 	PRINT a,b,c,d,e,f
 	EQUB 32 + (a * 16) + (b * 32) + (c / 4) + (d / 4) + (e / 4) + (f / 8) + (n AND 128)
@@ -428,10 +464,20 @@ EQUB 0
 	NEXT
 }
 
+\\ Spare character row which will get added to bottom of scroll
+\\ NB. If anything other than top two pixels set here (1 + 2)
+\\ then behaviour is undefined!
+
 .fx_creditscroll_new_line
 FOR n, 0, MODE7_char_width-1, 1
 EQUB 0
 NEXT
+
+\\ Credit text strings
+\\ First byte is character offset from left side of screen
+\\ Then text string terminted by 0
+\\ If character offset is &FF this indicates no more strings
+\\ Currently strings just loop but could just stop!
 
 .fx_creditscroll_text
 EQUS 4,"Bitshifters",0
@@ -453,6 +499,8 @@ EQUS 4," ",0
 EQUS 4," ",0
 EQUS 4," ",0
 EQUS &FF
+
+\\ Test fn to add pixels to bottom of the screen
 
 IF 0
 .fx_creditscroll_test
