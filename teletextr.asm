@@ -109,6 +109,7 @@ INCLUDE "src/fx/rasterbars.asm"
 INCLUDE "src/fx/vectorballs.asm"
 INCLUDE "src/fx/mirrorfloor.asm"
 INCLUDE "src/fx/interference.asm"
+INCLUDE "src/fx/creditscroll.asm"
 
 
 \ ******************************************************************
