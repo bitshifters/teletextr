@@ -1,4 +1,15 @@
 
+
+ZSORT = TRUE    ; turn zsorting on or off
+
+; minimum of 2, maximum 3, 4 breaks it. Need to add support for >63 verts. TODO!!!
+VCUBE_RES = 3
+
+DRAWLINES = FALSE       ; draw connecting lines (cube only)
+DRAWCOORDS = FALSE      ; debug draw z coords on screen
+
+
+
 .fx_vectorballs_init
 {
     ; lazy static initialise - only do this routine once per app lifecycle since it juggles mem
@@ -56,6 +67,8 @@
 
 .fx_vectorballs_update
 {
+;    jsr fx_vectorballs_set_large
+
 	lda #144+7
     ldx #0
 	jsr mode7_set_column_shadow_fast
@@ -66,30 +79,128 @@
     ; clear transformed vertex buffer
     JSR newpoints
 
+IF ZSORT
+    jsr zsort
+ENDIF
+
+IF 0
+; debug code to draw the sorted vertex ids
+    lda zorder+0:clc:adc#48:sta&7c00+40*24+0
+    lda zorder+1:clc:adc#48:sta&7c00+40*24+1
+    lda zorder+2:clc:adc#48:sta&7c00+40*24+2
+    lda zorder+3:clc:adc#48:sta&7c00+40*24+3
+    lda zorder+4:clc:adc#48:sta&7c00+40*24+4
+    lda zorder+5:clc:adc#48:sta&7c00+40*24+5
+    lda zorder+6:clc:adc#48:sta&7c00+40*24+6
+    lda zorder+7:clc:adc#48:sta&7c00+40*24+7
+ENDIF
+
+
+IF DRAWCOORDS
+; debug code to visualize the zcoord of each vertex on the screen
     ldx #0
+.zpoints_loop
+    txa
+    pha
+
+    ; plot zcoord of vertex on x
+    jsr getscreenz ; returns A=Z
+    lsr a
+    lsr a   ; 8 bit to 6 bit (so X coord range is 0-64 )
+    tax
+    pla
+    pha
+
+    tay
+    
+    PLOT_PIXEL_CLIPPED
+    ldx #64
+    PLOT_PIXEL_CLIPPED
+    
+
+
+    pla
+    tax
+    inx
+    cpx #8
+    bne zpoints_loop
+ENDIF   ; DRAWCOORDS
+
+
+
+; daft effect to plot lines between balls (only works if VCUBE_RES is 2)
+IF DRAWLINES
+IF 1
+    lda #0:jsr getcoordinatesXY:jsr move_to
+    lda #1:jsr getcoordinatesXY:jsr draw_to
+    lda #3:jsr getcoordinatesXY:jsr draw_to
+    lda #2:jsr getcoordinatesXY:jsr draw_to      
+    lda #0:jsr getcoordinatesXY:jsr draw_to          
+ENDIF 
+IF 1
+    lda #4:jsr getcoordinatesXY:jsr move_to
+    lda #5:jsr getcoordinatesXY:jsr draw_to
+    lda #7:jsr getcoordinatesXY:jsr draw_to
+    lda #6:jsr getcoordinatesXY:jsr draw_to      
+    lda #4:jsr getcoordinatesXY:jsr draw_to  
+ENDIF
+IF 1
+    lda #0:jsr getcoordinatesXY:jsr move_to
+    lda #4:jsr getcoordinatesXY:jsr draw_to
+    lda #1:jsr getcoordinatesXY:jsr move_to
+    lda #5:jsr getcoordinatesXY:jsr draw_to
+    lda #3:jsr getcoordinatesXY:jsr move_to
+    lda #7:jsr getcoordinatesXY:jsr draw_to
+    lda #2:jsr getcoordinatesXY:jsr move_to
+    lda #6:jsr getcoordinatesXY:jsr draw_to
+ENDIF
+ENDIF   ; DRAWLINES
+
+
+    ; render the sprites in zsorted back to front order
+    ldx npts
 .points_loop
     txa
     pha
 
-    jsr getcoordinates ; returns A=X, Y=Y, bit cack would be better coming back in X/Y obvs. 
-    ; also would be good to get screen Z too for sorting...TODO
+IF ZSORT
+    ; fetch the vertex id from the sorted array instead
+    lda zorder,x
     tax
+ENDIF
 
-;    PLOT_PIXEL
+
+    jsr getcoordinatesXY ; returns A=X, Y=Y, bit cack would be better coming back in X/Y obvs. 
+
+;    tax
+
 	JSR mode7_sprites_plot_centred
-    
+
     pla
     tax
-    inx
-    cpx npts
-    bne points_loop
+
+    dex
+    bpl points_loop
+
+
 
 
 
     ; rotate the model
     ldx delta_time
 .delta_loop
-    JSR rotate
+
+    ; rotate
+IF 0
+    lda #0:sta rx
+;    lda #0:sta ry
+    inc ry
+    lda #0:sta rz
+ELSE
+    INC rx:INC rx
+    INC ry:INC ry
+    INC rz
+ENDIF
     dex
     BNE delta_loop    
     rts
@@ -98,10 +209,12 @@
 
 .fx_vectorballs_model
 
-; minimum of 2, maximum 3, 4 breaks it. Need to add support for >63 verts. TODO!!!
-VCUBE_RES = 3
 
-VCUBE_NPTS = VCUBE_RES^3
+IF VCUBE_RES==3
+    VCUBE_NPTS = VCUBE_RES^3-1
+ELSE
+    VCUBE_NPTS = VCUBE_RES^3
+ENDIF
 
 VCUBE_NLINES = 0
 VCUBE_NSURFS = 0
@@ -115,7 +228,10 @@ VCUBE_STEP = 2.0 / (VCUBE_RES-1)
 FOR ZC, -1.0, 1.0, VCUBE_STEP
     FOR YC, -1.0, 1.0, VCUBE_STEP
         FOR XC, -1.0, 1.0, VCUBE_STEP
-            MD_POINT XC, YC, ZC, VCUBE_SCALE
+            IF XC==0.0 AND YC==0.0 AND ZC=0.0 AND VCUBE_RES==3
+            ELSE
+                MD_POINT XC, YC, ZC, VCUBE_SCALE
+            ENDIF
         NEXT
     NEXT
 NEXT
