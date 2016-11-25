@@ -2,6 +2,7 @@ ALIGN 256
 
 SCREEN_OFFSET_X = 39 ;128
 SCREEN_OFFSET_Y = 37
+MAX_VERTS = 64
 
 ;----------------------------------------------------------------------------------------------------------
 ; screen space 3D perspective projection table
@@ -21,14 +22,15 @@ SCREEN_OFFSET_Y = 37
 
 ; array of bytes to indicate if vertex N has already been transformed in the current render frame
 ;  0=untransformed, 255=transformed 
-.ptsdone SKIP &40
+.ptsdone SKIP MAX_VERTS
 
 ;----------------------------------------------------------------------------------------------------------
 ; screen space vertex coordinates, max 64 verts per model
 ;----------------------------------------------------------------------------------------------------------
 ; calculated by 'transform' routine
-.sx SKIP &40
-.sy SKIP &40
+.sx SKIP MAX_VERTS
+.sy SKIP MAX_VERTS
+.sz SKIP MAX_VERTS
 
 
 
@@ -50,6 +52,18 @@ SCREEN_OFFSET_Y = 37
 
 
 ;----------------------------------------------------------------------------------------------------------
+; update model rotation angles
+; shouldnt be in here.
+;----------------------------------------------------------------------------------------------------------
+.rotate
+{
+    INC rx
+    INC ry:INC ry
+    INC rz:INC rz:INC rz
+    RTS
+}
+
+;----------------------------------------------------------------------------------------------------------
 ; fetch a 2D screen space transformed vertex coordinate
 ;----------------------------------------------------------------------------------------------------------
 ; input - X=vertex id to fetch
@@ -59,23 +73,52 @@ SCREEN_OFFSET_Y = 37
 ;----------------------------------------------------------------------------------------------------------
 .getcoordinates
 {
-    LDA ptsdone,X:BPL transform
+    LDA ptsdone,X:BNE transformed
+    JSR transform
+.transformed
     LDA sx,X
     LDY sy,X
     RTS
 }
 
+;----------------------------------------------------------------------------------------------------------
+; fetch a 2D screen space transformed vertex coordinate, returned in X/Y 
+; (transformed vertices are cached)
+;----------------------------------------------------------------------------------------------------------
 
-;----------------------------------------------------------------------------------------------------------
-; update model rotation angles
-;----------------------------------------------------------------------------------------------------------
-.rotate
+; where A is vertex id
+; returns vertex X,Y in X,Y
+.getcoordinatesXY
 {
-    INC rx
-    INC ry:INC ry
-    INC rz:INC rz:INC rz
+    TAX
+    LDA ptsdone,X:BNE transformed
+    JSR transform
+.transformed
+    LDA sy,X
+    TAY
+    LDA sx,X
+    TAX
     RTS
 }
+
+;----------------------------------------------------------------------------------------------------------
+; fetch a 2D screen space Z coordinate
+; (transformed vertices are cached)
+;----------------------------------------------------------------------------------------------------------
+; On entry:
+;  X contains vertex id
+; On exit:
+;  A contains screen z
+;  X is preserved
+.getscreenz
+{
+    LDA ptsdone,X:BNE transformed
+    JSR transform
+.transformed
+    LDA sz,X
+    RTS    
+}
+
 
 ;----------------------------------------------------------------------------------------------------------
 ; table of addresses pointing to each address in the transform routine
@@ -108,6 +151,7 @@ EQUB u20 DIV 256:EQUB u21 DIV 256:EQUB u22 DIV 256
 ;           A, sx[N] = screen X coord
 ;           Y, sy[N] = screen Y coord
 ;           ptsdone[N] = 255
+;           X is preserved
 ;----------------------------------------------------------------------------------------------------------
 ; uses table lookups for all multiplies for speed
 
@@ -215,10 +259,12 @@ EQUB u20 DIV 256:EQUB u21 DIV 256:EQUB u22 DIV 256
 
 
     ; now calculate screen space coordinates using perspective projection
-    
-
     ASL zr:ROL A:ASL zr
-    ADC#&80:TAY
+
+    ROL A:ASL zr    ; SM: added an extra bit of z precision here; it improves z range & perspective 
+    
+    ADC#&80:TAY     ; convert to unsigned
+    STA sz,X        ; store screen z (before perspective correction)
     
     CLC   
     LDA#&80:ADC perspective,Y:STA adr:STA adr+2
