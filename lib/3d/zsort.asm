@@ -41,19 +41,21 @@ MAX_DEPTH = 2^DEPTH_BITS
     stx zcount
 
     lda #255            ; [2]
+    ldx #MAX_DEPTH      ; [2]
 .resetz
     sta ztable,X        ; [5]
-    inx                 ; [2]
-    cpx #MAX_DEPTH      ; [2]
-    bne resetz          ; [3]
-                        ; 12 x MAX_DEPTH = 96 cycles
+    dex                 ; [2]
+    bpl resetz          ; [3]
+                        ; WAS 12 x MAX_DEPTH = 96 cycles
+                        ; NOW 10 x MAX_DEPTH = 80 cycles
 
 
     ; sort the coordinates of the current model into z depth order from far plane to near plane (z = 0 to 255)
     ldx npts
 .zpoints_loop
-    txa                 ; [2]
-    pha                 ; [3]
+;    txa                 ; [2]
+;    pha                 ; [3]
+    stx &9f             ; [3]
     
     ; get zcoord of vertex ID (X is preserved)
     jsr getscreenz      ; [6]+routine cost
@@ -71,13 +73,14 @@ MAX_DEPTH = 2^DEPTH_BITS
 
     ; if ztable[z] >= 0, goto relink 
     lda ztable,y        ; [5]
-    bpl relink          ; [2/3]
+    ; if empty, contains -1, which we can store directly in linked list so no need for compare/branch/load
+;    bpl relink          ; [2/3]
 
     ; else:
     ; zlinks[zcount] = -1
-    lda #255            ; [2]
+;    lda #255            ; [2]
 
-.relink
+;.relink
 
     ; zlinks[zcount] = ztable[z]
     sta zlinks,x        ; [5]
@@ -90,21 +93,23 @@ MAX_DEPTH = 2^DEPTH_BITS
     inc zcount          ; [6]
 
     ; for each vertex z
-    pla                 ; [4]
-    tax                 ; [2]
+;    pla                 ; [4]
+;    tax                 ; [2]
+    ldx &9f             ; [3]
     dex                 ; [2]
     bpl zpoints_loop    ; [3]
 
-                        ; approx 69 cycles per point
-
+                        ; WAS approx 69 cycles per point
+                        ; NOW approx 58 cycles per point
     ; we now have a sparse linked list order table
     ; so traverse it and compile the final ordered list
     ; guaranteed to visit all MAX_DEPTH entries in ztable
     ldx #0
     ldy #0
 .ploop
-    tya                 ; [2]
-    pha                 ; [3]
+;    tya                 ; [2]
+;    pha                 ; [3]
+    sty &9f             ; [3]
 
     ; get order table entry, and check if empty (-1)
     lda ztable,y        ; [5]
@@ -125,20 +130,28 @@ MAX_DEPTH = 2^DEPTH_BITS
     bpl traverse        ; [2/3]
                         ; 23-24 cycles
 .empty
-    pla                 ; [4], zp stash would be 1 cycle faster, plus could ldy
-    tay                 ; [2]
-
+;    pla                 ; [4], zp stash would be 1 cycle faster, plus could ldy
+;    tay                 ; [2]
+    ldy &9f             ; [3]
     iny                 ; [2]
     cpy #MAX_DEPTH      ; [2]
     bne ploop           ; [3]
-                        ; 26 cycle loop overhead
+                        ; WAS 26 cycle loop overhead
+                        ; NOW 21 cycle loop overhead
 
     ; setup = MAX_DEPTH x 12 cycles
     ; allocate = npts x 69 cycles
-    ; traverse = npts x 23 cycles + MAX_DEPTH x 26 cycles
-
+    ; traverse = npts x 23 cycles + MAX_DEPTH x 21 cycles
     ; so MAX_DEPTH=8, npts=26, cycles=96+1794+598+208 
     ; total 2696 cycles, 1.34ms
+
+    ; NOW
+    ; setup = MAX_DEPTH x 10 cycles
+    ; allocate = npts x 58 cycles
+    ; traverse = npts x 23 cycles + MAX_DEPTH x 26 cycles
+    ; so MAX_DEPTH=8, npts=26, cycles=8*10+58*26+26*23+8*26 
+    ; total 2394 cycles, 1.19ms
+
 
     rts
 
