@@ -67,7 +67,7 @@ DRAWCOORDS = FALSE      ; debug draw z coords on screen
 
 .fx_vectorballs_update
 {
-    jsr fx_vectorballs_set_large
+;    jsr fx_vectorballs_set_large
 
 	lda #144+7
     ldx #0
@@ -84,6 +84,7 @@ IF ZSORT
 ENDIF
 
 IF 0
+; debug code to draw the sorted vertex ids
     lda zorder+0:clc:adc#48:sta&7c00+40*24+0
     lda zorder+1:clc:adc#48:sta&7c00+40*24+1
     lda zorder+2:clc:adc#48:sta&7c00+40*24+2
@@ -94,10 +95,9 @@ IF 0
     lda zorder+7:clc:adc#48:sta&7c00+40*24+7
 ENDIF
 
-; draw zcoords
 
 IF DRAWCOORDS
-    ; put coordinates into the order table
+; debug code to visualize the zcoord of each vertex on the screen
     ldx #0
 .zpoints_loop
     txa
@@ -106,7 +106,7 @@ IF DRAWCOORDS
     ; plot zcoord of vertex on x
     jsr getscreenz ; returns A=Z
     lsr a
-    lsr a
+    lsr a   ; 8 bit to 6 bit (so X coord range is 0-64 )
     tax
     pla
     pha
@@ -128,7 +128,7 @@ ENDIF   ; DRAWCOORDS
 
 
 
-
+; daft effect to plot lines between balls (only works if VCUBE_RES is 2)
 IF DRAWLINES
 IF 1
     lda #0:jsr getcoordinatesXY:jsr move_to
@@ -164,14 +164,15 @@ ENDIF   ; DRAWLINES
     pha
 
 IF ZSORT
+    ; fetch the vertex id from the sorted array instead
     lda zorder,x
     tax
 ENDIF
 
 
-    jsr getcoordinates ; returns A=X, Y=Y, bit cack would be better coming back in X/Y obvs. 
-    ; also would be good to get screen Z too for sorting...TODO
-    tax
+    jsr getcoordinatesXY ; returns A=X, Y=Y, bit cack would be better coming back in X/Y obvs. 
+
+;    tax
 
 	JSR mode7_sprites_plot_centred
 
@@ -201,7 +202,7 @@ ELSE
     INC rz
 ENDIF
     dex
-;    BNE delta_loop    
+    BNE delta_loop    
     rts
 }
 
