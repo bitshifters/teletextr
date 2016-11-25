@@ -25,6 +25,8 @@ IKN_a = 65
 SEI_OP = $78
 CLI_OP = $58
 NOP_OP = $ea
+OPCODE_eor_indirect_Y = &51
+OPCODE_ora_indirect_Y = &11
 
 \\ SN Register Values
 SN_REG_MASK = &70
