@@ -17,11 +17,16 @@ SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
-
+SCRIPT_SEGMENT_START    30.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_dotscroller_update
+    SCRIPT_CALL fx_mirrorfloor_update
+SCRIPT_SEGMENT_END
 
 
 ; point cube effect
 SCRIPT_CALL fx_vectorballs_init
+
 SCRIPT_CALL fx_vectorballs_set_small
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
