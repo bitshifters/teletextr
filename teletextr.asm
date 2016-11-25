@@ -72,6 +72,8 @@ INCLUDE "lib/3d/fastmultiply.asm"
 INCLUDE "lib/3d/sincos.asm"
 INCLUDE "lib/3d/maths.asm"
 INCLUDE "lib/3d/culling.asm"
+INCLUDE "lib/3d/zsort.asm"
+
 
 INCLUDE "lib/mode7_graphics.asm"
 INCLUDE "lib/mode7_plot_pixel.asm"
