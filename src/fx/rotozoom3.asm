@@ -3,7 +3,7 @@
 
 
 
-
+ROTOZOOM3_DEBUG = FALSE
 
 
 
@@ -51,13 +51,19 @@ EQUB 147,148,148,148,148,147,148,148,148,148,147,148,148,148,148,147,147,150,150
 EQUB 147,147,148,148,147,147,147,148,148,147,147,147,148,148,147,147,147,150,147,147,147,150,150,147,147,150,150,147,147,147,150,147
 EQUB 147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147,147
 
-
+IF ROTOZOOM3_DEBUG
 CANVAS_ADDR2 = &7C00+40*4
 CANVAS_W2 = 40-4
 CANVAS_H2 = 25-4
+ELSE
+CANVAS_ADDR2 = &7C00
+CANVAS_W2 = 40-4
+CANVAS_H2 = 25
+
+ENDIF
 
 ; high byte incorporates MSB of texture address
-.fx_texture_ytab_hi_texture3
+.fx_texture_ytab_hi_texture2
 {
     FOR n,0,TEXTURE_SIZE-1
         EQUB HI(TEXTURE_SIZE*n) + HI(fx_texture2)
@@ -65,8 +71,10 @@ CANVAS_H2 = 25-4
 }
 
 MACRO LOADTEXTUREADDR_TEXTURE2   xreg,yreg,addr
-    LOADTEXTUREADDRT xreg,yreg,addr,fx_texture_ytab_hi_texture3
+    LOADTEXTUREADDRT xreg,yreg,addr,fx_texture_ytab_hi_texture2
 ENDMACRO
+
+
 .zoomscale EQUW ONE
 
 .fx_rotozoom3
@@ -130,10 +138,11 @@ ENDMACRO
     lda rz_sinus_hi,x
     sta rz_dy+1
 
+IF ROTOZOOM3_DEBUG
     MPRINTMEM txt_m1,&7c00
     MPRINTMEM txt_m2,&7c00+10
     MPRINTMEM txt_m3,&7c00+20
-
+ENDIF
 
     ; * scale
 IF 1
@@ -165,9 +174,11 @@ ELSE
     lda PRODUCT+1:sta rz_dy+0:lda PRODUCT+2:sta rz_dy+1    
 ENDIF
 ENDIF
+
+IF ROTOZOOM3_DEBUG
     MPRINTMEM txt_m2,&7c00+40
     MPRINTMEM txt_m3,&7c00+50
-
+ENDIF
 
 
     ; set write address
@@ -240,10 +251,7 @@ ENDIF
     SUBOFFSET   rz_sx,rz_dy,rz_sx
     ADDOFFSET   rz_sy,rz_dx,rz_sy
 
-IF 0
-    SUBOFFSET   rz_sx,rz_dy,rz_sx
-    ADDOFFSET   rz_sy,rz_dx,rz_sy
-ENDIF
+
 
     ldy &9f
     dey
@@ -261,17 +269,11 @@ ENDIF
 
 
 
-.maths_fastmul_t1	SKIP 2
-.maths_fastmul_t2	SKIP 2
-
-.maths_fastmul_res	SKIP 4
-
-T1 = maths_fastmul_t1
-T2 = maths_fastmul_t2
-PRODUCT = maths_fastmul_res
 
 
+IF ROTOZOOM3_DEBUG
 .txt_m1 EQUS "zoom %w", LO(zoomscale), HI(zoomscale), "  ", 0
 .txt_m2 EQUS "rz_dx %w", LO(rz_dx), HI(rz_dx), "  ", 0
 .txt_m3 EQUS "rz_dy %w", LO(rz_dy), HI(rz_dy), "  ", 0
 
+ENDIF

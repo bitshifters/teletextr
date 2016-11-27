@@ -141,7 +141,14 @@ FOR i, 0, 511
 NEXT
 
 
+.maths_fastmul_t1	SKIP 2
+.maths_fastmul_t2	SKIP 2
 
+.maths_fastmul_res	SKIP 4
+
+T1 = maths_fastmul_t1
+T2 = maths_fastmul_t2
+PRODUCT = maths_fastmul_res
 
 
 ; Description: Unsigned 16-bit multiplication with unsigned 32-bit result.
