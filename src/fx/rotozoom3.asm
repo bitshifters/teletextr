@@ -5,9 +5,9 @@
 
 ROTOZOOM3_DEBUG = FALSE
 
-
-
-
+ROTOZOOM3_SCALE = TRUE
+ROTOZOOM3_KEYS = TRUE
+ROTOZOOM3_ANIMATE = TRUE
 
 USE_TEXTURE2 = TRUE
 
@@ -76,6 +76,55 @@ ENDMACRO
 
 
 .zoomscale EQUW ONE
+.zoomanim EQUB 0
+
+.fx_rotozoom3_animate
+{
+
+IF ROTOZOOM3_ANIMATE
+    inc zoomanim
+;    inc zoomanim
+    lda zoomanim
+    tax
+
+IF 1    
+    lda rz_sinus_lo,x
+    sta zoomscale+0
+    lda rz_sinus_hi,x
+    sta zoomscale+1
+
+    asl zoomscale+0
+    rol zoomscale+1
+ENDIF
+
+IF 0
+    lda rz_sinus_lo+64,x
+    sta xoff+0
+    lda rz_sinus_hi+64,x
+    sta xoff+1
+
+    lda rz_sinus_lo,x
+    sta yoff+0
+    lda rz_sinus_hi,x
+    sta yoff+1
+
+
+    for n,0,4:asl xoff+0:rol xoff+1:next
+    for n,0,4:asl yoff+0:rol yoff+1:next
+ENDIF
+
+    inc xoff+1
+    inc yoff+1
+;    inc xoff+1
+;    inc yoff+1
+
+    inc zrot
+;    inc zrot    
+ENDIF
+
+    rts
+}
+
 
 .fx_rotozoom3
 {
@@ -93,13 +142,11 @@ ENDMACRO
     dex
 ;    bne uloop  ; too slow atm
 
- ;   lda #LO(ONE):sta xoff+0:lda #HI(ONE):sta xoff+1
- ;   lda #LO(ONE):sta yoff+0:lda #HI(ONE):sta yoff+1
-    
-;    inc xoff+1
-;    inc yoff+1
 
+
+IF ROTOZOOM3_KEYS
     ; check for key presses
+    LDA#&81:LDX#LO(-66):LDY#&FF:JSR &FFF4:TYA:BEQ nok0:jsr fx_rotozoom3_animate:.nok0     ; A
     LDA#&81:LDX#LO(-26):LDY#&FF:JSR &FFF4:TYA:BEQ nok1:dec xoff+1:.nok1     ; left
     LDA#&81:LDX#LO(-122):LDY#&FF:JSR &FFF4:TYA:BEQ nok2:inc xoff+1:.nok2    ; right
     LDA#&81:LDX#LO(-58):LDY#&FF:JSR &FFF4:TYA:BEQ nok3:dec yoff+1:.nok3     ; up
@@ -113,7 +160,7 @@ ENDMACRO
     LDA#&81:LDX#LO(-56):LDY#&FF:JSR &FFF4:TYA:BEQ nok8
     lda zoomscale+0:clc:adc #1:sta zoomscale+0:lda zoomscale+1:adc #0:sta zoomscale+1
     .nok8     ; p
-
+ENDIF
 
 
     ; sx = xoff
@@ -145,34 +192,20 @@ IF ROTOZOOM3_DEBUG
 ENDIF
 
     ; * scale
-IF 1
+IF ROTOZOOM3_SCALE
     lda rz_dx+0:sta T1+0:lda rz_dx+1:sta T1+1
     lda zoomscale+0:sta T2+0:lda zoomscale+1:sta T2+1
-;    lda #255:sta T2+0:lda #0:sta T2+1
     sec
     jsr maths_multiply_16bit_signed
-IF 0    
-    for n,1,8
-        lsr PRODUCT+3:ror PRODUCT+2:ror PRODUCT+1:ror PRODUCT+0
-    next
-    lda PRODUCT+0:sta rz_dx+0:lda PRODUCT+1:sta rz_dx+1
-ELSE
+    ; get bits 8-24 >> 8
     lda PRODUCT+1:sta rz_dx+0:lda PRODUCT+2:sta rz_dx+1
-ENDIF
 
     lda rz_dy+0:sta T1+0:lda rz_dy+1:sta T1+1
     lda zoomscale+0:sta T2+0:lda zoomscale+1:sta T2+1
-;    lda #255:sta T2+0:lda #0:sta T2+1
     sec
     jsr maths_multiply_16bit_signed
-IF 0
-    for n,1,8
-        lsr PRODUCT+3:ror PRODUCT+2:ror PRODUCT+1:ror PRODUCT+0
-    next
-    lda PRODUCT+0:sta rz_dy+0:lda PRODUCT+1:sta rz_dy+1    
-ELSE
+    ; get bits 8-24 >> 8
     lda PRODUCT+1:sta rz_dy+0:lda PRODUCT+2:sta rz_dy+1    
-ENDIF
 ENDIF
 
 IF ROTOZOOM3_DEBUG
@@ -194,11 +227,6 @@ ENDIF
     ; stash y coord
     sty &9f
 
-    ; we sample the texture 3 vertical lines at time
-    ; creating a character block which is written once every other horizontal step
-
-    ; compute the x,y offsets for the 2 pixel below the current pixel
-    ; so we can render teletext chars in 2x3 chunks
 
     ; px0 = sx
     ; py0 = sy
@@ -245,13 +273,11 @@ ENDIF
     adc #0
     sta write_addr+2
 
-    ; advance start texture v coord by 3 steps
+    ; advance start texture v coord to next line
     ; sx -= dy
     ; sy += dx
     SUBOFFSET   rz_sx,rz_dy,rz_sx
     ADDOFFSET   rz_sy,rz_dx,rz_sy
-
-
 
     ldy &9f
     dey
