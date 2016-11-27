@@ -46,7 +46,7 @@ SCRIPT_SEGMENT_START    30.0
 SCRIPT_SEGMENT_END
 
 
-IF 0
+IF 1
 ; point cube effect
 SCRIPT_CALL fx_vectorballs_init
 SCRIPT_CALL fx_vectorballs_set_small
