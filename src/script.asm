@@ -182,7 +182,16 @@ ENDIF
 
  ;   MPRINTMEM script_text,&7800
 
+    ; DEBUG CODE
+    ; check for space bar pressed to skip segment
+    lda #&81:ldx #LO(-99):ldy #&FF:jsr &FFF4
+    tya:beq nopress:lda debounce:bne nopress
+    lda #0:sta script_segment_duration+0:sta script_segment_duration+1
+    lda #1:.nopress sta debounce
+
+
     rts
+.debounce EQUB 0
 }
 
 .script_process
