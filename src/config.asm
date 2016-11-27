@@ -18,6 +18,26 @@ SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
 
+\\ Test cheapo rotozoom effect 
+
+SCRIPT_SEGMENT_START    600.0
+;    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_PLAY fx_rotozoom3
+SCRIPT_SEGMENT_END
+
+
+SCRIPT_SEGMENT_START    10.0
+;    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_PLAY fx_rotozoom1
+SCRIPT_SEGMENT_END
+
+SCRIPT_SEGMENT_START    10.0
+;    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_PLAY fx_rotozoom2
+SCRIPT_SEGMENT_END
+
+
+
 ; plasma segment
 SCRIPT_CALL fx_plasma_init
 SCRIPT_SEGMENT_START    30.0
@@ -25,13 +45,8 @@ SCRIPT_SEGMENT_START    30.0
     SCRIPT_PLAY fx_plasma
 SCRIPT_SEGMENT_END
 
-\\ Test cheapo rotozoom effect 
-SCRIPT_SEGMENT_START    10.0
-;    SCRIPT_PLAY fx_copybuffer_update
-    SCRIPT_PLAY fx_rotozoom
-SCRIPT_SEGMENT_END
 
-
+IF 0
 ; point cube effect
 SCRIPT_CALL fx_vectorballs_init
 SCRIPT_CALL fx_vectorballs_set_small
@@ -54,7 +69,7 @@ SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_CALL fx_vectorballs_update
 SCRIPT_SEGMENT_END
-
+ENDIF
 
 \\ Test cheapo rasterbars effect 
 SCRIPT_SEGMENT_START    10.0

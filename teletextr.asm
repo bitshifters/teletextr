@@ -106,8 +106,11 @@ INCLUDE "src/fx/plasma.asm"
 INCLUDE "src/fx/testcard.asm"
 INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/rasterbars.asm"
-INCLUDE "src/fx/vectorballs.asm"
+;INCLUDE "src/fx/vectorballs.asm"
 INCLUDE "src/fx/rotozoom.asm"
+INCLUDE "src/fx/rotozoom1.asm"
+INCLUDE "src/fx/rotozoom2.asm"
+INCLUDE "src/fx/rotozoom3.asm"
 INCLUDE "src/fx/mirrorfloor.asm"
 
 
@@ -198,6 +201,7 @@ PUTFILE "data/pages/TVB","TVB", &7C00
 PUTFILE "data/pages/TVGuide","TVGuide", &7C00
 PUTFILE "data/pages/Yorks","Yorks", &7C00
 
+PUTBASIC "src/fx/6845.txt", "6845"
 
 
 PRINT "Build successful."
