@@ -42,14 +42,12 @@ EQUB 0
 
 .fx_playgifs_init
 {
-	SEI
 	LDA &F4
 	PHA
 
 	\\ Switch to swram bank
 	LDA #PLAYGIFS_swram_slot
 	JSR swr_select_slot
-	CLI
 
 	\\ Get GIF data
 	LDA fx_playgifs_num
@@ -73,47 +71,43 @@ EQUB 0
 	STA fx_playgifs_timer
 
 	\\ Restore current bank
-	SEI
 	PLA
 	JSR swr_select_bank
-	CLI
 
 	RTS
 }
 
 .fx_playgifs_update
 {
-	SEI
-	LDA &F4
-	PHA
+	\\ Decrement our timer
+	DEC fx_playgifs_timer
+	BEQ play_next_gif
 
 	\\ Switch to swram bank
+	LDA &F4
+	PHA
 	LDA #PLAYGIFS_swram_slot
 	JSR swr_select_slot
-	CLI
 
 	\\ Update GIF player
 	JSR mode7_gif_anim_update
 
 	\\ Restore current bank
-	SEI
 	PLA
-	JSR swr_select_bank
-	CLI
-
-	\\ Decrement our timer
-	DEC fx_playgifs_timer
-	BNE return
+	JMP swr_select_bank			; will RTS for us
 
 	\\ Next GIF
+	.play_next_gif
 	LDA fx_playgifs_num
 	CLC
 	ADC #1
 	CMP #PLAYGIFS_num
-	BCC load_next_gif
+	BCC init_next_gif
+
+	JSR fx_buffer_clear
 	LDA #0
 
-	.load_next_gif
+	.init_next_gif
 	STA fx_playgifs_num
 	JSR fx_playgifs_init
 
