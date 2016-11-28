@@ -17,10 +17,12 @@ SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
+SCRIPT_CALL fx_buffer_clear
+SCRIPT_CALL fx_playgifs_init
+
 SCRIPT_SEGMENT_START    30.0
-    SCRIPT_PLAY fx_copybuffer_update
-    SCRIPT_CALL fx_dotscroller_update
-    SCRIPT_CALL fx_mirrorfloor_update
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_playgifs_update
 SCRIPT_SEGMENT_END
 
 

@@ -65,7 +65,7 @@ MUSICB_SLOT_NO = 1
     beq exit
 
     lda &f4
-    tay
+    PHA
 
     ; page in the music bank
     lda fx_music_slot
@@ -75,7 +75,7 @@ MUSICB_SLOT_NO = 1
 	jsr poll_player
     
     ; restore previously paged ROM bank
-    tya
+    PLA
     jsr swr_select_bank
 .exit
     rts    
