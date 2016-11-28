@@ -17,7 +17,20 @@ SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
+SCRIPT_SEGMENT_START    15.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_interference_update
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL fx_interference_set_blend_ora
+
+SCRIPT_SEGMENT_START    15.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_interference_update
+SCRIPT_SEGMENT_END
+
 SCRIPT_CALL fx_buffer_clear
+
 SCRIPT_CALL fx_playgifs_init
 
 SCRIPT_SEGMENT_START    30.0
@@ -26,11 +39,25 @@ SCRIPT_SEGMENT_START    30.0
 SCRIPT_SEGMENT_END
 
 
+SCRIPT_SEGMENT_START    15.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_creditscroll_update
+SCRIPT_SEGMENT_END
+
+
+SCRIPT_SEGMENT_START    15.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_creditscroll_update
+    SCRIPT_PLAY fx_rasterbars_update
+    SCRIPT_PLAY fx_rasterbars_write_shadow
+SCRIPT_SEGMENT_END
+
+
 ; point cube effect
 SCRIPT_CALL fx_vectorballs_init
 
 SCRIPT_CALL fx_vectorballs_set_small
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_SEGMENT_START    5.0
     SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_CALL fx_vectorballs_update
 SCRIPT_SEGMENT_END

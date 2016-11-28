@@ -46,7 +46,7 @@ INCLUDE "src/main.h.asm"
 \ ******************************************************************
 
 ORG &1100
-
+GUARD &7800
 
 .start
 
@@ -73,6 +73,8 @@ INCLUDE "lib/3d/fastmultiply.asm"
 INCLUDE "lib/3d/sincos.asm"
 INCLUDE "lib/3d/maths.asm"
 INCLUDE "lib/3d/culling.asm"
+INCLUDE "lib/3d/zsort.asm"
+
 
 INCLUDE "lib/mode7_graphics.asm"
 INCLUDE "lib/mode7_plot_pixel.asm"
@@ -110,6 +112,8 @@ INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/rasterbars.asm"
 INCLUDE "src/fx/vectorballs.asm"
 INCLUDE "src/fx/mirrorfloor.asm"
+INCLUDE "src/fx/interference.asm"
+INCLUDE "src/fx/creditscroll.asm"
 INCLUDE "src/fx/dotscroller.asm"
 INCLUDE "src/fx/playgifs.asm"
 
@@ -169,17 +173,7 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank2_start
-;...
-;INCBIN "data/edittf.bin"
-.animated_gif_bird
-INCBIN "data\gifs\bird_beeb.bin"
-.animated_gif_weather
-INCBIN "data\gifs\weather_beeb.bin"
-.animated_gif_dancer
-INCBIN "data\gifs\dancer_beeb.bin"
-.animated_gif_blueblob
-INCBIN "data\gifs\blueblob_beeb.bin"
-
+INCLUDE "src\sprites\circles.asm"
 .bank2_end
 SAVE "Bank2", bank2_start, bank2_end, &8000
 
@@ -191,7 +185,15 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank3_start
-;...
+
+.animated_gif_bird
+INCBIN "data\gifs\bird_beeb.bin"
+.animated_gif_weather
+INCBIN "data\gifs\weather_beeb.bin"
+.animated_gif_dancer
+INCBIN "data\gifs\dancer_beeb.bin"
+.animated_gif_blueblob
+INCBIN "data\gifs\blueblob_beeb.bin"
 
 .bank3_end
 SAVE "Bank3", bank3_start, bank3_end, &8000
