@@ -32,6 +32,8 @@ INCLUDE "lib/bresenham.h.asm"
 INCLUDE "lib/3d/3d.h.asm"
 INCLUDE "src/main.h.asm"
 
+INCLUDE "src/fx/raycaster.h.asm"
+
 .zp_end
 
 
@@ -116,6 +118,7 @@ INCLUDE "src/fx/interference.asm"
 INCLUDE "src/fx/creditscroll.asm"
 INCLUDE "src/fx/dotscroller.asm"
 INCLUDE "src/fx/playgifs.asm"
+INCLUDE "src/fx/raycaster.asm"
 
 
 \ ******************************************************************
