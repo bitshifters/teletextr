@@ -3,6 +3,16 @@
 
 RAYCASTER_shadow_addr = &7800
 RAYCASTER_sin_scale = 127
+RAYCASTER_block_size = 40
+
+RAYCASTER_default_heading = &20
+RAYCASTER_default_player_x = 8
+RAYCASTER_default_player_y = 8
+
+INKEY_w = 33
+INKEY_s = 81
+INKEY_a = 65
+INKEY_d = 50
 
 \ ******************************************************************
 \ *	Ray caster FX
@@ -10,15 +20,308 @@ RAYCASTER_sin_scale = 127
 
 .fx_raycaster_init
 {
+	LDA #RAYCASTER_default_heading
+	STA raycaster_heading
+
+	LDA #RAYCASTER_default_player_x
+	STA raycaster_playerxh
+
+	LDA #RAYCASTER_default_player_y
+	STA raycaster_playeryh
+
+	LDA #0
+	STA raycaster_playerx
+	STA raycaster_playery
+
+\\ Set colours (sky, wall, floor)
+
+	LDA #144+4
+	STA raycaster_colours+0
+	LDA #144+3
+	STA raycaster_colours+1
+	LDA #144+6
+	STA raycaster_colours+2
+
+    jsr fx_buffer_clear
+
+\\ Initialise teletext setup
+
+	lda #144+7  ; white graphics
+    ldx #1
+	jsr mode7_set_column_shadow_fast
+
+    lda #255    ; full block (used as control character for rest of line)
+    ldx #2
+	jsr mode7_set_column_shadow_fast    
+
+    lda #158    ; hold graphics
+    ldx #0
+	jsr mode7_set_column_shadow_fast
+
 	.return
 	RTS
 }
 
-.fx_raycaster_update
+.copyply2ray
 {
+	LDA raycaster_playerx
+	STA raycaster_rayposx
+	LDA raycaster_playerxh
+	STA raycaster_rayposxh
+	
+	LDA raycaster_playery
+	STA raycaster_rayposy
+	LDA raycaster_playeryh
+	STA raycaster_rayposyh
+
 	.return
 	RTS
 }
+
+.copyray2ply
+{
+	LDA raycaster_rayposx
+	STA raycaster_playerx
+	LDA raycaster_rayposxh
+	STA raycaster_playerxh
+	
+	LDA raycaster_rayposy
+	STA raycaster_playery
+	LDA raycaster_rayposyh
+	STA raycaster_playeryh
+
+	.return
+	RTS
+}
+
+.getsincos_copyplr2ray
+{
+\\ Get step in x & y from sin & cos table
+
+	LDA raycaster_sin_table, X
+	STA raycaster_stepx
+
+	LDA	raycaster_cos_table, X
+	STA raycaster_stepy
+
+\\ Reset ray start position to player position
+
+	JSR copyply2ray
+
+	.return
+	RTS
+}
+
+.addsteptopos
+{
+	LDX #2
+
+	.loop_stepadd
+	LDA raycaster_stepx, X
+	ORA #&7F
+	BMI sign_ext
+	LDA #0
+	.sign_ext
+	PHA
+
+	CLC
+	LDA raycaster_stepx, X
+	ADC raycaster_rayposx, X
+	STA raycaster_rayposx, X
+	PLA
+	ADC raycaster_rayposxh, X
+	STA raycaster_rayposxh, X
+
+	DEX
+	DEX
+	BPL loop_stepadd
+
+	\\ Look up map
+	ASL A: ASL A: ASL A: ASL A
+	ADC raycaster_rayposyh
+	TAX
+	LDA fx_raycaster_map, X
+
+	.return
+	RTS
+}
+
+.raycaster_colours
+EQUB 0, 0, 0
+
+.raycaster_heights
+EQUB 0, 0, 0
+
+.fx_raycaster_update
+{
+	.loop_main
+
+	LDY #39				; start on righthand side of screen
+
+	.loop_ray
+
+	TYA
+	CLC
+	ADC raycaster_heading
+	SEC
+	SBC #18				; half of the fov (+1 because of sec)
+	TAX
+
+	CPY #2
+	BNE holdgfx_hack
+	LDY #1
+	.holdgfx_hack
+
+	JSR getsincos_copyplr2ray
+
+	LDA #0
+	STA raycaster_distance
+
+	.loop_dist
+	INC raycaster_distance
+
+	\\ Can limit distance here
+	BMI skip_dist
+
+	JSR addsteptopos
+	\\ Returns a cell or empty
+
+	BEQ loop_dist
+
+	.skip_dist
+
+	\\ Use this for colour
+	CLC
+	ADC #144
+	STA raycaster_colours+1		; wall colour
+
+	LDX #&FF
+	LDA #RAYCASTER_block_size
+	.loop_div
+	INX
+	SBC raycaster_distance
+	BCS loop_div
+
+	TXA
+	CMP #14
+	BCC vline_validheight
+	LDA #13
+	.vline_validheight
+	ASL A
+	SEC
+	SBC #1
+	STA raycaster_heights+1
+	EOR #&FF
+	ADC #25+1
+	LSR A
+	STA raycaster_heights+0
+	STA raycaster_heights+2
+	
+	LDA #LO(RAYCASTER_shadow_addr)
+	STA writeptr
+	LDA #HI(RAYCASTER_shadow_addr)
+	STA writeptr+1
+
+	LDX #2
+	.vline_loop
+	DEC raycaster_heights,X
+	BMI vline_sectioncomplete
+
+	LDA raycaster_colours, X
+	STA (writeptr), Y
+
+	CLC
+	LDA writeptr
+	ADC #40
+	STA writeptr
+	LDA writeptr+1
+	ADC #0
+	STA writeptr+1
+
+	JMP vline_loop
+
+	.vline_sectioncomplete
+	DEX
+	BPL vline_loop
+
+	DEY
+	CPY #2
+	BCS loop_ray
+
+	\\ Do user input
+
+	\\ Reset ray pos
+	JSR copyply2ray
+
+	\\ Check keys
+	{
+		LDA #121
+		LDX #0
+		JSR osbyte
+
+		CPX #INKEY_w
+		BNE not_w
+		JSR addsteptopos
+		JSR copyray2ply
+		JMP done_keys
+
+		.not_w
+		CPX #INKEY_s
+		BNE not_s
+
+		LDA raycaster_stepx
+		EOR #&FF
+		STA raycaster_stepx
+		LDA raycaster_stepy
+		EOR #&FF
+		STA raycaster_stepy
+		JSR addsteptopos
+		JSR copyray2ply
+		JMP done_keys
+
+		.not_s
+		CPX #INKEY_a
+		BNE not_a
+		DEC raycaster_heading
+		DEC raycaster_heading
+		DEC raycaster_heading
+		DEC raycaster_heading
+
+		.not_a
+		CPX #INKEY_d
+		BNE not_d
+		INC raycaster_heading
+		INC raycaster_heading
+		INC raycaster_heading
+		INC raycaster_heading
+
+		.not_d
+
+		.done_keys
+	}
+
+	.return
+	RTS
+}
+
+ALIGN &100
+.fx_raycaster_map
+EQUB 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 7, 7, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 7, 7, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 7, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 7, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5		; could pre-add 144
+EQUB 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3		; could pre-add 144
 
 .raycaster_sin_table
 FOR n,0,&13F,1
