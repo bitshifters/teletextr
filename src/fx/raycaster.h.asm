@@ -6,6 +6,7 @@
 .raycaster_stepx        SKIP 2; leave 1 byte between x and y
 .raycaster_stepy        SKIP 1
 
+.raycaster_distancel    SKIP 1
 .raycaster_distance     SKIP 1
 
 .raycaster_playerx      SKIP 1

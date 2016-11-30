@@ -1,13 +1,18 @@
 
 ; ray caster
 
-RAYCASTER_shadow_addr = &7800
+RAYCASTER_shadow_addr = &7803
 RAYCASTER_sin_scale = 127
 RAYCASTER_block_size = 40
 
 RAYCASTER_default_heading = &20
 RAYCASTER_default_player_x = 8
 RAYCASTER_default_player_y = 8
+
+RAYCASTER_num_rays = 37
+
+_RAYCASTER_FISHEYE = FALSE
+_RAYCASTER_DEBUG = FALSE
 
 INKEY_w = 33
 INKEY_s = 81
@@ -46,6 +51,10 @@ INKEY_d = 50
 
 \\ Initialise teletext setup
 
+    lda #158    ; hold graphics
+    ldx #0
+	jsr mode7_set_column_shadow_fast
+
 	lda #144+7  ; white graphics
     ldx #1
 	jsr mode7_set_column_shadow_fast
@@ -53,10 +62,6 @@ INKEY_d = 50
     lda #255    ; full block (used as control character for rest of line)
     ldx #2
 	jsr mode7_set_column_shadow_fast    
-
-    lda #158    ; hold graphics
-    ldx #0
-	jsr mode7_set_column_shadow_fast
 
 	.return
 	RTS
@@ -156,7 +161,7 @@ EQUB 0, 0, 0
 {
 	.loop_main
 
-	LDY #39				; start on righthand side of screen
+	LDY #0				; start on lefthand side of screen
 
 	.loop_ray
 
@@ -164,13 +169,8 @@ EQUB 0, 0, 0
 	CLC
 	ADC raycaster_heading
 	SEC
-	SBC #18				; half of the fov (+1 because of sec)
+	SBC #(RAYCASTER_num_rays/2)			; half of the fov
 	TAX
-
-	CPY #2
-	BNE holdgfx_hack
-	LDY #1
-	.holdgfx_hack
 
 	JSR getsincos_copyplr2ray
 
@@ -195,6 +195,54 @@ EQUB 0, 0, 0
 	ADC #144
 	STA raycaster_colours+1		; wall colour
 
+	\\ Debug
+IF _RAYCASTER_DEBUG
+	LDA raycaster_distance
+	STA raycaster_debug_distance, Y
+
+	LDA raycaster_rayposxh
+	STA raycaster_debug_rayx, Y
+
+	LDA raycaster_rayposyh
+	STA raycaster_debug_rayy, Y
+ENDIF
+
+	\\ Scale distasnce to avoid fisheye
+
+IF _RAYCASTER_FISHEYE
+	LDX raycaster_distance
+
+	LDA #0
+	STA raycaster_distancel
+
+	LDA #1
+	STA raycaster_distance
+
+	.fisheye_loop
+	CLC
+	LDA raycaster_distancel
+	ADC raycaster_cos_table - (RAYCASTER_num_rays/2), Y
+	STA raycaster_distancel
+	LDA raycaster_distance
+	ADC #0
+	STA raycaster_distance
+
+	DEX
+	BNE fisheye_loop
+
+	ASL raycaster_distancel
+	ROL raycaster_distance
+	ASL raycaster_distancel
+	ROL raycaster_distance
+	ASL raycaster_distancel
+	ROL raycaster_distance
+
+	IF _RAYCASTER_DEBUG
+	LDA raycaster_distance
+	STA raycaster_debug_fisheye, Y
+	ENDIF
+ENDIF
+
 	LDX #&FF
 	LDA #RAYCASTER_block_size
 	.loop_div
@@ -209,14 +257,15 @@ EQUB 0, 0, 0
 	.vline_validheight
 	ASL A
 	SEC
-	SBC #1
+	SBC #1						; make odd number as mode 7 has odd number of rows
 	STA raycaster_heights+1
 	EOR #&FF
-	ADC #25+1
+	ADC #MODE7_char_height+1
 	LSR A
 	STA raycaster_heights+0
 	STA raycaster_heights+2
 	
+	.screen_addr_hack
 	LDA #LO(RAYCASTER_shadow_addr)
 	STA writeptr
 	LDA #HI(RAYCASTER_shadow_addr)
@@ -244,14 +293,19 @@ EQUB 0, 0, 0
 	DEX
 	BPL vline_loop
 
-	DEY
-	CPY #2
-	BCS loop_ray
+	INY
+	CPY #RAYCASTER_num_rays
+	BCS finished_rays
+
+	JMP loop_ray
+
+	.finished_rays
 
 	\\ Do user input
 
 	\\ Reset ray pos
-	JSR copyply2ray
+	LDX raycaster_heading
+	JSR getsincos_copyplr2ray
 
 	\\ Check keys
 	{
@@ -284,16 +338,16 @@ EQUB 0, 0, 0
 		BNE not_a
 		DEC raycaster_heading
 		DEC raycaster_heading
-		DEC raycaster_heading
-		DEC raycaster_heading
+;		DEC raycaster_heading
+;		DEC raycaster_heading
 
 		.not_a
 		CPX #INKEY_d
 		BNE not_d
 		INC raycaster_heading
 		INC raycaster_heading
-		INC raycaster_heading
-		INC raycaster_heading
+;		INC raycaster_heading
+;		INC raycaster_heading
 
 		.not_d
 
@@ -329,3 +383,17 @@ EQUB RAYCASTER_sin_scale * SIN(2 * PI * n / 256)
 NEXT
 
 raycaster_cos_table = raycaster_sin_table + &40			; this can be overlapped with sin table +64
+
+IF _RAYCASTER_DEBUG
+.raycaster_debug_distance
+SKIP 40
+
+.raycaster_debug_fisheye
+SKIP 40
+
+.raycaster_debug_rayx
+SKIP 40
+
+.raycaster_debug_rayy
+SKIP 40
+ENDIF
