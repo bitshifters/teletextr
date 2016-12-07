@@ -16,6 +16,13 @@ SCRIPT_CALL fx_music_initb
 SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
+SCRIPT_CALL fx_particles_init
+
+
+SCRIPT_SEGMENT_START    60.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_particles_update
+SCRIPT_SEGMENT_END
 
 
 SCRIPT_SEGMENT_START    15.0
