@@ -4,7 +4,8 @@
 MODE7_particles_addr = &7800
 
 PARTICLES_max = 256
-
+_PARTICLES_ENABLE_BANG = TRUE
+_PARTICLES_ENABLE_SPIN = TRUE
 
 .fx_particles_init
 {
@@ -31,19 +32,18 @@ PARTICLES_max = 256
 	STA fx_particles_xacc+1
 	STA fx_particles_yacc+1
 
-	LDA #&1f
+	LDA #&0f
 	STA fx_particles_yacc
 
 	.return
 	RTS
 }
 
-.fx_particles_get_next_free
+.fx_particles_get_next_free_X
 {
-	CLC
-	LDX #0
 	.loop
 	LDA fx_particles_state, X
+	CLC
 	BEQ return
 	INX
 	CPX #LO(PARTICLES_max)
@@ -53,60 +53,100 @@ PARTICLES_max = 256
 	RTS
 }
 
+.fx_particles_bang_idx
+EQUB 0
+
 .fx_particles_bang
 {
-	LDY #0
 	LDX #0
+	LDY fx_particles_bang_idx
 
 	.loop
-	LDA fx_particles_state, X
-	BNE next
+	JSR fx_particles_get_next_free_X
+	BCS return
 
 	LDA #1
 	STA fx_particles_state, X
 
-	LDA #40
+	LDA #0
 	STA fx_particles_xpos, X
-	LDA #25
 	STA fx_particles_ypos, X
 
-	TXA
-	SEC
-	SBC #16
-	STA fx_particles_xvel, X
+	LDA #20
+	STA fx_particles_xposh, X
+	LDA #15
+	STA fx_particles_yposh, X
 
-	TXA
-	SEC
-	SBC #16
-	STA fx_particles_yvel, X
+	JSR fx_particles_set_vel_Y
 
-	INY
-	CPY #32
-	BCS return
-
-	.next
 	INX
-	CPX #LO(PARTICLES_max)
+
+	TYA
+	CLC
+	ADC #16
+	TAY
+	CPY #0
 	BNE loop
 
 	.return
+	INC fx_particles_bang_idx
+
+	RTS
+}
+
+.fx_particles_set_vel_Y
+{
+	\\ Sign extend X&Y vel
+	{
+		LDA fx_particles_table, Y
+		ORA #&7F
+		BMI neg
+		LDA #0
+		.neg
+		STA fx_particles_xvelh, X
+	}
+
+	{
+		LDA fx_particles_table_cos, Y
+		ORA #&7F
+		BMI neg
+		LDA #0
+		.neg
+		STA fx_particles_yvelh, X
+	}
+
+	\\ X vel * 4
+	CLC
+	LDA fx_particles_table, Y
+;	ASL A
+;	ROL fx_particles_xvelh, X
+	ASL A
+	ROL fx_particles_xvelh, X
+	STA fx_particles_xvel, X
+
+	\\ Y vel * 4
+	CLC
+	LDA fx_particles_table_cos, Y
+;	ASL A
+;	ROL fx_particles_yvelh, X
+	ASL A
+	ROL fx_particles_yvelh, X
+	STA fx_particles_yvel, X
+
 	RTS
 }
 
 .fx_particles_spin_idx
 EQUB 0
 
-.fx_particles_spin
+.fx_particles_spin_Y
 {
-	LDY fx_particles_spin_idx
-	LDX #0
-	.loop
-	LDA fx_particles_state,X
-	BNE next
+	JSR fx_particles_get_next_free_X
+	BCS return
 
 	\\ Found a free one!
 	LDA #1
-	STA fx_particles_state,X
+	STA fx_particles_state, X
 
 	\\ Set X&Y pos
 	LDA #0
@@ -118,54 +158,12 @@ EQUB 0
 	LDA #25
 	STA fx_particles_yposh, X
 
-	\\ Sign extend X&Y vel
-	{
-		LDA fx_particles_table,Y
-		ORA #&7F
-		BMI neg
-		LDA #0
-		.neg
-		STA fx_particles_xvelh, X
-	}
+	JSR fx_particles_set_vel_Y
 
-	{
-		LDA fx_particles_table_cos,Y
-		ORA #&7F
-		BMI neg
-		LDA #0
-		.neg
-		STA fx_particles_yvelh, X
-	}
-
-	\\ X vel * 4
-	CLC
-	LDA fx_particles_table, Y
-	ASL A
-	ROL fx_particles_xvelh, X
-	ASL A
-	ROL fx_particles_xvelh, X
-	STA fx_particles_xvel, X
-
-	\\ Y vel * 4
-	CLC
-	LDA fx_particles_table_cos, Y
-	ASL A
-	ROL fx_particles_yvelh, X
-	ASL A
-	ROL fx_particles_yvelh, X
-	STA fx_particles_yvel, X
-
-	JMP return
-
-	.next
+	INY
 	INX
-	CPX #LO(PARTICLES_max)
-	BNE loop
 
 	.return
-
-	INC fx_particles_spin_idx
-
 	RTS
 }
 
@@ -175,20 +173,30 @@ EQUB 0
     ldx #0
 	jsr mode7_set_column_shadow_fast
 
-;	LDA #121
-;	LDX #0
-;	JSR osbyte
-;	CPX #81
-;	BNE not_s
-;	JSR fx_particles_bang
-;	.not_s
+IF _PARTICLES_ENABLE_BANG
+	LDA #121
+	LDX #0
+	JSR osbyte
+	CPX #81
+	BNE not_s
+	JSR fx_particles_bang
+	.not_s
+ENDIF
 
-	JSR fx_particles_spin
-	JSR fx_particles_spin
-	JSR fx_particles_spin
-	JSR fx_particles_spin
-	JSR fx_particles_spin
-	JSR fx_particles_spin
+IF _PARTICLES_ENABLE_SPIN
+	LDX #0
+	LDY fx_particles_spin_idx
+	JSR fx_particles_spin_Y
+	INY:INY
+	STY fx_particles_spin_idx
+
+	TYA:CLC:ADC #&40:TAY
+	JSR fx_particles_spin_Y
+	TYA:CLC:ADC #&40:TAY
+	JSR fx_particles_spin_Y
+	TYA:CLC:ADC #&40:TAY
+	JSR fx_particles_spin_Y
+ENDIF
 
 	JSR fx_particles_tick
 	JSR fx_particles_draw
