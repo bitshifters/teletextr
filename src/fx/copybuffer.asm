@@ -12,7 +12,7 @@
 .fx_copybuffer_update
 {
 	jsr mode7_copy_screen_fast
-    lda #0
+    lda #32
 	jsr mode7_clear_shadow_fast
 
     rts    
@@ -28,7 +28,7 @@
 ; clear back buffer
 .fx_buffer_clear
 {
-    lda #0
+    lda #32
 	jsr mode7_clear_shadow_fast
     rts    
 }

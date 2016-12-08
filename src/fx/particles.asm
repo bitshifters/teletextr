@@ -3,9 +3,10 @@
 
 MODE7_particles_addr = &7800
 
-PARTICLES_max = 256
+PARTICLES_max = 128
 _PARTICLES_ENABLE_BANG = TRUE
 _PARTICLES_ENABLE_SPIN = TRUE
+_PARTICLES_ENABLE_COLOUR = TRUE
 
 .fx_particles_init
 {
@@ -41,55 +42,61 @@ _PARTICLES_ENABLE_SPIN = TRUE
 
 .fx_particles_get_next_free_X
 {
+;	STX loop_test+1
+	CLC
 	.loop
 	LDA fx_particles_state, X
-	CLC
 	BEQ return
 	INX
+;	AND #LO(PARTICLES_max-1)
+	.loop_test
 	CPX #LO(PARTICLES_max)
-	BNE loop
-	SEC
+	BCC loop
+	LDX #0
 	.return
 	RTS
 }
 
 .fx_particles_bang_idx
-EQUB 0
+EQUB 20
 
 .fx_particles_bang
 {
 	LDX #0
-	LDY fx_particles_bang_idx
+	LDY #0	;fx_particles_bang_idx
 
 	.loop
 	JSR fx_particles_get_next_free_X
 	BCS return
 
-	LDA #1
+	TXA
+	AND #&1
+	CLC
+	ADC #149
 	STA fx_particles_state, X
 
 	LDA #0
 	STA fx_particles_xpos, X
 	STA fx_particles_ypos, X
 
-	LDA #20
+	LDA fx_particles_bang_idx
 	STA fx_particles_xposh, X
 	LDA #15
 	STA fx_particles_yposh, X
 
 	JSR fx_particles_set_vel_Y
 
-	INX
-
 	TYA
 	CLC
-	ADC #16
+	ADC #32
 	TAY
 	CPY #0
 	BNE loop
 
 	.return
-	INC fx_particles_bang_idx
+	LDA fx_particles_bang_idx
+	EOR #40
+	STA fx_particles_bang_idx
 
 	RTS
 }
@@ -145,7 +152,10 @@ EQUB 0
 	BCS return
 
 	\\ Found a free one!
-	LDA #1
+	TYA
+	AND #&3
+	CLC
+	ADC #145
 	STA fx_particles_state, X
 
 	\\ Set X&Y pos
@@ -160,8 +170,7 @@ EQUB 0
 
 	JSR fx_particles_set_vel_Y
 
-	INY
-	INX
+	INY			; assumes 256 entries in spin table
 
 	.return
 	RTS
@@ -169,9 +178,11 @@ EQUB 0
 
 .fx_particles_update
 {
+IF _PARTICLES_ENABLE_COLOUR = FALSE
 	lda #144+7
     ldx #0
 	jsr mode7_set_column_shadow_fast
+ENDIF
 
 IF _PARTICLES_ENABLE_BANG
 	LDA #121
@@ -187,15 +198,17 @@ IF _PARTICLES_ENABLE_SPIN
 	LDX #0
 	LDY fx_particles_spin_idx
 	JSR fx_particles_spin_Y
-	INY:INY
+;	INY:INY:INY:INY
+	TYA:CLC:ADC #&40:TAY
 	STY fx_particles_spin_idx
 
-	TYA:CLC:ADC #&40:TAY
-	JSR fx_particles_spin_Y
-	TYA:CLC:ADC #&40:TAY
-	JSR fx_particles_spin_Y
-	TYA:CLC:ADC #&40:TAY
-	JSR fx_particles_spin_Y
+; This gives 4x particles generated per frame - a bit much!
+;	TYA:CLC:ADC #&40:TAY
+;	JSR fx_particles_spin_Y
+;	TYA:CLC:ADC #&40:TAY
+;	JSR fx_particles_spin_Y
+;	TYA:CLC:ADC #&40:TAY
+;	JSR fx_particles_spin_Y
 ENDIF
 
 	JSR fx_particles_tick
@@ -295,15 +308,81 @@ EQUB 0
 	LDA fx_particles_xposh, X
 	TAX
 
+	\\ MACRO PLOT_PIXEL
 	{
-		PLOT_PIXEL	; CLIPPED?
+		clc							;[2]
+		lda plot_pixel_xtable,x		;[4]	get chr offset on row (Xcoord / 2)
+		adc plot_pixel_ytable_lo,y	;[4]	C may be set after this addition.
+
+		sta plot_lo 					;[3]
+
+		lda plot_pixel_ytable_hi,y	;[4]	C will be clear after this addition
+		adc draw_buffer_addr 		;[3]	for double buffering - add the base drawbuffer address, uses 1 more cycle than fixed addressing
+
+		sta plot_hi						;[3]
+
+		lda plot_pixel_ytable_chr,y	;[4]	get 2-pixel wide teletext glyph for Y coord
+		and plot_pixel_xtable_chr,x	;[4]	apply odd/even X coord mask  
+
+		ora (plot_lo),y					;[5]		
+		sta (plot_lo),y					;[5]
 	}
 
 	LDX fx_particles_draw_idx
+
 	.next
 	INX
 	CPX #LO(PARTICLES_max)
 	BNE loop
+
+	IF _PARTICLES_ENABLE_COLOUR
+	{
+		LDX #0
+
+		.colloop
+		STX fx_particles_draw_idx
+		LDA fx_particles_state, X
+		BEQ colnext
+
+		STA plot_tmp
+
+		LDA fx_particles_yposh, X
+		TAY
+
+		LDA fx_particles_xposh, X
+		TAX
+
+		\\ MACRO PLOT_PIXEL
+		{
+			clc							;[2]
+			lda plot_pixel_xtable,x		;[4]	get chr offset on row (Xcoord / 2)
+			adc fx_particles_pixel_ytable_lo,y	;[4]	C may be set after this addition.
+
+			sta plot_lo 					;[3]
+
+			lda fx_particles_pixel_ytable_hi,y	;[4]	C will be clear after this addition
+			adc draw_buffer_addr 		;[3]	for double buffering - add the base drawbuffer address, uses 1 more cycle than fixed addressing
+
+			sta plot_hi						;[3]
+
+			lda (plot_lo),y
+			cmp #32
+			bne skipcol
+
+			lda plot_tmp
+			sta (plot_lo),y					;[5]
+
+			.skipcol
+		}
+
+		LDX fx_particles_draw_idx
+
+		.colnext
+		INX
+		CPX #LO(PARTICLES_max)
+		BNE colloop
+	}
+	ENDIF
 
 	.return
 	RTS
@@ -347,3 +426,14 @@ EQUB 127 * SIN(2 * PI * n / 255)
 NEXT
 
 fx_particles_table_cos = fx_particles_table + 64
+
+.fx_particles_pixel_ytable_lo
+	FOR i, 0, PLOT_PIXEL_RANGE_Y-1
+	  y = (i DIV 3) * 40		; +1 due to graphics chr
+	  EQUB LO(y-i)	; adjust for (zp),y style addressing, where Y will be the y coordinate
+	NEXT
+.fx_particles_pixel_ytable_hi
+	FOR i, 0, PLOT_PIXEL_RANGE_Y-1
+	  y = (i DIV 3) * 40		; +1 due to graphics chr
+	  EQUB HI(y-i)	; adjust for (zp),y style addressing, where Y will be the y coordinate
+	NEXT
