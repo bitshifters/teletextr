@@ -8,6 +8,12 @@ _PARTICLES_ENABLE_BANG = TRUE
 _PARTICLES_ENABLE_SPIN = TRUE
 _PARTICLES_ENABLE_COLOUR = TRUE
 
+PARTICLES_BANG_num = 8
+PARTICLES_BANG_ypos = 15
+
+PARTICLES_SPIN_xpos = 40
+PARTICLES_SPIN_ypos = 25
+
 .fx_particles_init
 {
 	LDA #0
@@ -57,13 +63,17 @@ _PARTICLES_ENABLE_COLOUR = TRUE
 	RTS
 }
 
-.fx_particles_bang_idx
+.fx_particles_bang_xpos
 EQUB 20
+
+.fx_particles_bang_idx
+EQUB 0
 
 .fx_particles_bang
 {
 	LDX #0
-	LDY #0	;fx_particles_bang_idx
+	LDY fx_particles_bang_idx
+	STY loop_test+1
 
 	.loop
 	JSR fx_particles_get_next_free_X
@@ -79,24 +89,27 @@ EQUB 20
 	STA fx_particles_xpos, X
 	STA fx_particles_ypos, X
 
-	LDA fx_particles_bang_idx
+	LDA fx_particles_bang_xpos
 	STA fx_particles_xposh, X
-	LDA #15
+	LDA #PARTICLES_BANG_ypos
 	STA fx_particles_yposh, X
 
 	JSR fx_particles_set_vel_Y
 
 	TYA
 	CLC
-	ADC #32
+	ADC #(256 / PARTICLES_BANG_num)
 	TAY
+	.loop_test
 	CPY #0
 	BNE loop
 
 	.return
-	LDA fx_particles_bang_idx
+	LDA fx_particles_bang_xpos
 	EOR #40
-	STA fx_particles_bang_idx
+	STA fx_particles_bang_xpos
+
+	INC fx_particles_bang_idx
 
 	RTS
 }
@@ -163,9 +176,9 @@ EQUB 0
 	STA fx_particles_xpos, X
 	STA fx_particles_ypos, X
 
-	LDA #40
+	LDA #PARTICLES_SPIN_xpos
 	STA fx_particles_xposh, X
-	LDA #25
+	LDA #PARTICLES_SPIN_ypos
 	STA fx_particles_yposh, X
 
 	JSR fx_particles_set_vel_Y
