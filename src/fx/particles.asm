@@ -7,7 +7,8 @@ PARTICLES_max = 128
 _PARTICLES_ENABLE_BANG = TRUE
 _PARTICLES_ENABLE_SPIN = FALSE
 _PARTICLES_ENABLE_SPIN4 = FALSE
-_PARTICLES_ENABLE_SPURT = TRUE
+_PARTICLES_ENABLE_SPURT = FALSE
+_PARTICLES_ENABLE_DRIP = TRUE
 _PARTICLES_ENABLE_COLOUR = TRUE
 
 PARTICLES_gravity = &0F				; fractional part
@@ -300,6 +301,55 @@ EQUB PARTICLES_SPURT_speed
 }
 ENDIF
 
+IF _PARTICLES_ENABLE_DRIP
+.fx_particles_drip_idx
+EQUB 0
+
+.fx_particles_drip_Y					; do lissajous pattern instead?
+{
+	JSR fx_particles_get_next_free_X
+	BCS return
+
+	\\ Found a free particle
+	LDY fx_particles_drip_idx
+	TYA
+	AND #&3
+	CLC
+	ADC #145
+	STA fx_particles_state, X
+
+	\\ Set X&Y pos
+	LDA #0
+	STA fx_particles_xpos, X
+	STA fx_particles_ypos, X
+
+	\\ No velocity!
+	STA fx_particles_xvel, X
+	STA fx_particles_xvelh, X
+	STA fx_particles_yvel, X
+	STA fx_particles_yvelh, X
+
+	LDA fx_particles_table, Y
+	CMP #&80
+	ROR A
+	CMP #&80
+	ROR A
+	CLC
+	ADC #40
+	STA fx_particles_xposh, X
+
+	LDA #0
+	STA fx_particles_yposh, X
+
+	INC fx_particles_drip_idx
+	INC fx_particles_drip_idx
+	INC fx_particles_drip_idx
+
+	.return
+	RTS
+}
+ENDIF
+
 .fx_particles_update
 {
 IF _PARTICLES_ENABLE_COLOUR = FALSE
@@ -342,6 +392,10 @@ ENDIF
 
 IF _PARTICLES_ENABLE_SPURT
 	JSR fx_particles_spurt_Y
+ENDIF
+
+IF _PARTICLES_ENABLE_DRIP
+	JSR fx_particles_drip_Y
 ENDIF
 
 	JSR fx_particles_tick
