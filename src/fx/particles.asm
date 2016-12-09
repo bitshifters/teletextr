@@ -1,5 +1,7 @@
 
-; extremely dodgy particle fx
+; particle fx
+; less dodgy than before but a bit slow
+; might be a race against raster with back to front buffer copy?
 
 MODE7_particles_addr = &7800
 
@@ -10,8 +12,9 @@ _PARTICLES_ENABLE_SPIN4 = FALSE
 _PARTICLES_ENABLE_SPURT = FALSE
 _PARTICLES_ENABLE_DRIP = TRUE
 _PARTICLES_ENABLE_COLOUR = TRUE
+_PARTICLES_ENABLE_DELTA_TIME = TRUE
 
-PARTICLES_gravity = &0F				; fractional part
+PARTICLES_gravity = &0F				; fractional part only
 
 PARTICLES_BANG_num = 8
 PARTICLES_BANG_ypos = 15
@@ -24,6 +27,9 @@ PARTICLES_SPURT_ypos = 60
 PARTICLES_SPURT_centre = 128
 PARTICLES_SPURT_width = 20
 PARTICLES_SPURT_speed = 3
+
+PARTICLES_DRIP_xpos = 40
+PARTICLES_DRIP_ypos = 37
 
 .fx_particles_init
 {
@@ -305,20 +311,36 @@ IF _PARTICLES_ENABLE_DRIP
 .fx_particles_drip_idx
 EQUB 0
 
+.fx_particles_drip_idy
+EQUB 0
+
+.fx_particles_drip_addx
+EQUB 3
+
+.fx_particles_drip_addy
+EQUB 4
+
+.fx_particles_drip_col
+EQUB 0
+
 .fx_particles_drip_Y					; do lissajous pattern instead?
 {
 	JSR fx_particles_get_next_free_X
 	BCS return
 
 	\\ Found a free particle
-	LDY fx_particles_drip_idx
-	TYA
+	LDA fx_particles_drip_col
+
+	\\ Increment colour
+	ADC #1
 	AND #&3
-	CLC
+	STA fx_particles_drip_col
+
+	\\ Turn this into teletext code
 	ADC #145
 	STA fx_particles_state, X
 
-	\\ Set X&Y pos
+	\\ Set X&Y pos fraction
 	LDA #0
 	STA fx_particles_xpos, X
 	STA fx_particles_ypos, X
@@ -329,21 +351,38 @@ EQUB 0
 	STA fx_particles_yvel, X
 	STA fx_particles_yvelh, X
 
+	\\ X = 40 + sin(iy) / 4
+	LDY fx_particles_drip_idx
 	LDA fx_particles_table, Y
 	CMP #&80
 	ROR A
 	CMP #&80
 	ROR A
 	CLC
-	ADC #40
+	ADC #PARTICLES_DRIP_xpos
 	STA fx_particles_xposh, X
 
-	LDA #0
+	\\ Y = 37 + cos(iy) / 4
+	LDY fx_particles_drip_idy
+	LDA fx_particles_table_cos, Y
+	CMP #&80
+	ROR A
+	CMP #&80
+	ROR A
+	CLC
+	ADC #PARTICLES_DRIP_ypos
 	STA fx_particles_yposh, X
 
-	INC fx_particles_drip_idx
-	INC fx_particles_drip_idx
-	INC fx_particles_drip_idx
+	\\ Update sin/cos table lookups
+	CLC
+	LDA fx_particles_drip_idx
+	ADC fx_particles_drip_addx
+	STA fx_particles_drip_idx
+
+	CLC
+	LDA fx_particles_drip_idy
+	ADC fx_particles_drip_addy
+	STA fx_particles_drip_idy
 
 	.return
 	RTS
@@ -398,7 +437,18 @@ IF _PARTICLES_ENABLE_DRIP
 	JSR fx_particles_drip_Y
 ENDIF
 
+IF _PARTICLES_ENABLE_DELTA_TIME
+	LDY delta_time
+	.tick_loop
+ENDIF
+
 	JSR fx_particles_tick
+
+IF _PARTICLES_ENABLE_DELTA_TIME
+	DEY
+	BNE tick_loop
+ENDIF
+
 	JSR fx_particles_draw
 
 	.return
@@ -578,6 +628,7 @@ EQUB 0
 
 
 \\ Let's try everything with 16-bit precision
+\\ Each particle requires 9 bytes so 128 particles = 1152 bytes
 
 .fx_particles_state
 SKIP PARTICLES_max
@@ -615,6 +666,7 @@ NEXT
 fx_particles_table_cos = fx_particles_table + 64
 
 \\ Fast x,y coordinates to character address lookup
+\\ Copied from plot_pixel but offset by -1 for the colour byte - can this be shared?
 IF _PARTICLES_ENABLE_COLOUR
 .fx_particles_pixel_ytable_lo
 	FOR i, 0, PLOT_PIXEL_RANGE_Y-1
