@@ -203,5 +203,11 @@ SAVE "Bank3", bank3_start, bank3_end, &8000
 
 PRINT "ZeroPage from", ~zp_start, "to", ~zp_end, ", size is", (zp_end-zp_start), "bytes"
 PRINT "Code from", ~start, "to", ~end, ", size is", (end-start), "bytes"
+PRINT "Bank0 from", ~bank0_start, "to", ~bank0_end, ", size is", (bank0_end-bank0_start), "bytes"
+PRINT "Bank1 from", ~bank1_start, "to", ~bank1_end, ", size is", (bank1_end-bank1_start), "bytes"
+PRINT "Bank2 from", ~bank2_start, "to", ~bank2_end, ", size is", (bank2_end-bank2_start), "bytes"
+PRINT "Bank3 from", ~bank3_start, "to", ~bank3_end, ", size is", (bank3_end-bank3_start), "bytes"
+
+PRINT "Code space remaining", &7800-end, "bytes"
 
 PRINT "Build successful."
