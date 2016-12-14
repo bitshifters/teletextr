@@ -116,6 +116,7 @@ INCLUDE "src/fx/interference.asm"
 INCLUDE "src/fx/creditscroll.asm"
 INCLUDE "src/fx/dotscroller.asm"
 INCLUDE "src/fx/playgifs.asm"
+INCLUDE "src/fx/musicbars.asm"
 
 
 \ ******************************************************************

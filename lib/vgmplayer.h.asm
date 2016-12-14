@@ -25,7 +25,10 @@ VGM_PLAYER_sample_rate = 50			; locked to 50Hz
 \\ These two must be contiguous in memory
 .vgm_freq_array				SKIP VGM_FX_num_freqs
 .vgm_chan_array				SKIP VGM_FX_num_channels
-.vgm_player_reg_vals		SKIP SN_REG_MAX		; data values passed to each channel during audio playback (4x channels x pitch + volume)
+
+\\ Data values passed to each channel during audio playback (4x channels x pitch + volume)
+\\ NB. Don't require these to be stored unless we want to show them (BeebTracker) or use for fx
+.vgm_player_reg_vals		SKIP SN_REG_MAX
 
 \\ Copied out of the RAW VGM header
 .vgm_player_packet_count	SKIP 2		; number of packets

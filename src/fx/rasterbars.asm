@@ -64,14 +64,14 @@ EQUB 0
 	.loop1
 	STA teletext_bg_col, Y
 	DEY
-	BNE loop1
+	BPL loop1
 
 	LDA #MODE7_contiguous
 	LDY #MODE7_char_height - 1
 	.loop2
 	STA teletext_fx, Y
 	DEY
-	BNE loop2
+	BPL loop2
 
 	.return
 	RTS

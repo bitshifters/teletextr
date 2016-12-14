@@ -4,6 +4,8 @@
 \ ******************************************************************
 
 VGM_PLAYER_ORG = *
+VGM_PLAYER_TRIGGER_BEAT_FOR_VOLUME = TRUE	; set channel beat to volume value
+; useful for tunes that set freq once then control notes by setting volume only
 
 ORG &0380
 GUARD &03E0
@@ -356,6 +358,21 @@ PSG_STROBE_CLI_INSN = psg_strobe + 25
 	LDA #SN_VOL_MAX
 	SBC vgm_player_reg_vals,Y
 	STA vgm_player_reg_vals,Y
+
+	\\ Trigger beat on volume
+IF VGM_PLAYER_TRIGGER_BEAT_FOR_VOLUME
+	{
+		TYA:LSR A:TAX						; channel is register / 2
+
+		LDA vgm_player_reg_vals,Y
+		CMP #9
+		BCC set_beat_vol
+		LDA #9
+		.set_beat_vol
+		STA vgm_chan_array, X
+	}
+ENDIF
+
 	JMP return
 
 	\\ Frequency / tone data
