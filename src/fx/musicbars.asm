@@ -1,42 +1,112 @@
 
-; extremely dodgy music bars
+; extremely dodgy music bars :)
 
 FX_MUSICBARS_BEAT_HEIGHT = 2    ; num lines to set
-FX_MUSICBARS_BEAT_FADE = 3      ; fade speed
+FX_MUSICBARS_BEAT_FADE = 3      ; fade speed, down from 9
 
-FX_MUSICBARS_SOLID = FALSE      ; doesn't reset fg col yet
+FX_MUSICBARS_FREQ_FADE = 3      ; fade speed, down from 15
+
+FX_MUSICBARS_SOLID = FALSE      ; **BROKEN (doesn't reset fg col yet)
 
 .fx_musicbars_horiz_freq
 {
-;	JSR fx_rasterbars_reset_bg
+	JSR fx_rasterbars_reset_bg
 
-    LDY #VGM_FX_num_freqs-1
-    LDX #0
+    {
+        LDX #0
+        LDY #VGM_FX_num_freqs-1
+        .loop
+        LDA vgm_freq_array, Y
+        BEQ next
 
-    .loop
-    TYA
-    AND #&3
-    BEQ next        ; skip every 4th entry
+        SEC
+        SBC #FX_MUSICBARS_FREQ_FADE
+        BPL set_freq
 
-    LDA vgm_freq_array, Y
-    BEQ set_zero
+;        LDA teletext_bg_col, X
+;        AND #&FE
+;        STA teletext_bg_col, X
 
-    SEC
-    SBC #1
-    STA vgm_freq_array, Y
+        LDA #0
+        STA vgm_freq_array, Y
+        JMP next
 
-    TXA
-    AND #&3
-    CLC
-    ADC #1
+        .set_freq
+        STA vgm_freq_array, Y
 
-    .set_zero
-    STA teletext_bg_col, X
-    INX
+        LDA #1
+        ORA teletext_bg_col, X
+        STA teletext_bg_col, X
 
-    .next
-    DEY
-    BPL loop
+        .next
+        INX
+        DEY
+        BPL loop
+    }
+
+    {
+        LDX #0
+        LDY #VGM_FX_num_freqs-1
+        .loop
+        LDA vgm_freq_array+16, Y
+        BEQ next
+
+        SEC
+        SBC #FX_MUSICBARS_FREQ_FADE
+        BPL set_freq
+
+;        LDA teletext_bg_col, X
+;        AND #&FD
+;        STA teletext_bg_col, X
+
+        LDA #0
+        STA vgm_freq_array+16, Y
+        JMP next
+
+        .set_freq
+        STA vgm_freq_array+16, Y
+
+        LDA #2
+        ORA teletext_bg_col, X
+        STA teletext_bg_col, X
+
+        .next
+        INX
+        DEY
+        BPL loop
+    }
+
+    {
+        LDX #0
+        LDY #VGM_FX_num_freqs-1
+        .loop
+        LDA vgm_freq_array+32, Y
+        BEQ next
+
+        SEC
+        SBC #FX_MUSICBARS_FREQ_FADE
+        BPL set_freq
+
+ ;       LDA teletext_bg_col, X
+ ;       AND #&FB
+ ;       STA teletext_bg_col, X
+
+        LDA #0
+        STA vgm_freq_array+32, Y
+        JMP next
+
+        .set_freq
+        STA vgm_freq_array+32, Y
+
+        LDA #4
+        ORA teletext_bg_col, X
+        STA teletext_bg_col, X
+
+        .next
+        INX
+        DEY
+        BPL loop
+    }
 
     .return
     RTS

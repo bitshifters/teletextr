@@ -9,7 +9,7 @@
 \ *	Define global constants
 \ ******************************************************************
 
-VGM_FX_num_freqs = 32				; number of VU bars - can be 16 or 32
+VGM_FX_num_freqs = 16				; number of VU bars - can be 16 or 32
 VGM_FX_num_channels = 4				; number of beat bars (one per channel)
 
 
@@ -20,15 +20,6 @@ VGM_PLAYER_sample_rate = 50			; locked to 50Hz
 \ ******************************************************************
 \ *	Declare ZP variables
 \ ******************************************************************
-
-\\ Frequency array for vu-meter effect, plus beat bars for 4 channels
-\\ These two must be contiguous in memory
-.vgm_freq_array				SKIP VGM_FX_num_freqs
-.vgm_chan_array				SKIP VGM_FX_num_channels
-
-\\ Data values passed to each channel during audio playback (4x channels x pitch + volume)
-\\ NB. Don't require these to be stored unless we want to show them (BeebTracker) or use for fx
-.vgm_player_reg_vals		SKIP SN_REG_MAX
 
 \\ Copied out of the RAW VGM header
 .vgm_player_packet_count	SKIP 2		; number of packets
@@ -45,4 +36,4 @@ VGM_PLAYER_sample_rate = 50			; locked to 50Hz
 .vgm_player_reg_bits		SKIP 1		; bits 0 - 7 set if SN register 0 - 7 updated this frame, cleared at start of player poll
 .vgm_player_counter			SKIP 2		; increments by 1 every poll (20ms) - used as our tracker line no. & to sync fx with audio update
 
-.vgm_player_counter_tmp     SKIP 1
+;.vgm_player_counter_tmp     SKIP 1

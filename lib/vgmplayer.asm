@@ -7,6 +7,8 @@ VGM_PLAYER_ORG = *
 VGM_PLAYER_TRIGGER_BEAT_FOR_VOLUME = TRUE	; set channel beat to volume value
 ; useful for tunes that set freq once then control notes by setting volume only
 
+VGM_PLAYER_CAPTURE_FREQ_REG = &04
+
 ORG &0380
 GUARD &03E0
 
@@ -22,6 +24,14 @@ ORG VGM_PLAYER_ORG
 
 .vgm_player_start
 
+\\ Frequency array for vu-meter effect, plus beat bars for 4 channels
+\\ These two must be contiguous in memory - this is only true for BeebTracker!
+.vgm_freq_array				SKIP VGM_FX_num_freqs * VGM_FX_num_channels
+.vgm_chan_array				SKIP VGM_FX_num_channels
+
+\\ Data values passed to each channel during audio playback (4x channels x pitch + volume)
+\\ NB. Don't require these to be stored unless we want to show them (BeebTracker) or use for fx
+.vgm_player_reg_vals		SKIP SN_REG_MAX
 
 .tmp_var SKIP 1
 .tmp_msg_idx SKIP 1
@@ -416,6 +426,17 @@ ENDIF
 ;	LDA #9
 ;	STA vgm_chan_array, Y
 
+	\\ Capture frequency info for data
+;	IF VGM_PLAYER_CAPTURE_FREQ_REG <> -1
+;	CPY #VGM_PLAYER_CAPTURE_FREQ_REG
+;	BNE return
+;	ENDIF
+
+; ONLY WORKS WITH 16 FREQS CURRENTLY
+	TYA
+	ASL A: ASL A: ASL A					; channel is reg / 2 array * 16
+	STA tmp_msg_idx
+
 	LDA tmp_var
 IF VGM_FX_num_freqs == 16
 	\\ 16 frequency bars, so use top 4 bits
@@ -431,6 +452,7 @@ ENDIF
 	LDA #VGM_FX_num_freqs-1
 	SEC
 	SBC tmp_var
+	ADC tmp_msg_idx
 	TAX
 	LDA #15
 	STA vgm_freq_array,X
