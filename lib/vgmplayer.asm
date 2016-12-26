@@ -426,34 +426,66 @@ ENDIF
 ;	LDA #9
 ;	STA vgm_chan_array, Y
 
-	\\ Capture frequency info for data
-;	IF VGM_PLAYER_CAPTURE_FREQ_REG <> -1
-;	CPY #VGM_PLAYER_CAPTURE_FREQ_REG
-;	BNE return
-;	ENDIF
+IF VGM_FX_num_freqs == 24
+	{
+											; Y is only 0, 2 or 4
+		LDA #0
+		.mulloop
+		CPY #0
+		BEQ done_mulloop
+		CLC
+		ADC #12
+		DEY
+		BNE mulloop
+		.done_mulloop
+		STA tmp_msg_idx						; crappy Y*24
+	}
 
-; ONLY WORKS WITH 16 FREQS CURRENTLY
-	TYA
-	ASL A: ASL A: ASL A					; channel is reg / 2 array * 16
-	STA tmp_msg_idx
+	LDY vgm_player_last_reg
+	LDA vgm_player_reg_vals,Y				; 8-bit version
 
-	LDA tmp_var
-IF VGM_FX_num_freqs == 16
-	\\ 16 frequency bars, so use top 4 bits
-	LSR A : LSR A
+	{
+		LDX #&FF
+		.divloop
+		INX
+		SEC
+		SBC #11
+		BCS divloop
+		; divide by 11 to get 24 possible freqs
+		TXA
+	}
+
 ELSE
-	\\ 32 frequency bars, so use top 5 bits
-	LSR A
+
+		TYA									; only 0, 2 or 4
+
+	IF VGM_FX_num_freqs == 16
+		ASL A: ASL A: ASL A					; channel is reg / 2 array * 16
+		STA tmp_msg_idx
+		LDA tmp_var
+
+		\\ 16 frequency bars, so use top 4 bits
+		LSR A : LSR A
+	ELSE
+		ASL A: ASL A: ASL A: ASL A			; channel is reg / 2 array * 32
+		STA tmp_msg_idx
+		LDA tmp_var
+
+		\\ 32 frequency bars, so use top 5 bits
+		LSR A
+	ENDIF
+		
+		\\ clamp final frequency to array range and invert 
+		AND #VGM_FX_num_freqs-1
 ENDIF
-	
-	\\ clamp final frequency to array range and invert 
-	AND #VGM_FX_num_freqs-1
-	STA tmp_var
-	LDA #VGM_FX_num_freqs-1
-	SEC
-	SBC tmp_var
-	ADC tmp_msg_idx
-	TAX
+
+		STA tmp_var
+		LDA #VGM_FX_num_freqs-1
+		SEC
+		SBC tmp_var
+		ADC tmp_msg_idx
+		TAX
+
 	LDA #15
 	STA vgm_freq_array,X
 

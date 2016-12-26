@@ -48,7 +48,7 @@ FX_MUSICBARS_SOLID = FALSE      ; **BROKEN (doesn't reset fg col yet)
         LDX #0
         LDY #VGM_FX_num_freqs-1
         .loop
-        LDA vgm_freq_array+16, Y
+        LDA vgm_freq_array+VGM_FX_num_freqs, Y
         BEQ next
 
         SEC
@@ -60,11 +60,11 @@ FX_MUSICBARS_SOLID = FALSE      ; **BROKEN (doesn't reset fg col yet)
 ;        STA teletext_bg_col, X
 
         LDA #0
-        STA vgm_freq_array+16, Y
+        STA vgm_freq_array+VGM_FX_num_freqs, Y
         JMP next
 
         .set_freq
-        STA vgm_freq_array+16, Y
+        STA vgm_freq_array+VGM_FX_num_freqs, Y
 
         LDA #2
         ORA teletext_bg_col, X
@@ -80,7 +80,7 @@ FX_MUSICBARS_SOLID = FALSE      ; **BROKEN (doesn't reset fg col yet)
         LDX #0
         LDY #VGM_FX_num_freqs-1
         .loop
-        LDA vgm_freq_array+32, Y
+        LDA vgm_freq_array+(VGM_FX_num_freqs*2), Y
         BEQ next
 
         SEC
@@ -92,11 +92,11 @@ FX_MUSICBARS_SOLID = FALSE      ; **BROKEN (doesn't reset fg col yet)
  ;       STA teletext_bg_col, X
 
         LDA #0
-        STA vgm_freq_array+32, Y
+        STA vgm_freq_array+(VGM_FX_num_freqs*2), Y
         JMP next
 
         .set_freq
-        STA vgm_freq_array+32, Y
+        STA vgm_freq_array+(VGM_FX_num_freqs*2), Y
 
         LDA #4
         ORA teletext_bg_col, X
