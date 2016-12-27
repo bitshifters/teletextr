@@ -30,6 +30,9 @@
     
 
 ; call once before the animation routine
+.old_irqv
+EQUW 0
+
 .fx_plasma_init
 {
     jsr fx_buffer_clear
@@ -51,11 +54,134 @@
 
     lda #144+7  ; white block 
     ldx #39
-	jsr mode7_set_column_shadow_fast      
+	jsr mode7_set_column_shadow_fast
+
+    SEI
+	LDX #&FF					; X=11111111
+	STX &FE44					; R4=T1 Low-Order Latches (write)
+	STX &FE45					; R5=T1 High-Order Counter
+	STX &FE46
+	STX &FE47
+	
+	LDA #64						; A=00000000
+	STA &FE4B					; R11=Auxillary Control Register (timer 1 latched mode)
+
+	LDA #&7F					; A=01111111
+	STA &FE4E					; R14=Interrupt Enable (disable all interrupts)
+
+	LDA #&C2					; A=11000010
+	STA &FE4E					; R14=Interrupt Enable (enable main_vsync and timer interrupt)
+
+    lda #9
+    sta &fe00
+    lda #8                      ; R9 = X - 2
+    sta &fe01
+
+	LDA &204:STA old_irqv
+	LDA &205:STA old_irqv+1
+	
+	LDA #LO(main_irq):STA &204
+	LDA #HI(main_irq):STA &205		; set interrupt handler
+    CLI
+
     rts
 }
 
+TIMER_initial = (40 * 64) - 2			; 
+TIMER_latch = (6 * 25 * 64) - 2				; 
 
+.main_irq_flag
+EQUB 0
+
+.main_irq
+{
+	LDA &FC
+	PHA
+
+	LDA &FE4D
+    AND #&40
+    BNE irqtimer
+
+    .irqvsync
+    ; don't acknowledge vsync otherwise *fx19 doesn't work
+
+	LDA #LO(TIMER_initial)
+	STA &FE44					; R4=T1 Low-Order Latches (write)
+	LDA #HI(TIMER_initial)
+	STA &FE45					; R5=T1 High-Order Counter
+	
+	LDA #LO(TIMER_latch)
+	STA &FE46
+	LDA #HI(TIMER_latch)
+	STA &FE47
+
+    LDA #0
+    STA main_irq_flag
+
+    .exit_vsync
+    PLA
+    STA &FC
+    JMP (old_irqv)
+
+    .irqtimer
+    STA &FE4D       ; ack timer 1
+
+    LDA main_irq_flag
+    BNE second_part
+
+    ; default MODE 7
+    ; R4 = vertical total rows = 30 = 31 - 1 = 25 + 6 - 1
+    ; R6 = vertical displayed rows = 25
+    ; R7 = vertical sync position = 27 = 25 + 2
+    ; R9 = scanlines per character = 18 = 20 - 2 (interlaced)
+IF 1
+    ; first part
+ 	\\ CRTC cycle 25 - 1 rows
+	LDA #4: STA &FE00
+	LDA #24: STA &FE01				; 
+	
+	\\ Never generate vsync
+	LDA #7: STA &FE00
+	LDA #&ff: STA &FE01				; never generate vsync
+	
+	\\ Visible rows = 25
+	LDA #6: STA &FE00
+	LDA #25: STA &FE01				; 
+
+    \\ Vertical total adjust
+    LDA #5: STA &FE00
+    LDA #0: STA &FE01
+ENDIF
+
+    JMP exit_timer
+
+    .second_part
+IF 1
+    ; should restart data from &7c00
+ 	\\ CRTC cycle 25 - 1 rows
+	LDA #4: STA &FE00
+	LDA #30: STA &FE01				; 
+	
+	\\ Never generate vsync
+	LDA #7: STA &FE00
+	LDA #27: STA &FE01			;
+	
+	\\ Visible rows = 16
+	LDA #6: STA &FE00
+	LDA #25: STA &FE01				; 
+
+    \\ Vertical total adjust
+    LDA #5: STA &FE00
+    LDA #2: STA &FE01
+ENDIF
+
+    .exit_timer
+    INC main_irq_flag
+
+    PLA
+    STA &FC
+    RTI
+}
 
 
 .fx_plasma

@@ -17,6 +17,13 @@ SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
+SCRIPT_CALL fx_plasma_init
+
+SCRIPT_SEGMENT_START    30.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_PLAY fx_plasma
+SCRIPT_SEGMENT_END
+
 SCRIPT_CALL fx_playgifs_init
 
 SCRIPT_SEGMENT_START    20.0
