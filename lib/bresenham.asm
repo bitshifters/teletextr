@@ -76,13 +76,13 @@ IF _USE_RTW
 .steepline
 
 	; self-modify code so that line progresses according to direction remembered earlier
-	PLP
+	PLP					; C=sign of dy
 	LDA #&C8			; INY (goingdown)
 	BCC P%+4
 	LDA #&88			; DEY (goingup)
 	STA goingupdown
 	
-	PLP
+	PLP					; C=sign of dx
 	LDA #&E8			; INX (goingright)
 	BCC P%+4
 	LDA #&CA			; DEX (goingleft)
@@ -102,14 +102,14 @@ IF _USE_RTW
 
 	; check if done
 	DEC rtw_count
-	.branchupdown
 	BNE goingupdown
+
 	.exitline
 	RTS
 	
 	; move up to next line
 	.goingupdown
-	NOP				; self-modified to INY (goingdown) or DEY (goingup)
+	NOP					; self-modified to INY (goingdown) or DEY (goingup)
 	
 	; check move to next pixel column
 	.movetonextcolumn
@@ -121,23 +121,23 @@ IF _USE_RTW
 	
 	; move left or right to next pixel column
 	.goingleftright
-	NOP				; self-modifed to INX (goingright) or DEX (goingleft)
+	NOP					; self-modifed to INX (goingright) or DEX (goingleft)
 	JMP steeplineloop
 	
 .shallowline
 
 	; self-modify code so that line progresses according to direction remembered earlier
-	PLP
-	LDA #goingdown2-branchupdown2-2
+	PLP					; C=sign of dy
+	LDA #&C8			; INY (goingdown)
 	BCC P%+4
-	LDA #goingup2-branchupdown2-2
-	STA branchupdown2+1
+	LDA #&88			; DEY (goingup)
+	STA goingupdown2
 	
-	PLP
-	LDA #goingright2-branchleftright2-2
+	PLP					; C=sign of dx
+	LDA #&E8			; INX (goingright)
 	BCC P%+4
-	LDA #goingleft2-branchleftright2-2
-	STA branchleftright2+1
+	LDA #&CA			; DEX (goingleft)
+	STA goingleftright2
 
 	; initialise accumulator for 'steep' line
 	LDA rtw_dx
@@ -153,19 +153,14 @@ IF _USE_RTW
 	
 	; check if done
 	DEC rtw_count
-	.branchleftright2
-	BNE P%					; self-modified to goingleft2 or goingright2
+	BNE goingleftright2
+
 	.exitline2
 	RTS
 	
-	; move left to next pixel column
-	.goingleft2
-	DEX
-	JMP movetonextline
-	
-	; move right to next pixel column
-	.goingright2
-	INX
+	; move left or right to next pixel column
+	.goingleftright2
+	NOP					; self-modifed to INX (goingright) or DEX (goingleft)
 	
 	; check whether we move to the next line
 	.movetonextline
@@ -175,17 +170,9 @@ IF _USE_RTW
 	BCS shallowlineloop
 	ADC rtw_dx
 
-	.branchupdown2
-	BCS P%					; self-modified to goingdown2 or goingup2
-	
-	; move down to next line
-	.goingdown2
-	INY
-	JMP shallowlineloop
-	
-	; move up to next line
-	.goingup2
-	DEY
+	; move down or up to next line
+	.goingupdown2
+	NOP					; self-modified to INY (goingdown) or DEY (goingup)
 	JMP shallowlineloop
 }
 
