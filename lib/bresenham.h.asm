@@ -17,8 +17,6 @@ IF _USE_RTW
 .rtw_dy					SKIP 1
 .rtw_accum				SKIP 1
 .rtw_count				SKIP 1
-.rtw_temp				SKIP 1
-.rtw_scrn				SKIP 2
 
 ELSE
 

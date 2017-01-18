@@ -59,7 +59,14 @@ IF _USE_RTW
 	
 	; Coincident start and end points exit early
 	ORA rtw_dx
-	BEQ exitline
+	BNE nonzero
+
+	; safe exit for coincident points
+	PLP
+	PLP
+	RTS
+
+	.nonzero
 	
 	; determine which type of line it is
 	LDA rtw_dy
@@ -149,14 +156,11 @@ IF _USE_RTW
 	LDA rtw_dx
 	STA rtw_count
 	LSR A
-	STA rtw_accum	
 
 .shallowlineloop
 
-	; cache byte from destination screen address
+	STA rtw_accum
 	
-.shallowlineloop2
-
 	; plot pixel in cached byte
 	PLOT_PIXEL_CLIPPED
 	
@@ -164,7 +168,6 @@ IF _USE_RTW
 	DEC rtw_count
 	.branchleftright2
 	BNE P%					; self-modified to goingleft2 or goingright2
-
 	.exitline2
 	RTS
 	
@@ -176,31 +179,25 @@ IF _USE_RTW
 	; move right to next pixel column
 	.goingright2
 	INX
-	JMP movetonextline
 	
 	; check whether we move to the next line
 	.movetonextline
-	STA rtw_temp
 	SEC
 	LDA rtw_accum
 	SBC rtw_dy
+	BCS shallowlineloop
+	ADC rtw_dx
+
 	.branchupdown2
-	BCC P%					; self-modified to goingdown2 or goingup2
-	STA rtw_accum
-	LDA rtw_temp
-	BCS shallowlineloop2	; always taken
+	BCS P%					; self-modified to goingdown2 or goingup2
 	
 	; move down to next line
 	.goingdown2
-	ADC rtw_dx
-	STA rtw_accum				; store new accumulator
 	INY
 	JMP shallowlineloop
 	
 	; move up to next line
 	.goingup2
-	ADC rtw_dx
-	STA rtw_accum
 	DEY
 	JMP shallowlineloop
 }
