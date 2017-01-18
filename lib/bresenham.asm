@@ -77,16 +77,16 @@ IF _USE_RTW
 
 	; self-modify code so that line progresses according to direction remembered earlier
 	PLP
-	LDA #goingdown-branchupdown-2
+	LDA #&C8			; INY (goingdown)
 	BCC P%+4
-	LDA #goingup-branchupdown-2
-	STA branchupdown+1
+	LDA #&88			; DEY (goingup)
+	STA goingupdown
 	
 	PLP
-	LDA #goingright-branchleftright-2
+	LDA #&E8			; INX (goingright)
 	BCC P%+4
-	LDA #goingleft-branchleftright-2
-	STA branchleftright+1
+	LDA #&CA			; DEX (goingleft)
+	STA goingleftright
 
 	; initialise accumulator for 'steep' line
 	LDA rtw_dy
@@ -103,18 +103,13 @@ IF _USE_RTW
 	; check if done
 	DEC rtw_count
 	.branchupdown
-	BNE P%			; self-modified to goingdown or goingup
+	BNE goingupdown
 	.exitline
 	RTS
 	
 	; move up to next line
-	.goingup
-	DEY
-	JMP movetonextcolumn	; always taken
-	
-	; move down to next line
-	.goingdown
-	INY
+	.goingupdown
+	NOP				; self-modified to INY (goingdown) or DEY (goingup)
 	
 	; check move to next pixel column
 	.movetonextcolumn
@@ -124,17 +119,9 @@ IF _USE_RTW
 	BCS steeplineloop
 	ADC rtw_dy
 	
-	.branchleftright
-	BCS P%					; self-modified to goingright or goingleft
-	
-	; move left to next pixel column
-	.goingleft
-	DEX
-	JMP steeplineloop
-	
-	; move right to next pixel column
-	.goingright
-	INX
+	; move left or right to next pixel column
+	.goingleftright
+	NOP				; self-modifed to INX (goingright) or DEX (goingleft)
 	JMP steeplineloop
 	
 .shallowline
