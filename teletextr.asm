@@ -89,6 +89,11 @@ INCLUDE "lib/3d/model.asm"
 ;----------------------------------------------------------------------------------------------------------
 ; demo config
 ;----------------------------------------------------------------------------------------------------------
+_ABUG = FALSE
+_VECTORBALLS = FALSE    ; temp define just to free up some ram prior to SWR optimizations 
+_VECTORTEXT = FALSE
+_ROTOZOOM = FALSE
+
 INCLUDE "src/script.asm"
 INCLUDE "src/config.asm"
 
@@ -110,7 +115,20 @@ INCLUDE "src/fx/plasma.asm"
 INCLUDE "src/fx/testcard.asm"
 INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/rasterbars.asm"
+
+IF _VECTORBALLS == TRUE
 INCLUDE "src/fx/vectorballs.asm"
+ENDIF
+
+IF _ABUG==FALSE ; no ram for these with the ABUG demo enabled
+IF _ROTOZOOM
+INCLUDE "src/fx/rotozoom.asm"
+INCLUDE "src/fx/rotozoom1.asm"
+INCLUDE "src/fx/rotozoom2.asm"
+INCLUDE "src/fx/rotozoom3.asm"
+ENDIF
+ENDIF
+
 INCLUDE "src/fx/mirrorfloor.asm"
 INCLUDE "src/fx/interference.asm"
 INCLUDE "src/fx/creditscroll.asm"
@@ -118,6 +136,9 @@ INCLUDE "src/fx/dotscroller.asm"
 INCLUDE "src/fx/playgifs.asm"
 INCLUDE "src/fx/particles.asm"
 
+IF _VECTORTEXT == TRUE
+INCLUDE "src/fx/vectortext.asm"
+ENDIF
 
 \ ******************************************************************
 \ *	Code entry
@@ -207,5 +228,18 @@ PRINT "Bank2 from", ~bank2_start, "to", ~bank2_end, ", size is", (bank2_end-bank
 PRINT "Bank3 from", ~bank3_start, "to", ~bank3_end, ", size is", (bank3_end-bank3_start), "bytes"
 
 PRINT "Code space remaining", &7800-end, "bytes"
+
+
+PUTFILE "data/pages/holdtest.txt.bin", "HOLD", &7C00
+PUTFILE "data/pages/testpage.txt.bin", "TEST", &7C00
+PUTFILE "data/pages/Channl4","Channl4", &7C00
+PUTFILE "data/pages/owl","owl", &7C00
+PUTFILE "data/pages/TESTPAGE","TESTPAG", &7C00
+PUTFILE "data/pages/TVB","TVB", &7C00
+PUTFILE "data/pages/TVGuide","TVGuide", &7C00
+PUTFILE "data/pages/Yorks","Yorks", &7C00
+
+PUTBASIC "src/fx/6845.txt", "6845"
+
 
 PRINT "Build successful."
