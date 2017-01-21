@@ -1,5 +1,5 @@
 
-.fx_vectorballs_start
+.start_fx_vectorballs
 
 
 ZSORT = TRUE    ; turn zsorting on or off
@@ -246,4 +246,4 @@ INCLUDE "src\sprites\ball15.asm"
 
 
 
-.fx_vectorballs_end
+.end_fx_vectorballs

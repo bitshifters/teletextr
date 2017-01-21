@@ -6,8 +6,8 @@
 ;----------------------------------------------------------------------------------------------------------
 DEBUG = TRUE
 _ABUG = FALSE
-_VECTORBALLS = FALSE    ; temp define just to free up some ram prior to SWR optimizations 
-_VECTORTEXT = FALSE
+_VECTORBALLS = TRUE    ; temp define just to free up some ram prior to SWR optimizations 
+_VECTORTEXT = TRUE
 _ROTOZOOM = FALSE
 
 ; sdm: aiming to have SWR such that any slot can be selected and retained - any IRQs that use SWR should preserve current selected bank on exit
@@ -78,7 +78,7 @@ GUARD &7800
 ; Common code
 ;----------------------------------------------------------------------------------------------------------
 ; Include common code used by effects here...
-
+.start_lib
 INCLUDE "lib/print.asm"
 INCLUDE "lib/exomiser.asm"
 INCLUDE "lib/vgmplayer.h.asm"
@@ -123,9 +123,10 @@ INCLUDE "src/config.asm"
 ;----------------------------------------------------------------------------------------------------------
 ; Include your effects here...
 INCLUDE "src/fx/music.asm"
+.end_lib
 
 .start_fx_code
-INCLUDE "src/fx/data.asm"	; should be in a bank!!
+
 
 INCLUDE "src/fx/3dshape.asm"
 INCLUDE "src/fx/copybuffer.asm"
@@ -267,10 +268,16 @@ SAVE "Bank3", bank3_start, bank3_end, &8000
 PRINT "------------------------------------------------------------"
 PRINT "Effects in Main RAM:"
 PRINT " fx_code size is", (end_fx_code-start_fx_code), "bytes"
-PRINT "Efects in SWR:"
+PRINT " fx_plasma size is", (end_fx_plasma-start_fx_plasma), "bytes"
+PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
 IF _VECTORBALLS
 PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
 ENDIF
+IF _VECTORTEXT
+PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
+ENDIF
+
+PRINT "Efects in SWR:"
 PRINT " fx_interference size is", (end_fx_interference-start_fx_interference), "bytes"
 PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
 PRINT "------------------------------------------------------------"
@@ -280,10 +287,11 @@ PRINT "------------------------------------------------------------"
 ;----------------------------------------------------------------------------------------------------------
 PRINT "ZeroPage from", ~zp_start, "to", ~zp_end, ", size is", (zp_end-zp_start), "bytes"
 PRINT "Code from", ~start, "to", ~end, ", size is", (end-start), "bytes"
-PRINT "Bank0 from", ~bank0_start, "to", ~bank0_end, ", size is", (bank0_end-bank0_start), "bytes"
-PRINT "Bank1 from", ~bank1_start, "to", ~bank1_end, ", size is", (bank1_end-bank1_start), "bytes"
-PRINT "Bank2 from", ~bank2_start, "to", ~bank2_end, ", size is", (bank2_end-bank2_start), "bytes"
-PRINT "Bank3 from", ~bank3_start, "to", ~bank3_end, ", size is", (bank3_end-bank3_start), "bytes"
+PRINT "Library code from", ~start_lib, "to", ~end_lib, ", size is", (end_lib-start_lib), "bytes"
+PRINT "Bank0 from", ~bank0_start, "to", ~bank0_end, ", free mem is", 16384-(bank0_end-bank0_start), "bytes"
+PRINT "Bank1 from", ~bank1_start, "to", ~bank1_end, ", free mem is", 16384-(bank1_end-bank1_start), "bytes"
+PRINT "Bank2 from", ~bank2_start, "to", ~bank2_end, ", free mem is", 16384-(bank2_end-bank2_start), "bytes"
+PRINT "Bank3 from", ~bank3_start, "to", ~bank3_end, ", free mem is", 16384-(bank3_end-bank3_start), "bytes"
 
 PRINT "Code space remaining", &7800-end, "bytes"
 
