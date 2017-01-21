@@ -1,3 +1,4 @@
+.start_fx_teletext
 
 .teletext_data  
 .teletext_page1
@@ -234,3 +235,5 @@ EQUS "100  Fri 19 Jan ",131,"20:49/1"
     rts
 
 }
+
+.end_fx_teletext
