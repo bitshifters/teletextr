@@ -34,10 +34,12 @@ SCRIPT_SEGMENT_START    1000.0
 SCRIPT_SEGMENT_END
 ENDIF
 
+SCRIPT_SLOT PLAYGIFS_swram_slot
 SCRIPT_CALL fx_playgifs_init
 
 SCRIPT_SEGMENT_START    20.0
     SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_SLOT PLAYGIFS_swram_slot    
     SCRIPT_CALL fx_playgifs_update
 SCRIPT_SEGMENT_END
 
@@ -45,13 +47,16 @@ SCRIPT_CALL fx_buffer_clear
 
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_SLOT INTERFERENCE_slot_no
     SCRIPT_CALL fx_interference_update
 SCRIPT_SEGMENT_END
 
+SCRIPT_SLOT INTERFERENCE_slot_no
 SCRIPT_CALL fx_interference_set_blend_ora
 
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_SLOT INTERFERENCE_slot_no
     SCRIPT_CALL fx_interference_update
 SCRIPT_SEGMENT_END
 

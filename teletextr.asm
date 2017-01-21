@@ -124,7 +124,7 @@ INCLUDE "src/config.asm"
 ; Include your effects here...
 INCLUDE "src/fx/music.asm"
 
-
+.start_fx_code
 INCLUDE "src/fx/data.asm"	; should be in a bank!!
 
 INCLUDE "src/fx/3dshape.asm"
@@ -151,14 +151,16 @@ ENDIF
 ENDIF
 
 INCLUDE "src/fx/mirrorfloor.asm"
-INCLUDE "src/fx/interference.asm"
+
 INCLUDE "src/fx/creditscroll.asm"
 INCLUDE "src/fx/dotscroller.asm"
-INCLUDE "src/fx/playgifs.asm"
+
 
 IF _VECTORTEXT == TRUE
 INCLUDE "src/fx/vectortext.asm"
 ENDIF
+
+.end_fx_code
 
 \ ******************************************************************
 \ *	Code entry
@@ -217,14 +219,18 @@ GUARD &BFFF
 .bank2_start
 
 ;----------------------------------------------------------------------------------------------------------
-; Interference effect data
+; Interference effect
+.start_fx_interference
 INTERFERENCE_slot_no = 2				; SWRAM bank containing sprite data
+INCLUDE "src/fx/interference.asm"
 INCLUDE "src\sprites\circles.asm"
+.end_fx_interference
 ;----------------------------------------------------------------------------------------------------------
 
 
 .bank2_end
 SAVE "Bank2", bank2_start, bank2_end, &8000
+;----------------------------------------------------------------------------------------------------------
 
 ;----------------------------------------------------------------------------------------------------------
 ; SWR Bank 3
@@ -237,7 +243,9 @@ GUARD &BFFF
 
 ;----------------------------------------------------------------------------------------------------------
 ; GIF player effect data
+.start_fx_playgifs
 PLAYGIFS_swram_slot = 3
+INCLUDE "src/fx/playgifs.asm"
 .animated_gif_bird
 INCBIN "data\gifs\bird_beeb.bin"
 .animated_gif_weather
@@ -246,11 +254,30 @@ INCBIN "data\gifs\weather_beeb.bin"
 INCBIN "data\gifs\dancer_beeb.bin"
 .animated_gif_blueblob
 INCBIN "data\gifs\blueblob_beeb.bin"
+.end_fx_playgifs
 ;----------------------------------------------------------------------------------------------------------
 
 .bank3_end
 SAVE "Bank3", bank3_start, bank3_end, &8000
 
+
+;----------------------------------------------------------------------------------------------------------
+; Effect stats
+;----------------------------------------------------------------------------------------------------------
+PRINT "------------------------------------------------------------"
+PRINT "Effects in Main RAM:"
+PRINT " fx_code size is", (end_fx_code-start_fx_code), "bytes"
+PRINT "Efects in SWR:"
+IF _VECTORBALLS
+PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
+ENDIF
+PRINT " fx_interference size is", (end_fx_interference-start_fx_interference), "bytes"
+PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
+PRINT "------------------------------------------------------------"
+
+;----------------------------------------------------------------------------------------------------------
+; Build stats
+;----------------------------------------------------------------------------------------------------------
 PRINT "ZeroPage from", ~zp_start, "to", ~zp_end, ", size is", (zp_end-zp_start), "bytes"
 PRINT "Code from", ~start, "to", ~end, ", size is", (end-start), "bytes"
 PRINT "Bank0 from", ~bank0_start, "to", ~bank0_end, ", size is", (bank0_end-bank0_start), "bytes"
