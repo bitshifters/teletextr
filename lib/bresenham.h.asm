@@ -5,6 +5,21 @@
 \\ 21-5 cycles per iteration
 \\ +cost of plot pixel routine
 
+_USE_RTW=TRUE
+
+IF _USE_RTW
+
+.rtw_startx				SKIP 1
+.rtw_starty				SKIP 1
+.rtw_endx				SKIP 1
+.rtw_endy				SKIP 1
+.rtw_dx					SKIP 1
+.rtw_dy					SKIP 1
+.rtw_accum				SKIP 1
+.rtw_count				SKIP 1
+
+ELSE
+
 .my_pos_y SKIP 1
 
 
@@ -28,7 +43,6 @@
 .x_2	SKIP 1
 .y_2	SKIP 1
 
-
-
+ENDIF
 
 
