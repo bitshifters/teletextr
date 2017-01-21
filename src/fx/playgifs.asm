@@ -4,7 +4,7 @@
 PLAYGIFS_shadow_addr = &7800
 PLAYGIFS_num = 4
 PLAYGIFS_time = 25 * 8
-PLAYGIFS_swram_slot = 3
+
 
 .fx_playgifs_data
 {
@@ -42,8 +42,10 @@ EQUB 0
 
 .fx_playgifs_init
 {
+IF _SAVESWR
 	LDA &F4
 	PHA
+ENDIF
 
 	\\ Switch to swram bank
 	LDA #PLAYGIFS_swram_slot
@@ -70,9 +72,11 @@ EQUB 0
 	LDA fx_playgifs_length, X
 	STA fx_playgifs_timer
 
+IF _SAVESWR
 	\\ Restore current bank
 	PLA
 	JSR swr_select_bank
+ENDIF
 
 	RTS
 }
@@ -83,18 +87,27 @@ EQUB 0
 	DEC fx_playgifs_timer
 	BEQ play_next_gif
 
+IF _SAVESWR
 	\\ Switch to swram bank
 	LDA &F4
 	PHA
+ENDIF
+
 	LDA #PLAYGIFS_swram_slot
 	JSR swr_select_slot
+
+
 
 	\\ Update GIF player
 	JSR mode7_gif_anim_update
 
+IF _SAVESWR
 	\\ Restore current bank
 	PLA
 	JMP swr_select_bank			; will RTS for us
+ELSE
+	RTS
+ENDIF
 
 	\\ Next GIF
 	.play_next_gif

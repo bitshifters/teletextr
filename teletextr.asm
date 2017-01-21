@@ -1,13 +1,34 @@
 
+
+
+;----------------------------------------------------------------------------------------------------------
+; Build defines
+;----------------------------------------------------------------------------------------------------------
+DEBUG = TRUE
+_ABUG = FALSE
+_VECTORBALLS = FALSE    ; temp define just to free up some ram prior to SWR optimizations 
+_VECTORTEXT = FALSE
+_ROTOZOOM = FALSE
+
+; sdm: aiming to have SWR such that any slot can be selected and retained - any IRQs that use SWR should preserve current selected bank on exit
+; rule would be that all content for one effect should be within one SWR
+; This define enables/disables some legacy code
+_SAVESWR = FALSE
+
+
+
 \ ******************************************************************
 \ *	Headers
 \ ******************************************************************
-DEBUG=TRUE
+
 
 ; Allocate vars in ZP
 .zp_start
 ORG 0
 GUARD &8f
+
+
+
 
 ;----------------------------------------------------------------------------------------------------------
 ; Common global defines
@@ -50,6 +71,9 @@ GUARD &7800
 
 .start
 
+
+
+
 ;----------------------------------------------------------------------------------------------------------
 ; Common code
 ;----------------------------------------------------------------------------------------------------------
@@ -89,10 +113,7 @@ INCLUDE "lib/3d/model.asm"
 ;----------------------------------------------------------------------------------------------------------
 ; demo config
 ;----------------------------------------------------------------------------------------------------------
-_ABUG = FALSE
-_VECTORBALLS = FALSE    ; temp define just to free up some ram prior to SWR optimizations 
-_VECTORTEXT = FALSE
-_ROTOZOOM = FALSE
+
 
 INCLUDE "src/script.asm"
 INCLUDE "src/config.asm"
@@ -194,7 +215,14 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank2_start
+
+;----------------------------------------------------------------------------------------------------------
+; Interference effect data
+INTERFERENCE_slot_no = 2				; SWRAM bank containing sprite data
 INCLUDE "src\sprites\circles.asm"
+;----------------------------------------------------------------------------------------------------------
+
+
 .bank2_end
 SAVE "Bank2", bank2_start, bank2_end, &8000
 
@@ -207,6 +235,9 @@ ORG &8000
 GUARD &BFFF
 .bank3_start
 
+;----------------------------------------------------------------------------------------------------------
+; GIF player effect data
+PLAYGIFS_swram_slot = 3
 .animated_gif_bird
 INCBIN "data\gifs\bird_beeb.bin"
 .animated_gif_weather
@@ -215,6 +246,7 @@ INCBIN "data\gifs\weather_beeb.bin"
 INCBIN "data\gifs\dancer_beeb.bin"
 .animated_gif_blueblob
 INCBIN "data\gifs\blueblob_beeb.bin"
+;----------------------------------------------------------------------------------------------------------
 
 .bank3_end
 SAVE "Bank3", bank3_start, bank3_end, &8000
