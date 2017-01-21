@@ -1,4 +1,182 @@
 
+IF _USE_RTW
+
+
+\\ Plot line from lastX,lastY to X,Y
+.draw_to	
+{
+	lda rtw_startx
+	sta rtw_endx
+	lda rtw_starty
+	sta rtw_endy
+	stx rtw_startx
+	sty rtw_starty
+	jsr draw_line
+	rts
+}
+
+\\ Move plot cursor from lastX,lastY to X,Y
+.move_to
+{
+	lda rtw_startx
+	sta rtw_endx
+	lda rtw_starty
+	sta rtw_endy
+	stx rtw_startx
+	sty rtw_starty
+	rts
+}
+
+.draw_line
+{
+	; calc dx = ABS(startx - endx)
+	SEC
+	LDA rtw_startx
+	TAX
+	SBC rtw_endx
+	BCS posdx
+	EOR #255
+	ADC #1
+	.posdx
+	STA rtw_dx
+	
+	; C=0 if dir of startx -> endx is positive, otherwise C=1
+	PHP
+	
+	; calc dy = ABS(starty - endy)
+	SEC
+	LDA rtw_starty
+	TAY
+	SBC rtw_endy
+	BCS posdy
+	EOR #255
+	ADC #1
+	.posdy
+	STA rtw_dy
+	
+	; C=0 if dir of starty -> endy is positive, otherwise C=1
+	PHP
+	
+	; Coincident start and end points exit early
+	ORA rtw_dx
+	BNE nonzero
+
+	; safe exit for coincident points
+	PLP
+	PLP
+	RTS
+
+	.nonzero
+	
+	; determine which type of line it is
+	LDA rtw_dy
+	CMP rtw_dx
+	BCC shallowline
+		
+.steepline
+
+	; self-modify code so that line progresses according to direction remembered earlier
+	PLP					; C=sign of dy
+	LDA #&C8			; INY (goingdown)
+	BCC P%+4
+	LDA #&88			; DEY (goingup)
+	STA goingupdown
+	
+	PLP					; C=sign of dx
+	LDA #&E8			; INX (goingright)
+	BCC P%+4
+	LDA #&CA			; DEX (goingleft)
+	STA goingleftright
+
+	; initialise accumulator for 'steep' line
+	LDA rtw_dy
+	STA rtw_count
+	LSR A
+
+.steeplineloop
+
+	STA rtw_accum
+	
+	; plot pixel
+	PLOT_PIXEL_CLIPPED
+
+	; check if done
+	DEC rtw_count
+	BNE goingupdown
+
+	.exitline
+	RTS
+	
+	; move up to next line
+	.goingupdown
+	NOP					; self-modified to INY (goingdown) or DEY (goingup)
+	
+	; check move to next pixel column
+	.movetonextcolumn
+	SEC
+	LDA rtw_accum
+	SBC rtw_dx
+	BCS steeplineloop
+	ADC rtw_dy
+	
+	; move left or right to next pixel column
+	.goingleftright
+	NOP					; self-modifed to INX (goingright) or DEX (goingleft)
+	JMP steeplineloop
+	
+.shallowline
+
+	; self-modify code so that line progresses according to direction remembered earlier
+	PLP					; C=sign of dy
+	LDA #&C8			; INY (goingdown)
+	BCC P%+4
+	LDA #&88			; DEY (goingup)
+	STA goingupdown2
+	
+	PLP					; C=sign of dx
+	LDA #&E8			; INX (goingright)
+	BCC P%+4
+	LDA #&CA			; DEX (goingleft)
+	STA goingleftright2
+
+	; initialise accumulator for 'steep' line
+	LDA rtw_dx
+	STA rtw_count
+	LSR A
+
+.shallowlineloop
+
+	STA rtw_accum
+	
+	; plot pixel in cached byte
+	PLOT_PIXEL_CLIPPED
+	
+	; check if done
+	DEC rtw_count
+	BNE goingleftright2
+
+	.exitline2
+	RTS
+	
+	; move left or right to next pixel column
+	.goingleftright2
+	NOP					; self-modifed to INX (goingright) or DEX (goingleft)
+	
+	; check whether we move to the next line
+	.movetonextline
+	SEC
+	LDA rtw_accum
+	SBC rtw_dy
+	BCS shallowlineloop
+	ADC rtw_dx
+
+	; move down or up to next line
+	.goingupdown2
+	NOP					; self-modified to INY (goingdown) or DEY (goingup)
+	JMP shallowlineloop
+}
+
+ELSE
 
 \\ SELF MODIFYING CODE
 .draw_line
@@ -120,7 +298,7 @@
 	rts
 }
 
-
+ENDIF
 
 
 \.plot_point
