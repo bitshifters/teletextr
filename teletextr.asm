@@ -144,9 +144,7 @@ INCLUDE "src/fx/dotscroller.asm"
 
 
 
-IF _VECTORTEXT == TRUE
-INCLUDE "src/fx/vectortext.asm"
-ENDIF
+
 
 .end_fx_code
 
@@ -270,6 +268,13 @@ ENDIF
 FX_PLASMA_SLOT = 3
 INCLUDE "src/fx/plasma.asm"
 
+;----------------------------------------------------------------------------------------------------------
+FX_VECTORTEXT_SLOT = 3
+
+IF _VECTORTEXT == TRUE
+INCLUDE "src/fx/vectortext.asm"
+ENDIF
+
 .bank3_end
 SAVE "Bank3", bank3_start, bank3_end, &8000
 
@@ -281,9 +286,7 @@ PRINT "------------------------------------------------------------"
 PRINT " fx_code size is", (end_fx_code-start_fx_code), "bytes"
 PRINT "Main RAM effects:"
 PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
-IF _VECTORTEXT
-PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
-ENDIF
+
 
 PRINT " fx_testcard size is", (end_fx_testcard-start_fx_testcard), "bytes"
 PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
@@ -304,6 +307,9 @@ PRINT " fx_rotozoom size is", (end_fx_rotozoom-start_fx_rotozoom), "bytes"
 ENDIF
 PRINT " fx_interference size is", (end_fx_interference-start_fx_interference), "bytes"
 PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
+IF _VECTORTEXT
+PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
+ENDIF
 PRINT "------------------------------------------------------------"
 
 ;----------------------------------------------------------------------------------------------------------
