@@ -15,13 +15,15 @@
 
 ; initialise routines
 SCRIPT_CALL fx_music_initb
+
 IF _ABUG == FALSE
 SCRIPT_CALL fx_music_start
 ENDIF
+
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
-
+IF _ABUG == TRUE
 ; vector text effect
 SCRIPT_CALL fx_vectortext_init
 SCRIPT_SEGMENT_START    1000.0
@@ -29,6 +31,7 @@ SCRIPT_SEGMENT_START    1000.0
     SCRIPT_CALL fx_vectortext_update
         SCRIPT_CALL fx_teletext_header
 SCRIPT_SEGMENT_END
+ENDIF
 
 \\ Test cheapo rotozoom effect 
 IF 0
@@ -58,7 +61,7 @@ SCRIPT_SEGMENT_START    30.0
 SCRIPT_SEGMENT_END
 
 
-IF 1
+IF _VECTORBALLS == TRUE
 ; point cube effect
 SCRIPT_CALL fx_vectorballs_init
 SCRIPT_CALL fx_vectorballs_set_small
