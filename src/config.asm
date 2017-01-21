@@ -9,17 +9,29 @@
 ;   set specific start times for segments (so effects can be timed to the music track) 
 ;   wait command?
 
+
+
 .demo_script_start
 
 ; initialise routines
 SCRIPT_CALL fx_music_initb
+IF _ABUG == FALSE
 SCRIPT_CALL fx_music_start
+ENDIF
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
 
-\\ Test cheapo rotozoom effect 
+; vector text effect
+SCRIPT_CALL fx_vectortext_init
+SCRIPT_SEGMENT_START    1000.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_vectortext_update
+        SCRIPT_CALL fx_teletext_header
+SCRIPT_SEGMENT_END
 
+\\ Test cheapo rotozoom effect 
+IF 0
 SCRIPT_SEGMENT_START    600.0
 ;    SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_PLAY fx_rotozoom3
@@ -35,7 +47,7 @@ SCRIPT_SEGMENT_START    10.0
 ;    SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_PLAY fx_rotozoom2
 SCRIPT_SEGMENT_END
-
+ENDIF
 
 
 ; plasma segment

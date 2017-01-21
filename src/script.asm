@@ -212,7 +212,8 @@ ENDIF
 
     ; we are in a segment
 
-    
+; hack to force infinite loop    
+IF _ABUG == FALSE
 
     ; script_segment_time += delta_time
     lda script_segment_time+0
@@ -222,6 +223,7 @@ ENDIF
     lda script_segment_time+1
     adc #0
     sta script_segment_time+1
+ENDIF
 
     ; if script_segment_time >= duration
     ;   segment finished, leave sequence ptr    

@@ -85,6 +85,8 @@ INCLUDE "lib/3d/model.asm"
 ;----------------------------------------------------------------------------------------------------------
 ; demo config
 ;----------------------------------------------------------------------------------------------------------
+_ABUG = TRUE
+
 INCLUDE "src/script.asm"
 INCLUDE "src/config.asm"
 
@@ -107,11 +109,14 @@ INCLUDE "src/fx/testcard.asm"
 INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/rasterbars.asm"
 INCLUDE "src/fx/vectorballs.asm"
+IF _ABUG==FALSE ; no ram for these with the ABUG demo enabled
 INCLUDE "src/fx/rotozoom.asm"
 INCLUDE "src/fx/rotozoom1.asm"
 INCLUDE "src/fx/rotozoom2.asm"
 INCLUDE "src/fx/rotozoom3.asm"
+ENDIF
 INCLUDE "src/fx/mirrorfloor.asm"
+INCLUDE "src/fx/vectortext.asm"
 
 
 
