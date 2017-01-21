@@ -8,7 +8,7 @@ DEBUG = TRUE
 _ABUG = FALSE
 _VECTORBALLS = TRUE    ; temp define just to free up some ram prior to SWR optimizations 
 _VECTORTEXT = TRUE
-_ROTOZOOM = FALSE
+_ROTOZOOM = TRUE
 
 ; sdm: aiming to have SWR such that any slot can be selected and retained - any IRQs that use SWR should preserve current selected bank on exit
 ; rule would be that all content for one effect should be within one SWR
@@ -126,34 +126,22 @@ INCLUDE "src/fx/music.asm"
 .start_fx_code
 
 
-INCLUDE "src/fx/3dshape.asm"
 INCLUDE "src/fx/copybuffer.asm"
+INCLUDE "src/fx/mirrorfloor.asm"
 
+INCLUDE "src/fx/3dshape.asm"
 INCLUDE "src/fx/teletext.asm"
-
 INCLUDE "src/fx/greenscreen.asm"
 INCLUDE "src/fx/copperbars.asm"
 INCLUDE "src/fx/linebox.asm"
 INCLUDE "src/fx/testcard.asm"
 INCLUDE "src/fx/rasterbars.asm"
-
-
-
-IF _ABUG==FALSE ; no ram for these with the ABUG demo enabled
-IF _ROTOZOOM
-.start_fx_rotozoom
-INCLUDE "src/fx/rotozoom.asm"
-INCLUDE "src/fx/rotozoom1.asm"
-INCLUDE "src/fx/rotozoom2.asm"
-INCLUDE "src/fx/rotozoom3.asm"
-.end_fx_rotozoom
-ENDIF
-ENDIF
-
-INCLUDE "src/fx/mirrorfloor.asm"
-
 INCLUDE "src/fx/creditscroll.asm"
 INCLUDE "src/fx/dotscroller.asm"
+
+
+
+
 
 
 IF _VECTORTEXT == TRUE
@@ -206,6 +194,21 @@ INCBIN "data/music_exception.raw.exo"   ; 4297
 .music_reg
 INCBIN "data/music_reg.raw.exo"         ; 1548
 ;...
+
+
+FX_ROTOZOOM_SLOT = 1
+IF _ABUG==FALSE ; no ram for these with the ABUG demo enabled
+IF _ROTOZOOM
+.start_fx_rotozoom
+INCLUDE "src/fx/rotozoom.asm"
+INCLUDE "src/fx/rotozoom1.asm"
+INCLUDE "src/fx/rotozoom2.asm"
+INCLUDE "src/fx/rotozoom3.asm"
+.end_fx_rotozoom
+ENDIF
+ENDIF
+
+
 .bank1_end
 SAVE "Bank1", bank1_start, bank1_end, &8000
 
@@ -281,11 +284,6 @@ PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
 IF _VECTORTEXT
 PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 ENDIF
-IF _ROTOZOOM
-PRINT " fx_rotozoom size is", (end_fx_rotozoom-start_fx_rotozoom), "bytes"
-
-
-ENDIF
 
 PRINT " fx_testcard size is", (end_fx_testcard-start_fx_testcard), "bytes"
 PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
@@ -300,6 +298,9 @@ PRINT "SW RAM effects:"
 PRINT " fx_plasma size is", (end_fx_plasma-start_fx_plasma), "bytes"
 IF _VECTORBALLS
 PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
+ENDIF
+IF _ROTOZOOM
+PRINT " fx_rotozoom size is", (end_fx_rotozoom-start_fx_rotozoom), "bytes"
 ENDIF
 PRINT " fx_interference size is", (end_fx_interference-start_fx_interference), "bytes"
 PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
