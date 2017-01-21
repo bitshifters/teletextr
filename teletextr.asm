@@ -106,8 +106,6 @@ INCLUDE "lib/mode7_sprites.asm"
 INCLUDE "lib/mode7_gif_anim.asm"
 INCLUDE "lib/bresenham.asm"
 
-
-
 INCLUDE "lib/3d/model.asm"
 
 ;----------------------------------------------------------------------------------------------------------
@@ -138,9 +136,7 @@ INCLUDE "src/fx/testcard.asm"
 INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/rasterbars.asm"
 
-IF _VECTORBALLS == TRUE
-INCLUDE "src/fx/vectorballs.asm"
-ENDIF
+
 
 IF _ABUG==FALSE ; no ram for these with the ABUG demo enabled
 IF _ROTOZOOM
@@ -258,6 +254,12 @@ INCBIN "data\gifs\blueblob_beeb.bin"
 .end_fx_playgifs
 ;----------------------------------------------------------------------------------------------------------
 
+FX_VECTORBALLS_SLOT = 3
+IF _VECTORBALLS == TRUE
+INCLUDE "src/fx/vectorballs.asm"
+ENDIF
+;----------------------------------------------------------------------------------------------------------
+
 .bank3_end
 SAVE "Bank3", bank3_start, bank3_end, &8000
 
@@ -266,18 +268,15 @@ SAVE "Bank3", bank3_start, bank3_end, &8000
 ; Effect stats
 ;----------------------------------------------------------------------------------------------------------
 PRINT "------------------------------------------------------------"
-PRINT "Effects in Main RAM:"
 PRINT " fx_code size is", (end_fx_code-start_fx_code), "bytes"
 PRINT " fx_plasma size is", (end_fx_plasma-start_fx_plasma), "bytes"
 PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
-IF _VECTORBALLS
-PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
-ENDIF
 IF _VECTORTEXT
 PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 ENDIF
-
-PRINT "Efects in SWR:"
+IF _VECTORBALLS
+PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
+ENDIF
 PRINT " fx_interference size is", (end_fx_interference-start_fx_interference), "bytes"
 PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
 PRINT "------------------------------------------------------------"

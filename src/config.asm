@@ -108,26 +108,30 @@ SCRIPT_SEGMENT_END
 
 IF _VECTORBALLS == TRUE
 ; point cube effect
+SCRIPT_SLOT FX_VECTORBALLS_SLOT
 SCRIPT_CALL fx_vectorballs_init
-
 SCRIPT_CALL fx_vectorballs_set_small
+
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_SLOT FX_VECTORBALLS_SLOT
     SCRIPT_CALL fx_vectorballs_update
 SCRIPT_SEGMENT_END
 
 
-
+SCRIPT_SLOT FX_VECTORBALLS_SLOT
 SCRIPT_CALL fx_vectorballs_set_medium
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_SLOT FX_VECTORBALLS_SLOT    
     SCRIPT_CALL fx_vectorballs_update
 SCRIPT_SEGMENT_END
 
-
+SCRIPT_SLOT FX_VECTORBALLS_SLOT
 SCRIPT_CALL fx_vectorballs_set_large
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_SLOT FX_VECTORBALLS_SLOT
     SCRIPT_CALL fx_vectorballs_update
 SCRIPT_SEGMENT_END
 ENDIF
