@@ -267,7 +267,7 @@ IF _SAVESWR
     PHA
 ENDIF
 
-    lda #INTERFERENCE_slot_no
+    lda #FX_INTERFERENCE_SLOT
     jsr swr_select_slot
     cli
 

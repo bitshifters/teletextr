@@ -48,7 +48,7 @@ IF _SAVESWR
 ENDIF
 
 	\\ Switch to swram bank
-	LDA #PLAYGIFS_swram_slot
+	LDA #FX_PLAYGIFS_SLOT
 	JSR swr_select_slot
 
 	\\ Get GIF data
@@ -93,7 +93,7 @@ IF _SAVESWR
 	PHA
 ENDIF
 
-	LDA #PLAYGIFS_swram_slot
+	LDA #FX_PLAYGIFS_SLOT
 	JSR swr_select_slot
 
 

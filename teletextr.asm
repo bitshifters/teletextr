@@ -218,7 +218,7 @@ GUARD &BFFF
 ;----------------------------------------------------------------------------------------------------------
 ; Interference effect
 .start_fx_interference
-INTERFERENCE_slot_no = 2				; SWRAM bank containing sprite data
+FX_INTERFERENCE_SLOT = 2				; SWRAM bank containing sprite data
 INCLUDE "src/fx/interference.asm"
 INCLUDE "src\sprites\circles.asm"
 .end_fx_interference
@@ -241,7 +241,7 @@ GUARD &BFFF
 ;----------------------------------------------------------------------------------------------------------
 ; GIF player effect data
 .start_fx_playgifs
-PLAYGIFS_swram_slot = 3
+FX_PLAYGIFS_SLOT = 3
 INCLUDE "src/fx/playgifs.asm"
 .animated_gif_bird
 INCBIN "data\gifs\bird_beeb.bin"
