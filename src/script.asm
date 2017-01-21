@@ -5,6 +5,7 @@ SCRIPTID_SEGMENT_END=2
 SCRIPTID_CALL=3
 SCRIPTID_PLAY=4
 SCRIPTID_PLAYV=5
+SCRIPTID_SLOT=6
 SCRIPTID_END=255
 
 
@@ -41,6 +42,13 @@ MACRO SCRIPT_PLAYV   effect_ptr, offset, duration
     EQUW    offset*50
     EQUW    duration*50
     EQUW    effect_ptr
+ENDMACRO
+
+
+; Select a SWR slot (not bank)
+MACRO SCRIPT_SLOT   swr_slot
+    EQUB    SCRIPTID_SLOT
+    EQUB    swr_slot
 ENDMACRO
 
 ; End of script marker. All scripts must have exactly one of these commands.
@@ -321,13 +329,23 @@ ENDIF
     
     jmp command_loop
 
+
+
+
 .command_segment_end
     cmp #SCRIPTID_SEGMENT_END
-    bne command_unknown
+    bne command_slot
 
     ; end of segment reached
     ; next update we will either repeat the segment or advance to next command
     rts
+
+.command_slot
+    cmp #SCRIPTID_SLOT
+    bne command_unknown
+    jsr script_fetch_byte   ; SWR slot id
+    jsr swr_select_slot
+    jmp command_loop
 
 .command_unknown
     rts
