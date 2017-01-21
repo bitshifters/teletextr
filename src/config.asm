@@ -23,6 +23,7 @@ ENDIF
 SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALL fx_3dshape_init
 
+
 IF _ABUG == TRUE
 ; vector text effect
 SCRIPT_CALL fx_vectortext_init
@@ -33,13 +34,52 @@ SCRIPT_SEGMENT_START    1000.0
 SCRIPT_SEGMENT_END
 ENDIF
 
+SCRIPT_CALL fx_playgifs_init
+
+SCRIPT_SEGMENT_START    20.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_playgifs_update
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL fx_buffer_clear
+
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_interference_update
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL fx_interference_set_blend_ora
+
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_interference_update
+SCRIPT_SEGMENT_END
+
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_creditscroll_update
+SCRIPT_SEGMENT_END
+
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_creditscroll_update
+    SCRIPT_PLAY fx_rasterbars_update
+    SCRIPT_PLAY fx_rasterbars_write_shadow
+SCRIPT_SEGMENT_END
+
+
+SCRIPT_SEGMENT_START    20.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_dotscroller_update
+    SCRIPT_CALL fx_mirrorfloor_update
+SCRIPT_SEGMENT_END
+
 \\ Test cheapo rotozoom effect 
-IF 0
+IF _ROTOZOOM
 SCRIPT_SEGMENT_START    600.0
 ;    SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_PLAY fx_rotozoom3
 SCRIPT_SEGMENT_END
-
 
 SCRIPT_SEGMENT_START    10.0
 ;    SCRIPT_PLAY fx_copybuffer_update
@@ -64,8 +104,9 @@ SCRIPT_SEGMENT_END
 IF _VECTORBALLS == TRUE
 ; point cube effect
 SCRIPT_CALL fx_vectorballs_init
+
 SCRIPT_CALL fx_vectorballs_set_small
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_SEGMENT_START    5.0
     SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_CALL fx_vectorballs_update
 SCRIPT_SEGMENT_END
