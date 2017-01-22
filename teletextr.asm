@@ -127,14 +127,14 @@ INCLUDE "src/fx/music.asm"
 
 
 INCLUDE "src/fx/copybuffer.asm"
-INCLUDE "src/fx/mirrorfloor.asm"
 
+INCLUDE "src/fx/mirrorfloor.asm"
 INCLUDE "src/fx/3dshape.asm"
 INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/greenscreen.asm"
 INCLUDE "src/fx/copperbars.asm"
 INCLUDE "src/fx/linebox.asm"
-INCLUDE "src/fx/testcard.asm"
+
 INCLUDE "src/fx/rasterbars.asm"
 
 ; SM: these two dont work in SWR for some reason? No font data coming thru...
@@ -181,8 +181,13 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank0_start
+
+MUSICA_SLOT_NO = 0
 .music_en
 INCBIN "data/music_en.raw.exo" ; 16362 bytes
+
+
+
 .bank0_end
 SAVE "Bank0", bank0_start, bank0_end, &8000
 
@@ -195,6 +200,8 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank1_start
+
+MUSICB_SLOT_NO = 1
 .music_exception
 INCBIN "data/music_exception.raw.exo"   ; 4297 
 .music_reg
@@ -281,7 +288,9 @@ IF _VECTORTEXT == TRUE
 INCLUDE "src/fx/vectortext.asm"
 ENDIF
 
-
+;----------------------------------------------------------------------------------------------------------
+FX_TESTCARD_SLOT = 3
+INCLUDE "src/fx/testcard.asm"
 
 .bank3_end
 SAVE "Bank3", bank3_start, bank3_end, &8000
@@ -296,7 +305,6 @@ PRINT "Main RAM effects:"
 PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
 
 
-PRINT " fx_testcard size is", (end_fx_testcard-start_fx_testcard), "bytes"
 PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
 PRINT " fx_rasterbars size is", (end_fx_rasterbars-start_fx_rasterbars), "bytes"
 PRINT " fx_mirrorfloor size is", (end_fx_mirrorfloor-start_fx_mirrorfloor), "bytes"
@@ -318,6 +326,7 @@ PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 ENDIF
 PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "bytes"
 PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "bytes"
+PRINT " fx_testcard size is", (end_fx_testcard-start_fx_testcard), "bytes"
 
 PRINT "------------------------------------------------------------"
 

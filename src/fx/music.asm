@@ -1,5 +1,5 @@
-MUSICA_SLOT_NO = 0
-MUSICB_SLOT_NO = 1
+
+
 
 \\ Initialise music player - pass in VGM_stream_data address
 \\ parses header from stream
