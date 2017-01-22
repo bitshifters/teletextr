@@ -1,6 +1,8 @@
 .start_fx_teletext
 
 .teletext_data  
+.teletext_page0
+INCBIN "data/pages/testpage.txt.bin"
 .teletext_page1
 INCBIN "data/pages/edittf.txt.bin"
 .teletext_page2
@@ -11,68 +13,22 @@ INCBIN "data/pages/heman.txt.bin"
 INCBIN "data/pages/heisenburg.txt.bin"
 
 
-.teletext_header
-;"0123456789012345678901234567890123456789"
-EQUS "P100   ",130,"CEEFAX "
-.page
-EQUS "100  Fri 19 Jan ",131,"20:49/1"
-.second EQUS "0"
-.counter EQUB 0
+
 
 .page_table
+    EQUW teletext_page0
     EQUW teletext_page1
     EQUW teletext_page2
     EQUW teletext_page3
     EQUW teletext_page4
 
-.page_num EQUB 0
-.page_count EQUB 0
-
-.teletext_update_page
-{
-    inc page_num
-    lda page_num
-    and #3
-    sta page_num    
-    rts
-}
-
-.teletext_update_header
-{
-
-    inc page_count
-    lda page_count
-    and #3
-    sta page_count    
-    and #3
-    bne ok1
-
-    inc page+2
-    lda page+2
-    cmp #48+10
-    bne ok1
-    lda #48
-    sta page+2
-    inc page+1
-    lda page+1
-    cmp #48+10
-    bne ok1
-    lda #48
-    sta page+1
-    inc page+0
-    lda page+0
-    cmp #48+10
-    bne ok1
-    lda #49
-    sta page+0
-
-.ok1        
-    rts
-}
 
 
 
-.fx_teletext_header
+
+
+; render the ceefax header at top of current draw buffer
+.fx_teletext_drawheader
 {
     lda draw_buffer_addr
     sta write_adr+2
@@ -86,89 +42,25 @@ EQUS "100  Fri 19 Jan ",131,"20:49/1"
     cpx #40
     bne loop2
 
-   ldx delta_time
-.delta_loop
+    rts
+}
 
-    inc counter
-    lda counter
-    cmp #50
-    bne skip
-
-
-    lda #0
-    sta counter
-
-
-    ; seconds units
-    inc second
-    lda second
-    cmp #48+10
-    bne nosecond
-    lda #48
-    sta second
-
-    ; seconds tens
-    jsr teletext_update_page
-
-    inc second-1
-    lda second-1
-    cmp #48+6
-    bne nosecond
-    lda #48
-    sta second-1
-
-    ; minutes units
-    inc second-3
-    lda second-3
-    cmp #48+10
-    bne nosecond
-    lda #48
-    sta second-3
-
-    ; minutes tens
-    inc second-4
-    lda second-4
-    cmp #48+6
-    bne nosecond
-    lda #48
-    sta second-4
-
-    ; hours units
-    inc second-6
-    lda second-6
-    cmp #48+10
-    bne nosecond
-    lda #48
-    sta second-6
-
-   ; hours tens
-    inc second-7
-    lda second-7
-    cmp #48+10
-    bne nosecond
-    lda #48
-    sta second-7    
-
-
-
-.nosecond
-    
-
-
-.skip
-    jsr teletext_update_header
-
-
-    dex
-    BNE delta_loop    
-
+.fx_teletext_drawheader2
+{
+    ldx #0
+.loop2
+    lda teletext_header,x
+    sta &7c00,x
+    inx
+    cpx #40
+    bne loop2
     rts
 }
 
 
+; on entry, A=page num
 .fx_teletext_drawpage
 {
-    lda page_num
     asl a
     tax
     lda page_table+0,x
@@ -226,14 +118,22 @@ EQUS "100  Fri 19 Jan ",131,"20:49/1"
 }
 
 
-.fx_teletext
+.fx_teletext_showtestcard
 {
+    lda #0
+    jsr fx_teletext_drawpage
+    rts
+}
+
+.fx_teletext_showpages
+{
+    lda page+1
+    and #3
+    clc
+    adc #1
     jsr fx_teletext_drawpage
 
-    jsr fx_teletext_header
-
     rts
-
 }
 
 .end_fx_teletext

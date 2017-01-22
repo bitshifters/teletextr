@@ -135,8 +135,9 @@ INCLUDE "src/main.asm"
 INCLUDE "src/fx/music.asm"
 INCLUDE "src/fx/copybuffer.asm"
 
+INCLUDE "src/fx/noise.asm"
 
-; SM: these two dont work in SWR for some reason? No font data coming thru...
+; SM: these two dont work in SWR for some reason - No font data coming thru...
 ;----------------------------------------------------------------------------------------------------------
 FX_CREDITSCROLL_SLOT = -1
 
@@ -158,7 +159,6 @@ INCLUDE "src/fx/vectortext.asm"
 
 
 
-
 .end_fx_code
 
 
@@ -167,7 +167,7 @@ INCLUDE "src/fx/vectortext.asm"
 
 
 
-SAVE "Main", start, end, main
+SAVE "Teletxr", start, end, main
 
 
 \ ******************************************************************
@@ -289,6 +289,7 @@ INCLUDE "src/fx/plasma.asm"
 ;----------------------------------------------------------------------------------------------------------
 FX_TESTCARD_SLOT = 3
 INCLUDE "src/fx/testcard.asm"
+
 
 .bank3_end
 SAVE "Bank3", bank3_start, bank3_end, &8000
