@@ -5,6 +5,8 @@
 
 ; separate routine fills the new line buffer with font data from an array of text
 
+.start_fx_creditscroll
+
 \\ Change these to adjust window that is scrolled
 CREDITS_shadow_addr = &7800
 CREDITS_end_addr = CREDITS_shadow_addr + (MODE7_char_width * MODE7_char_height)
@@ -523,3 +525,6 @@ IF 0
 	RTS
 }
 ENDIF
+
+
+.end_fx_creditscroll

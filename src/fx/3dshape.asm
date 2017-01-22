@@ -1,4 +1,6 @@
 
+.start_fx_3dshape
+
 ; hacked mode7 version of Nick Jamesons 3d renderer
 
 EFFECT_3DSHAPE_ORG = *
@@ -254,3 +256,8 @@ ENDIF
     rts
 .init_done EQUB 0
 }
+
+
+INCLUDE "src/fx/data.asm"	; should be in a bank!!
+
+.end_fx_3dshape

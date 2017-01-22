@@ -3,6 +3,8 @@
 ; copied from Kieran's mode7-sprites cracktro wip
 ; uses way too much memory for the quality of the effect!
 
+.start_fx_rasterbars
+
 MODE7_shadow_addr = &7800
 
 FX_RASTERBAR_TABLE_SIZE = 64
@@ -162,3 +164,6 @@ NEXT
 FOR n, 0, MODE7_char_height-1, 1
 EQUB MODE7_contiguous
 NEXT
+
+
+.end_fx_rasterbars

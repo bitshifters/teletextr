@@ -1,3 +1,4 @@
+.start_fx_vectortext
 
 .fx_vectortext_init
 {
@@ -303,7 +304,7 @@ VT_LINE 1,2,32
 
 
 
-
+.end_fx_vectortext
 
 
 

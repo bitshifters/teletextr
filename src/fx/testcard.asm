@@ -1,6 +1,8 @@
 
 ; fakey testcard effect
 
+.start_fx_testcard
+
 .fx_testcard_text
 ;EQUS "0123456789012345678901234567890123456789"
 EQUB 141
@@ -82,3 +84,5 @@ SNV = 4000000 / (2.0 * FREQ * 16.0 )
     jsr mode7_set_column
     rts    
 }
+
+.end_fx_testcard

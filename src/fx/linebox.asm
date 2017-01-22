@@ -1,5 +1,5 @@
 
-
+.start_fx_linebox
 
 .fx_linebox_update
 {
@@ -39,3 +39,6 @@ ENDIF
 
     rts    
 }
+
+
+.end_fx_linebox

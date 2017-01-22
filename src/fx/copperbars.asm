@@ -3,6 +3,8 @@
 ; hacked together as a test for the script system
 ; not really even good copperbars!
 
+.start_fx_copperbars
+
 .fx_copperbars_update
 {
 CB_XOFFSET = 2
@@ -104,3 +106,5 @@ ELSE
     GCOLOUR 5
 ENDIF    
     
+
+.end_fx_copperbars
