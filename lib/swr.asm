@@ -82,8 +82,8 @@
     lda swr_ram_banks,X
     bmi bad_socket
     sei
-    sta &f4
     sta &fe30
+    sta &f4
     sta swr_slot_selected
     cli
 .bad_socket
@@ -94,8 +94,8 @@
 .swr_select_bank
 {
     sei
-    sta &f4
     sta &fe30
+    sta &f4
     cli
     rts
 }

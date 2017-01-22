@@ -6,7 +6,7 @@
 ;----------------------------------------------------------------------------------------------------------
 DEBUG = TRUE
 _ABUG = FALSE
-
+_HEADER = TRUE  ; teletext header is visible, so adjust line offsets +1 in effects
 
 
 
@@ -135,8 +135,9 @@ INCLUDE "src/main.asm"
 INCLUDE "src/fx/music.asm"
 INCLUDE "src/fx/copybuffer.asm"
 
+INCLUDE "src/fx/noise.asm"
 
-; SM: these two dont work in SWR for some reason? No font data coming thru...
+; SM: these two dont work in SWR for some reason - No font data coming thru...
 ;----------------------------------------------------------------------------------------------------------
 FX_CREDITSCROLL_SLOT = -1
 
@@ -158,7 +159,6 @@ INCLUDE "src/fx/vectortext.asm"
 
 
 
-
 .end_fx_code
 
 
@@ -167,7 +167,7 @@ INCLUDE "src/fx/vectortext.asm"
 
 
 
-SAVE "Main", start, end, main
+SAVE "Teletxr", start, end, main
 
 
 \ ******************************************************************
@@ -183,7 +183,7 @@ ORG &8000
 GUARD &BFFF
 .bank0_start
 
-MUSICA_SLOT_NO = 0
+MUSIC_EN_SLOT = 0
 .music_en
 INCBIN "data/music_en.raw.exo" ; 16362 bytes
 
@@ -201,12 +201,15 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank1_start
-
-MUSICB_SLOT_NO = 1
-.music_exception
-INCBIN "data/music_exception.raw.exo"   ; 4297 
+MUSIC_REG_SLOT = 1
 .music_reg
 INCBIN "data/music_reg.raw.exo"         ; 1548
+
+MUSIC_EXCEPTION_SLOT = 1
+.music_exception
+INCBIN "data/music_exception.raw.exo"   ; 4297 
+
+
 ;...
 
 ;----------------------------------------------------------------------------------------------------------
@@ -289,6 +292,7 @@ INCLUDE "src/fx/plasma.asm"
 ;----------------------------------------------------------------------------------------------------------
 FX_TESTCARD_SLOT = 3
 INCLUDE "src/fx/testcard.asm"
+
 
 .bank3_end
 SAVE "Bank3", bank3_start, bank3_end, &8000

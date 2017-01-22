@@ -30,11 +30,12 @@
 {
 	;lda #144+5
 
+
     lda page+0
     and #7
     bne do3d
 
-    jsr fx_teletext_drawpage
+    jsr fx_teletext_showpages
     rts
 
 .do3d
