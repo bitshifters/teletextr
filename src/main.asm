@@ -89,9 +89,8 @@ IF 1
 
 
     lda #0
-	sei
     jsr swr_select_slot
-	cli
+
     lda #&80
     ldx #LO(bank_file0a)
     ldy #HI(bank_file0a)
@@ -99,9 +98,8 @@ IF 1
     MPRINT loading_bank_text2
 
     lda #1
-	sei
     jsr swr_select_slot
-	cli
+
     lda #&80
     ldx #LO(bank_file1a)
     ldy #HI(bank_file1a)
@@ -109,9 +107,8 @@ IF 1
     MPRINT loading_bank_text2
 
     lda #2
-	sei
     jsr swr_select_slot
-	cli
+
     lda #&80
     ldx #LO(bank_file2a)
     ldy #HI(bank_file2a)
@@ -119,9 +116,8 @@ IF 1
     MPRINT loading_bank_text2
 
     lda #3
-	sei
     jsr swr_select_slot
-	cli
+
     lda #&80
     ldx #LO(bank_file3a)
     ldy #HI(bank_file3a)
@@ -131,9 +127,8 @@ IF 1
 ELSE
 
     lda #0
-	sei
     jsr swr_select_slot
-	cli
+
     lda #&80
     ldx #LO(bank_file0)
     ldy #HI(bank_file0)
@@ -141,9 +136,8 @@ ELSE
     MPRINT loading_bank_text2
 
     lda #1
-	sei
     jsr swr_select_slot
-	cli
+
     lda #&80
     ldx #LO(bank_file1)
     ldy #HI(bank_file1)
@@ -151,9 +145,8 @@ ELSE
     MPRINT loading_bank_text2
 
     lda #2
-	sei
     jsr swr_select_slot
-	cli
+
     lda #&80
     ldx #LO(bank_file2)
     ldy #HI(bank_file2)
@@ -161,9 +154,8 @@ ELSE
     MPRINT loading_bank_text2
 
     lda #3
-	sei
     jsr swr_select_slot
-	cli
+
     lda #&80
     ldx #LO(bank_file3)
     ldy #HI(bank_file3)
@@ -239,21 +231,19 @@ ENDIF
 	\\ Preserve registers
 	pha:txa:pha:tya:pha
 
+	; prevent re-entry
+	lda re_entrant
+	bne skip_update
+	inc re_entrant
+
+    ; update vsync counter
 	inc vsync_time+0	; 5
 	bne no_timehi		; 2/3
 	inc vsync_time+1	; 5
 .no_timehi 
 	inc vsync_count
 
-
-	; prevent re-entry
-	lda re_entrant
-	bne skip_update
-
-	inc re_entrant
-
-
-
+    ; call our music interrupt handler
 	jsr fx_music_irq
 
 	dec re_entrant

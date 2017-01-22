@@ -262,16 +262,7 @@ EQUB 0
     ldx #0
 	jsr mode7_set_column_shadow_fast
 
-	\\ Select RAM bank with data
-    sei
-IF _SAVESWR
-    lda &f4
-    PHA
-ENDIF
 
-    lda #FX_INTERFERENCE_SLOT
-    jsr swr_select_slot
-    cli
 
 	\\ Draw base layer to screen
 
@@ -286,13 +277,7 @@ ENDIF
 	LDY #16
 	JSR fx_interference_blend_screen
 
-IF _SAVESWR
-    ; restore previously paged ROM bank
-    sei
-    PLA
-    jsr swr_select_bank
-	cli
-ENDIF
+
 
 	\\ Update motion for both layers
 

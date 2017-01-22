@@ -10,10 +10,7 @@ _VECTORBALLS = TRUE    ; temp define just to free up some ram prior to SWR optim
 _VECTORTEXT = TRUE
 _ROTOZOOM = TRUE
 
-; sdm: aiming to have SWR such that any slot can be selected and retained - any IRQs that use SWR should preserve current selected bank on exit
-; rule would be that all content for one effect should be within one SWR
-; This define enables/disables some legacy code
-_SAVESWR = FALSE
+
 
 
 

@@ -351,9 +351,7 @@ ENDIF
     cmp #SCRIPTID_SLOT
     bne command_unknown
     jsr script_fetch_byte   ; SWR slot id
-    sei
     jsr swr_select_slot
-    cli
     jmp command_loop
 
 .command_unknown

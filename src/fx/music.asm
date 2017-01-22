@@ -7,12 +7,11 @@
 {
     jsr fx_music_stop
     lda #19:jsr osbyte
-    
-    sei
+
     lda #MUSICA_SLOT_NO
     sta fx_music_slot
     jsr swr_select_slot
-    cli
+
 
 	LDX #LO(music_exception)
 	LDY #HI(music_exception)
@@ -27,11 +26,11 @@
     lda #19:jsr osbyte
 
 
-    sei
+
     lda #MUSICB_SLOT_NO
     sta fx_music_slot
     jsr swr_select_slot
-    cli
+
 
 	LDX #LO(music_reg)
 	LDY #HI(music_reg)
