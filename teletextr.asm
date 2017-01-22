@@ -134,17 +134,16 @@ INCLUDE "src/fx/teletext.asm"
 INCLUDE "src/fx/greenscreen.asm"
 INCLUDE "src/fx/copperbars.asm"
 INCLUDE "src/fx/linebox.asm"
-
 INCLUDE "src/fx/rasterbars.asm"
 
 ; SM: these two dont work in SWR for some reason? No font data coming thru...
 ;----------------------------------------------------------------------------------------------------------
-FX_CREDITSCROLL_SLOT = 2
+FX_CREDITSCROLL_SLOT = -1
 
 INCLUDE "src/fx/creditscroll.asm"
 
 ;----------------------------------------------------------------------------------------------------------
-FX_DOTSCROLLER_SLOT = 2
+FX_DOTSCROLLER_SLOT = -1
 INCLUDE "src/fx/dotscroller.asm"
 
 
