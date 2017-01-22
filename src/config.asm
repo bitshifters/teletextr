@@ -57,11 +57,13 @@ SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALL fx_interference_update
 SCRIPT_SEGMENT_END
 
+SCRIPT_SLOT FX_CREDITSCROLL_SLOT
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_buffer_copy
     SCRIPT_CALL fx_creditscroll_update
 SCRIPT_SEGMENT_END
 
+SCRIPT_SLOT FX_CREDITSCROLL_SLOT
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_buffer_copy
     SCRIPT_CALL fx_creditscroll_update
@@ -69,7 +71,7 @@ SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_rasterbars_write_shadow
 SCRIPT_SEGMENT_END
 
-
+SCRIPT_SLOT FX_DOTSCROLLER_SLOT
 SCRIPT_SEGMENT_START    20.0
     SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_CALL fx_dotscroller_update

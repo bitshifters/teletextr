@@ -136,7 +136,15 @@ INCLUDE "src/fx/copperbars.asm"
 INCLUDE "src/fx/linebox.asm"
 INCLUDE "src/fx/testcard.asm"
 INCLUDE "src/fx/rasterbars.asm"
+
+; SM: these two dont work in SWR for some reason? No font data coming thru...
+;----------------------------------------------------------------------------------------------------------
+FX_CREDITSCROLL_SLOT = 2
+
 INCLUDE "src/fx/creditscroll.asm"
+
+;----------------------------------------------------------------------------------------------------------
+FX_DOTSCROLLER_SLOT = 2
 INCLUDE "src/fx/dotscroller.asm"
 
 
@@ -229,7 +237,6 @@ INCLUDE "src\sprites\circles.asm"
 ;----------------------------------------------------------------------------------------------------------
 
 
-
 .bank2_end
 SAVE "Bank2", bank2_start, bank2_end, &8000
 ;----------------------------------------------------------------------------------------------------------
@@ -275,6 +282,8 @@ IF _VECTORTEXT == TRUE
 INCLUDE "src/fx/vectortext.asm"
 ENDIF
 
+
+
 .bank3_end
 SAVE "Bank3", bank3_start, bank3_end, &8000
 
@@ -293,8 +302,6 @@ PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
 PRINT " fx_rasterbars size is", (end_fx_rasterbars-start_fx_rasterbars), "bytes"
 PRINT " fx_mirrorfloor size is", (end_fx_mirrorfloor-start_fx_mirrorfloor), "bytes"
 PRINT " fx_linebox size is", (end_fx_linebox-start_fx_linebox), "bytes"
-PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "bytes"
-PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "bytes"
 PRINT " fx_copperbars size is", (end_fx_copperbars-start_fx_copperbars), "bytes"
 
 PRINT "SW RAM effects:"
@@ -310,6 +317,9 @@ PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
 IF _VECTORTEXT
 PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 ENDIF
+PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "bytes"
+PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "bytes"
+
 PRINT "------------------------------------------------------------"
 
 ;----------------------------------------------------------------------------------------------------------
