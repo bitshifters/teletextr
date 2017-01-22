@@ -67,7 +67,7 @@
 ;
 ; A BBC Master will have four 16Kb SWR banks
 ;
-; on entry A contains slot id to be selected
+; on entry A contains slot id to be selected (0-3)
 ; on exit A contains bank ID, N=0 if success, N=1 if failed
 ;   &F4 is updated with the selected ROM bank
 ;   swr_slot_selected contains the selected slot ID
@@ -75,6 +75,9 @@
 ; clobbers A,X
 .swr_select_slot
 {
+    cmp #4
+    bcs bad_socket ; >= 4
+    and #3
     tax
     lda swr_ram_banks,X
     bmi bad_socket

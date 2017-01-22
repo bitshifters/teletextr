@@ -152,9 +152,17 @@ FX_DOTSCROLLER_SLOT = -1
 INCLUDE "src/fx/dotscroller.asm"
 
 
+;----------------------------------------------------------------------------------------------------------
+; Teletext effect
+FX_TELETEXT_SLOT = -1
+INCLUDE "src/fx/teletext.asm"
 
+;----------------------------------------------------------------------------------------------------------
+FX_VECTORTEXT_SLOT = -1
 
-
+IF _VECTORTEXT == TRUE
+INCLUDE "src/fx/vectortext.asm"
+ENDIF
 
 
 
@@ -228,7 +236,6 @@ INCLUDE "src/fx/rasterbars.asm"
 
 
 FX_ROTOZOOM_SLOT = 1
-IF _ABUG==FALSE ; no ram for these with the ABUG demo enabled
 IF _ROTOZOOM
 .start_fx_rotozoom
 INCLUDE "src/fx/rotozoom.asm"
@@ -236,7 +243,6 @@ INCLUDE "src/fx/rotozoom1.asm"
 INCLUDE "src/fx/rotozoom2.asm"
 INCLUDE "src/fx/rotozoom3.asm"
 .end_fx_rotozoom
-ENDIF
 ENDIF
 
 
@@ -258,10 +264,7 @@ GUARD &BFFF
 FX_INTERFERENCE_SLOT = 2
 INCLUDE "src/fx/interference.asm"
 
-;----------------------------------------------------------------------------------------------------------
-; Teletext effect
-FX_TELETEXT_SLOT = 2
-INCLUDE "src/fx/teletext.asm"
+
 
 .bank2_end
 SAVE "Bank2", bank2_start, bank2_end, &8000
@@ -301,12 +304,7 @@ ENDIF
 FX_PLASMA_SLOT = 3
 INCLUDE "src/fx/plasma.asm"
 
-;----------------------------------------------------------------------------------------------------------
-FX_VECTORTEXT_SLOT = 3
 
-IF _VECTORTEXT == TRUE
-INCLUDE "src/fx/vectortext.asm"
-ENDIF
 
 ;----------------------------------------------------------------------------------------------------------
 FX_TESTCARD_SLOT = 3
