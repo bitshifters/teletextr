@@ -3,6 +3,8 @@
 ; uses large sprite of concentric circles drawn in two layers
 ; requires 6x versions of sprite in all offsets i.e. lots of memory
 
+.start_fx_interference
+
 INTERFERENCE_shadow_addr = &7800 + 4	; currently writing 36x22 character screen
 
 
@@ -394,3 +396,8 @@ NEXT
 FOR n, 0, MODE7_char_height-1, 1
 EQUB HI(INTERFERENCE_sprite_width * n)				; sprite pitch
 NEXT
+
+
+INCLUDE "src\sprites\circles.asm"
+
+.end_fx_interference

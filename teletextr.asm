@@ -229,11 +229,10 @@ GUARD &BFFF
 
 ;----------------------------------------------------------------------------------------------------------
 ; Interference effect
-.start_fx_interference
+
 FX_INTERFERENCE_SLOT = 2				; SWRAM bank containing sprite data
 INCLUDE "src/fx/interference.asm"
-INCLUDE "src\sprites\circles.asm"
-.end_fx_interference
+
 ;----------------------------------------------------------------------------------------------------------
 
 
