@@ -51,6 +51,13 @@ MACRO SCRIPT_SLOT   swr_slot
     EQUB    swr_slot
 ENDMACRO
 
+MACRO SCRIPT_CALLSLOT   effect_addr, swr_slot
+    SCRIPT_SLOT swr_slot
+    SCRIPT_CALL effect_addr
+ENDMACRO
+
+
+
 ; End of script marker. All scripts must have exactly one of these commands.
 MACRO SCRIPT_END
     EQUB    SCRIPTID_END
