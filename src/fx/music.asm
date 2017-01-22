@@ -3,34 +3,30 @@
 
 \\ Initialise music player - pass in VGM_stream_data address
 \\ parses header from stream
-.fx_music_init
+.fx_music_init_en
 {
     jsr fx_music_stop
     lda #19:jsr osbyte
 
-    lda #MUSICA_SLOT_NO
+    lda #MUSIC_EN_SLOT
     sta fx_music_slot
     jsr swr_select_slot
 
-
-	LDX #LO(music_exception)
-	LDY #HI(music_exception)
+	LDX #LO(music_en)
+	LDY #HI(music_en)
 	JSR	vgm_init_stream
     rts
 }
 \\ Initialise music player - pass in VGM_stream_data address
 \\ parses header from stream
-.fx_music_initb
+.fx_music_init_reg
 {
     jsr fx_music_stop
     lda #19:jsr osbyte
 
-
-
-    lda #MUSICB_SLOT_NO
+    lda #MUSIC_REG_SLOT
     sta fx_music_slot
     jsr swr_select_slot
-
 
 	LDX #LO(music_reg)
 	LDY #HI(music_reg)
@@ -38,6 +34,23 @@
     rts
 }
 
+
+\\ Initialise music player - pass in VGM_stream_data address
+\\ parses header from stream
+.fx_music_init_exception
+{
+    jsr fx_music_stop
+    lda #19:jsr osbyte
+
+    lda #MUSIC_EXCEPTION_SLOT
+    sta fx_music_slot
+    jsr swr_select_slot
+
+	LDX #LO(music_exception)
+	LDY #HI(music_exception)
+	JSR	vgm_init_stream
+    rts
+}
 
 .fx_music_on    EQUB 0
 .fx_music_slot  EQUB 0

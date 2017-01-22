@@ -14,11 +14,14 @@ CANVAS_SIZE = 32
 CANVAS_OFFS = 0
 
 CANVAS_W = 32
-CANVAS_H = 25
 
-
+IF _HEADER
+CANVAS_ADDR = &7c03+40
+CANVAS_H = 24
+ELSE
 CANVAS_ADDR = &7c03
-
+CANVAS_H = 25
+ENDIF
 
 ; 8 bits of fraction is useful enough, means that high byte is the integer part of the texture coordinate 
 PRECISION_BITS = 8

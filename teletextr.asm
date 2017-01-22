@@ -6,7 +6,7 @@
 ;----------------------------------------------------------------------------------------------------------
 DEBUG = TRUE
 _ABUG = FALSE
-
+_HEADER = TRUE  ; teletext header is visible, so adjust line offsets +1 in effects
 
 
 
@@ -183,7 +183,7 @@ ORG &8000
 GUARD &BFFF
 .bank0_start
 
-MUSICA_SLOT_NO = 0
+MUSIC_EN_SLOT = 0
 .music_en
 INCBIN "data/music_en.raw.exo" ; 16362 bytes
 
@@ -201,12 +201,15 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank1_start
-
-MUSICB_SLOT_NO = 1
-.music_exception
-INCBIN "data/music_exception.raw.exo"   ; 4297 
+MUSIC_REG_SLOT = 1
 .music_reg
 INCBIN "data/music_reg.raw.exo"         ; 1548
+
+MUSIC_EXCEPTION_SLOT = 1
+.music_exception
+INCBIN "data/music_exception.raw.exo"   ; 4297 
+
+
 ;...
 
 ;----------------------------------------------------------------------------------------------------------
