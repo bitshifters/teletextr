@@ -6,9 +6,7 @@
 ;----------------------------------------------------------------------------------------------------------
 DEBUG = TRUE
 _ABUG = FALSE
-_VECTORBALLS = TRUE    ; temp define just to free up some ram prior to SWR optimizations 
-_VECTORTEXT = TRUE
-_ROTOZOOM = TRUE
+
 
 
 
@@ -156,10 +154,8 @@ INCLUDE "src/fx/teletext.asm"
 
 ;----------------------------------------------------------------------------------------------------------
 FX_VECTORTEXT_SLOT = -1
-
-IF _VECTORTEXT == TRUE
 INCLUDE "src/fx/vectortext.asm"
-ENDIF
+
 
 
 
@@ -233,14 +229,13 @@ INCLUDE "src/fx/rasterbars.asm"
 
 
 FX_ROTOZOOM_SLOT = 1
-IF _ROTOZOOM
 .start_fx_rotozoom
 INCLUDE "src/fx/rotozoom.asm"
 INCLUDE "src/fx/rotozoom1.asm"
 INCLUDE "src/fx/rotozoom2.asm"
 INCLUDE "src/fx/rotozoom3.asm"
 .end_fx_rotozoom
-ENDIF
+
 
 
 .bank1_end
@@ -293,9 +288,7 @@ INCBIN "data\gifs\blueblob_beeb.bin"
 ;----------------------------------------------------------------------------------------------------------
 
 FX_VECTORBALLS_SLOT = 3
-IF _VECTORBALLS == TRUE
 INCLUDE "src/fx/vectorballs.asm"
-ENDIF
 ;----------------------------------------------------------------------------------------------------------
 
 FX_PLASMA_SLOT = 3
@@ -322,17 +315,11 @@ PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "
 
 PRINT "SW RAM effects:"
 PRINT " fx_plasma size is", (end_fx_plasma-start_fx_plasma), "bytes"
-IF _VECTORBALLS
 PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
-ENDIF
-IF _ROTOZOOM
 PRINT " fx_rotozoom size is", (end_fx_rotozoom-start_fx_rotozoom), "bytes"
-ENDIF
 PRINT " fx_interference size is", (end_fx_interference-start_fx_interference), "bytes"
 PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
-IF _VECTORTEXT
 PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
-ENDIF
 PRINT " fx_testcard size is", (end_fx_testcard-start_fx_testcard), "bytes"
 PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
 PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"

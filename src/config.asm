@@ -82,7 +82,7 @@ SCRIPT_SEGMENT_END
 
 
 
-IF _VECTORTEXT
+
 ; vector text effect
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
 SCRIPT_SEGMENT_START    30.0
@@ -90,11 +90,10 @@ SCRIPT_SEGMENT_START    30.0
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_header, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
-ENDIF
+
 
 
 \\ Test cheapo rotozoom effect 
-IF _ROTOZOOM
 SCRIPT_CALL fx_clear
 SCRIPT_SLOT FX_ROTOZOOM_SLOT
 SCRIPT_SEGMENT_START    60.0
@@ -111,7 +110,7 @@ SCRIPT_SEGMENT_START    10.0
 ;    SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_PLAY fx_rotozoom2
 SCRIPT_SEGMENT_END
-ENDIF
+
 
 
 ; plasma segment
@@ -124,7 +123,7 @@ SCRIPT_SEGMENT_START    30.0
 SCRIPT_SEGMENT_END
 
 
-IF _VECTORBALLS == TRUE
+
 SCRIPT_SLOT FX_VECTORBALLS_SLOT
 
 ; point cube effect
@@ -148,7 +147,7 @@ SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_CALL fx_vectorballs_update
 SCRIPT_SEGMENT_END
-ENDIF
+
 
 \\ Test cheapo rasterbars effect 
 SCRIPT_SEGMENT_START    10.0
