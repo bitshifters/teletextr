@@ -3,8 +3,10 @@
 ; uses large sprite of concentric circles drawn in two layers
 ; requires 6x versions of sprite in all offsets i.e. lots of memory
 
+.start_fx_interference
+
 INTERFERENCE_shadow_addr = &7800 + 4	; currently writing 36x22 character screen
-INTERFERENCE_slot_no = 2				; SWRAM bank containing sprite data
+
 
 INTERFERENCE_sprite_width = 54
 INTERFERENCE_sprite_height = 33
@@ -260,14 +262,7 @@ EQUB 0
     ldx #0
 	jsr mode7_set_column_shadow_fast
 
-	\\ Select RAM bank with data
-    sei
-    lda &f4
-    PHA
 
-    lda #INTERFERENCE_slot_no
-    jsr swr_select_slot
-    cli
 
 	\\ Draw base layer to screen
 
@@ -282,11 +277,7 @@ EQUB 0
 	LDY #16
 	JSR fx_interference_blend_screen
 
-    ; restore previously paged ROM bank
-    sei
-    PLA
-    jsr swr_select_bank
-	cli
+
 
 	\\ Update motion for both layers
 
@@ -390,3 +381,8 @@ NEXT
 FOR n, 0, MODE7_char_height-1, 1
 EQUB HI(INTERFERENCE_sprite_width * n)				; sprite pitch
 NEXT
+
+
+INCLUDE "src\sprites\circles.asm"
+
+.end_fx_interference

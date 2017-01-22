@@ -32,3 +32,18 @@
 	jsr mode7_clear_shadow_fast
     rts    
 }
+
+; clear front buffer
+.fx_screen_clear
+{
+    lda #32
+	jsr mode7_clear_screen_fast
+    rts    
+}
+
+; clear all buffers
+.fx_clear
+{
+    jsr fx_screen_clear
+    jmp fx_buffer_clear
+}

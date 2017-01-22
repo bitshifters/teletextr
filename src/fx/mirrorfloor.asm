@@ -3,6 +3,8 @@
 ; copied from Kieran's mode7-sprites cracktro wip
 ; hardcoded to only take top row of pixels from a row
 
+.start_fx_mirrorfloor
+
 MIRROR_shadow_addr = &7800
 
 MIRROR_read_row = 21			; and the 8 rows above it
@@ -128,3 +130,5 @@ MIRROR_write_row2_addr = (MIRROR_shadow_addr + ((MIRROR_write_row+2) * MODE7_cha
 	.return
 	RTS
 }
+
+.end_fx_mirrorfloor

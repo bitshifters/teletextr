@@ -7,6 +7,8 @@
 ; need a 8x8 font but can't be bothered to convert one
 ; could also just convert the entire BBC font at initialisation time
 
+.start_fx_dotscroller
+
 _DOTSCROLL_SMOOTH = FALSE			; don't like this effect
 _DOTSCROLL_BALL = FALSE				; not compatible with _SMOOTH!
 
@@ -547,3 +549,6 @@ IF _DOTSCROLL_SMOOTH
 	NEXT
 }
 ENDIF
+
+
+.end_fx_dotscroller

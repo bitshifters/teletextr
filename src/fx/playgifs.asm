@@ -1,10 +1,12 @@
 
 ; play some animated gifs
 
+.start_fx_playgifs
+
 PLAYGIFS_shadow_addr = &7800
 PLAYGIFS_num = 4
 PLAYGIFS_time = 25 * 8
-PLAYGIFS_swram_slot = 3
+
 
 .fx_playgifs_data
 {
@@ -42,12 +44,6 @@ EQUB 0
 
 .fx_playgifs_init
 {
-	LDA &F4
-	PHA
-
-	\\ Switch to swram bank
-	LDA #PLAYGIFS_swram_slot
-	JSR swr_select_slot
 
 	\\ Get GIF data
 	LDA fx_playgifs_num
@@ -70,10 +66,6 @@ EQUB 0
 	LDA fx_playgifs_length, X
 	STA fx_playgifs_timer
 
-	\\ Restore current bank
-	PLA
-	JSR swr_select_bank
-
 	RTS
 }
 
@@ -83,18 +75,13 @@ EQUB 0
 	DEC fx_playgifs_timer
 	BEQ play_next_gif
 
-	\\ Switch to swram bank
-	LDA &F4
-	PHA
-	LDA #PLAYGIFS_swram_slot
-	JSR swr_select_slot
+
 
 	\\ Update GIF player
 	JSR mode7_gif_anim_update
 
-	\\ Restore current bank
-	PLA
-	JMP swr_select_bank			; will RTS for us
+	RTS
+
 
 	\\ Next GIF
 	.play_next_gif
@@ -114,3 +101,15 @@ EQUB 0
 	.return
 	RTS
 }
+
+
+.animated_gif_bird
+INCBIN "data\gifs\bird_beeb.bin"
+.animated_gif_weather
+INCBIN "data\gifs\weather_beeb.bin"
+.animated_gif_dancer
+INCBIN "data\gifs\dancer_beeb.bin"
+.animated_gif_blueblob
+INCBIN "data\gifs\blueblob_beeb.bin"
+
+.end_fx_playgifs
