@@ -1,6 +1,8 @@
 
 ; play some animated gifs
 
+.start_fx_playgifs
+
 PLAYGIFS_shadow_addr = &7800
 PLAYGIFS_num = 4
 PLAYGIFS_time = 25 * 8
@@ -99,3 +101,15 @@ EQUB 0
 	.return
 	RTS
 }
+
+
+.animated_gif_bird
+INCBIN "data\gifs\bird_beeb.bin"
+.animated_gif_weather
+INCBIN "data\gifs\weather_beeb.bin"
+.animated_gif_dancer
+INCBIN "data\gifs\dancer_beeb.bin"
+.animated_gif_blueblob
+INCBIN "data\gifs\blueblob_beeb.bin"
+
+.end_fx_playgifs

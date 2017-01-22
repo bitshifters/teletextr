@@ -273,24 +273,14 @@ GUARD &BFFF
 
 ;----------------------------------------------------------------------------------------------------------
 ; GIF player effect data
-.start_fx_playgifs
 FX_PLAYGIFS_SLOT = 3
 INCLUDE "src/fx/playgifs.asm"
-.animated_gif_bird
-INCBIN "data\gifs\bird_beeb.bin"
-.animated_gif_weather
-INCBIN "data\gifs\weather_beeb.bin"
-.animated_gif_dancer
-INCBIN "data\gifs\dancer_beeb.bin"
-.animated_gif_blueblob
-INCBIN "data\gifs\blueblob_beeb.bin"
-.end_fx_playgifs
-;----------------------------------------------------------------------------------------------------------
 
+;----------------------------------------------------------------------------------------------------------
 FX_VECTORBALLS_SLOT = 3
 INCLUDE "src/fx/vectorballs.asm"
-;----------------------------------------------------------------------------------------------------------
 
+;----------------------------------------------------------------------------------------------------------
 FX_PLASMA_SLOT = 3
 INCLUDE "src/fx/plasma.asm"
 
@@ -312,6 +302,8 @@ PRINT " fx_code size is", (end_fx_code-start_fx_code), "bytes"
 PRINT "Main RAM effects:"
 PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "bytes"
 PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "bytes"
+PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
+PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 
 PRINT "SW RAM effects:"
 PRINT " fx_plasma size is", (end_fx_plasma-start_fx_plasma), "bytes"
@@ -319,10 +311,8 @@ PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "byt
 PRINT " fx_rotozoom size is", (end_fx_rotozoom-start_fx_rotozoom), "bytes"
 PRINT " fx_interference size is", (end_fx_interference-start_fx_interference), "bytes"
 PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
-PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 PRINT " fx_testcard size is", (end_fx_testcard-start_fx_testcard), "bytes"
 PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
-PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
 PRINT " fx_rasterbars size is", (end_fx_rasterbars-start_fx_rasterbars), "bytes"
 PRINT " fx_mirrorfloor size is", (end_fx_mirrorfloor-start_fx_mirrorfloor), "bytes"
 PRINT " fx_linebox size is", (end_fx_linebox-start_fx_linebox), "bytes"
