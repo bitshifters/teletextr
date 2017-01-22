@@ -95,6 +95,7 @@ ENDIF
 
 \\ Test cheapo rotozoom effect 
 IF _ROTOZOOM
+SCRIPT_CALL fx_clear
 SCRIPT_SLOT FX_ROTOZOOM_SLOT
 SCRIPT_SEGMENT_START    60.0
 ;    SCRIPT_PLAY fx_copybuffer_update
@@ -114,6 +115,7 @@ ENDIF
 
 
 ; plasma segment
+SCRIPT_CALL fx_clear
 SCRIPT_SLOT FX_PLASMA_SLOT
 SCRIPT_CALL fx_plasma_init
 SCRIPT_SEGMENT_START    30.0
@@ -165,13 +167,16 @@ SCRIPT_SEGMENT_START    10.0
 SCRIPT_SEGMENT_END
 
 ; teletext intro
+SCRIPT_CALL fx_clear
 SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_CALL fx_teletext
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALL fx_music_stop
 
 .segment1
+SCRIPT_CALL fx_clear
 SCRIPT_CALL fx_testcard_init
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_PLAY fx_testcard
