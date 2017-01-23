@@ -3,6 +3,8 @@
 ; less dodgy than before but a bit slow
 ; might be a race against raster with back to front buffer copy?
 
+.start_fx_particles
+
 MODE7_particles_addr = &7800
 
 PARTICLES_max = 128
@@ -679,3 +681,5 @@ IF _PARTICLES_ENABLE_COLOUR
 	  EQUB HI(y-i)	; adjust for (zp),y style addressing, where Y will be the y coordinate
 	NEXT
 ENDIF
+
+.end_fx_particles

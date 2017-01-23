@@ -146,12 +146,6 @@ INCLUDE "src/fx/creditscroll.asm"
 FX_DOTSCROLLER_SLOT = -1
 INCLUDE "src/fx/dotscroller.asm"
 
-
-;----------------------------------------------------------------------------------------------------------
-FX_PARTICLES_SLOT = -1
-INCLUDE "src/fx/particles.asm"
-
-
 ;----------------------------------------------------------------------------------------------------------
 ; Teletext effect
 FX_TELETEXT_SLOT = -1
@@ -261,6 +255,12 @@ GUARD &BFFF
 FX_INTERFERENCE_SLOT = 2
 INCLUDE "src/fx/interference.asm"
 
+;----------------------------------------------------------------------------------------------------------
+; Particle system
+FX_PARTICLES_SLOT = 2
+INCLUDE "src/fx/particles.asm"
+
+
 
 
 .bank2_end
@@ -322,6 +322,7 @@ PRINT " fx_rasterbars size is", (end_fx_rasterbars-start_fx_rasterbars), "bytes"
 PRINT " fx_mirrorfloor size is", (end_fx_mirrorfloor-start_fx_mirrorfloor), "bytes"
 PRINT " fx_linebox size is", (end_fx_linebox-start_fx_linebox), "bytes"
 PRINT " fx_copperbars size is", (end_fx_copperbars-start_fx_copperbars), "bytes"
+PRINT " fx_particles size is", (end_fx_particles-start_fx_particles), "bytes"
 
 
 PRINT "------------------------------------------------------------"
