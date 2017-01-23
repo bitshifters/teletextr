@@ -8,8 +8,6 @@
 MODE7_particles_addr = &7800
 
 PARTICLES_max = 128
-_PARTICLES_ENABLE_BANG = TRUE
-_PARTICLES_ENABLE_SPIN = FALSE
 _PARTICLES_ENABLE_SPIN4 = FALSE
 _PARTICLES_ENABLE_SPURT = FALSE
 _PARTICLES_ENABLE_DRIP = TRUE
@@ -391,7 +389,6 @@ EQUB 0
 }
 ENDIF
 
-.fx_particles_update
 {
 IF _PARTICLES_ENABLE_COLOUR = FALSE
 	lda #144+7
@@ -409,35 +406,9 @@ IF _PARTICLES_ENABLE_BANG
 	.not_s
 ENDIF
 
-IF _PARTICLES_ENABLE_SPIN
 	LDX #0
-	LDY fx_particles_spin_idx
-	JSR fx_particles_spin_Y
-	IF _PARTICLES_ENABLE_SPIN4
-	INY:INY:INY:INY
-	ELSE
-	TYA:CLC:ADC #&40:TAY
-	ENDIF
-	STY fx_particles_spin_idx
 
-; This gives 4x particles generated per frame - a bit much!
-	IF _PARTICLES_ENABLE_SPIN4
-	TYA:CLC:ADC #&40:TAY
 	JSR fx_particles_spin_Y
-	TYA:CLC:ADC #&40:TAY
-	JSR fx_particles_spin_Y
-	TYA:CLC:ADC #&40:TAY
-	JSR fx_particles_spin_Y
-	ENDIF
-ENDIF
-
-IF _PARTICLES_ENABLE_SPURT
-	JSR fx_particles_spurt_Y
-ENDIF
-
-IF _PARTICLES_ENABLE_DRIP
-	JSR fx_particles_drip_Y
-ENDIF
 
 IF _PARTICLES_ENABLE_DELTA_TIME
 	LDY delta_time
@@ -453,9 +424,7 @@ ENDIF
 
 	JSR fx_particles_draw
 
-	.return
 	RTS
-}
 
 .fx_particles_xacc
 EQUB 0
