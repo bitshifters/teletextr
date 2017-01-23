@@ -8,8 +8,9 @@
 MODE7_particles_addr = &7800
 
 PARTICLES_max = 128
-_PARTICLES_ENABLE_SPIN4 = FALSE
-_PARTICLES_ENABLE_SPURT = FALSE
+_PARTICLES_ENABLE_BANG = FALSE
+_PARTICLES_ENABLE_SPIN = TRUE
+_PARTICLES_ENABLE_SPURT = TRUE
 _PARTICLES_ENABLE_DRIP = TRUE
 _PARTICLES_ENABLE_COLOUR = TRUE
 _PARTICLES_ENABLE_DELTA_TIME = TRUE
@@ -31,9 +32,21 @@ PARTICLES_SPURT_speed = 3
 PARTICLES_DRIP_xpos = 40
 PARTICLES_DRIP_ypos = 37
 
+.fx_particles_fn_table
+{
+	EQUW fx_particles_spin_Y
+	EQUW fx_particles_spurt_Y
+	EQUW fx_particles_drip_Y
+}
+
+.fx_particle_fx
+EQUB 0
+
 .fx_particles_init
 {
 	LDA #0
+	STA fx_particle_fx
+
 	LDX #0
 
 	.loop
@@ -221,6 +234,10 @@ EQUB 0
 	BCS return
 
 	\\ Found a free one!
+
+	LDY fx_particles_spin_idx
+
+	\\ Derive colour
 	TYA
 	AND #&3
 	CLC
@@ -237,9 +254,12 @@ EQUB 0
 	LDA #PARTICLES_SPIN_ypos
 	STA fx_particles_yposh, X
 
+	\\ Must have Y here
 	JSR fx_particles_set_vel2_Y
 
 	INY			; assumes 256 entries in spin table
+	TYA:CLC:ADC #&40
+	STA fx_particles_spin_idx
 
 	.return
 	RTS
@@ -389,7 +409,39 @@ EQUB 0
 }
 ENDIF
 
+.fx_particles_set_fx_A
 {
+	ASL A
+	TAX
+	LDA fx_particles_fn_table, X
+	STA fx_particles_update_emitter+1
+	LDA fx_particles_fn_table+1, X
+	STA fx_particles_update_emitter+2
+
+	.return
+	RTS
+}
+
+.fx_particles_set_fx_spin
+{
+	LDA #0
+	JMP fx_particles_set_fx_A
+}
+
+.fx_particles_set_fx_spurt
+{
+	LDA #1
+	JMP fx_particles_set_fx_A
+}
+
+.fx_particles_set_fx_drip
+{
+	LDA #2
+	JMP fx_particles_set_fx_A
+}
+
+.fx_particles_update
+\\{
 IF _PARTICLES_ENABLE_COLOUR = FALSE
 	lda #144+7
     ldx #0
@@ -408,6 +460,8 @@ ENDIF
 
 	LDX #0
 
+	\\ Do emitter
+	.fx_particles_update_emitter
 	JSR fx_particles_spin_Y
 
 IF _PARTICLES_ENABLE_DELTA_TIME
@@ -424,7 +478,9 @@ ENDIF
 
 	JSR fx_particles_draw
 
+	.fx_particles_update_return
 	RTS
+\\}
 
 .fx_particles_xacc
 EQUB 0
