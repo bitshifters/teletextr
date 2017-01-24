@@ -227,6 +227,8 @@ FX_LINEBOX_SLOT = 1
 INCLUDE "src/fx/linebox.asm"
 FX_RASTERBARS_SLOT = 1
 INCLUDE "src/fx/rasterbars.asm"
+FX_STARFIELD_SLOT = 1
+INCLUDE "src/fx/starfield.asm"
 
 
 
@@ -327,6 +329,7 @@ PRINT " fx_mirrorfloor size is", (end_fx_mirrorfloor-start_fx_mirrorfloor), "byt
 PRINT " fx_linebox size is", (end_fx_linebox-start_fx_linebox), "bytes"
 PRINT " fx_copperbars size is", (end_fx_copperbars-start_fx_copperbars), "bytes"
 PRINT " fx_particles size is", (end_fx_particles-start_fx_particles), "bytes"
+PRINT " fx_starfield size is", (end_fx_starfield-start_fx_starfield), "bytes"
 
 
 PRINT "------------------------------------------------------------"

@@ -150,9 +150,19 @@ SCRIPT_CALL fx_clear
 
 ;-----------------------------------------------------------
 ; some kind of "Bitshifters presents" sequence would be good here
+; KC: Agree - a simple & reusable intro to each fx, maybe 5x5 font?
 ;-----------------------------------------------------------
 
 ; STARFIELD NEEDED!!! :)
+; Starfield provided! :D
+
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_buffer_copy              ; stars are self-erasing - optional!
+    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
+SCRIPT_SEGMENT_END
+
+
 
 IF 0
 ; SM: this effect is knacked for some reason, causes demo to hang, not sure why
@@ -174,6 +184,7 @@ ENDIF
 
 
 ; SM: gonna make the linebox demo do something more - like animated boxes/fractals etc.
+; KC: I get the line box starting in the middle of the screen when I run through?  Uninitialise start pos?
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
