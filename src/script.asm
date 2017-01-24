@@ -6,7 +6,8 @@ SCRIPTID_CALL=3
 ;SCRIPTID_PLAY=4
 ;SCRIPTID_PLAYV=5
 SCRIPTID_SLOT=6
-SCRIPTID_CALLV=7
+SCRIPTID_CALLSLOT=7
+SCRIPTID_CALLV=8
 
 SCRIPTID_END=255
 
@@ -21,6 +22,13 @@ ENDMACRO
 MACRO SCRIPT_CALLV    effect_addr, effect_value
     EQUB    SCRIPTID_CALLV
     EQUB    effect_value
+    EQUW    effect_addr
+ENDMACRO
+
+; Call a routine in a given slot 
+MACRO SCRIPT_CALLSLOT   effect_addr, swr_slot
+    EQUB    SCRIPTID_CALLSLOT
+    EQUB    swr_slot
     EQUW    effect_addr
 ENDMACRO
 
@@ -72,11 +80,7 @@ ENDMACRO
 
 
 ; Macro macros
-; Call a routine in a given slot 
-MACRO SCRIPT_CALLSLOT   effect_addr, swr_slot
-    SCRIPT_SLOT swr_slot
-    SCRIPT_CALL effect_addr
-ENDMACRO
+
 
 ; Call a routine in a given slot with a value parameter
 MACRO SCRIPT_CALLSLOTV   effect_addr, swr_slot, value
@@ -317,12 +321,23 @@ ENDIF
 
 .command_callv
     cmp #SCRIPTID_CALLV
-    bne command_play
+    bne command_callslot
 
     jsr script_fetch_byte
     sta script_value
     jsr script_call
     jmp command_loop    
+
+
+.command_callslot
+    cmp #SCRIPTID_CALLSLOT
+    bne command_play
+
+    jsr script_fetch_byte   ; SWR slot id
+    jsr swr_select_slot
+    jsr script_call
+    jmp command_loop 
+
 
 .command_play
 
