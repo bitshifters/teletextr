@@ -27,7 +27,7 @@ IF _ABUG
 ; vector text effect
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
 SCRIPT_SEGMENT_START    1000.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
@@ -52,7 +52,7 @@ SCRIPT_CALL show_vram
 ; Tuning in....
 ;-----------------------------------------------------------
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALL fx_noise_update
 SCRIPT_SEGMENT_END
 SCRIPT_CALL fx_clear
@@ -63,7 +63,7 @@ SCRIPT_CALL fx_clear
 ;-----------------------------------------------------------
 
 SCRIPT_SEGMENT_START    2.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_copperbars_update, FX_COPPERBARS_SLOT   
 SCRIPT_SEGMENT_END
 
@@ -93,18 +93,18 @@ SCRIPT_CALL fx_music_init_reg  ; reg
 SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_clear
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_teletext_showtestcard, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_teletext_showpages, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
@@ -129,7 +129,7 @@ SCRIPT_CALL fx_music_stop
 
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALL fx_colournoise_update
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
@@ -139,7 +139,7 @@ SCRIPT_CALL fx_music_init_en ; en
 SCRIPT_CALL fx_music_start
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
@@ -157,7 +157,7 @@ SCRIPT_CALL fx_clear
 ; Starfield provided! :D
 
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_buffer_copy              ; stars are self-erasing - optional!
+    SCRIPT_CALL fx_buffer_copy              ; stars are self-erasing - optional!
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
@@ -173,7 +173,7 @@ IF 0
 
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
 SCRIPT_SEGMENT_START    30.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
@@ -188,7 +188,7 @@ ENDIF
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
     SCRIPT_CALLSLOT fx_linebox_update, FX_LINEBOX_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
@@ -197,7 +197,7 @@ SCRIPT_SEGMENT_END
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
@@ -211,7 +211,7 @@ SCRIPT_SEGMENT_END
 ; SM: need to cycle through the various shapes & animate the sequence better
 SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
@@ -236,7 +236,7 @@ SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
 SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -244,7 +244,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -252,7 +252,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -260,7 +260,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -268,7 +268,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -276,7 +276,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -297,7 +297,7 @@ SCRIPT_CALLSLOT fx_vectorballs_init, FX_VECTORBALLS_SLOT
 SCRIPT_CALLSLOT fx_vectorballs_set_small, FX_VECTORBALLS_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -305,14 +305,14 @@ SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT fx_vectorballs_set_medium, FX_VECTORBALLS_SLOT
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_copybuffer_update 
+    SCRIPT_CALL fx_copybuffer_update 
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT fx_vectorballs_set_large, FX_VECTORBALLS_SLOT
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
@@ -330,7 +330,7 @@ SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT fx_playgifs_init, FX_PLAYGIFS_SLOT
 SCRIPT_SEGMENT_START    20.0
-    SCRIPT_PLAY fx_buffer_copy 
+    SCRIPT_CALL fx_buffer_copy 
     SCRIPT_CALLSLOT fx_playgifs_update, FX_PLAYGIFS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
@@ -345,7 +345,7 @@ SCRIPT_CALL fx_buffer_clear
 ;  Agree :) - KC
 
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
@@ -353,7 +353,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
 
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
@@ -364,7 +364,7 @@ SCRIPT_SEGMENT_END
 ;-----------------------------------------------------------
 
 SCRIPT_SEGMENT_START    20.0
-    SCRIPT_PLAY fx_copybuffer_update  
+    SCRIPT_CALL fx_copybuffer_update  
     SCRIPT_CALLSLOT fx_dotscroller_update, FX_DOTSCROLLER_SLOT
     SCRIPT_CALLSLOT fx_mirrorfloor_update, FX_MIRRORFLOOR_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
@@ -382,7 +382,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOT fx_plasma_init, FX_PLASMA_SLOT
 SCRIPT_SEGMENT_START    30.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_plasma, FX_PLASMA_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
@@ -395,7 +395,7 @@ SCRIPT_SEGMENT_END
 
 SCRIPT_CALL fx_clear
 SCRIPT_SEGMENT_START    60.0
-;    SCRIPT_PLAY fx_copybuffer_update
+;    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_rotozoom3, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
@@ -403,7 +403,7 @@ SCRIPT_SEGMENT_END
 
 ; Might kill this one - technically interesting, but way too slow
 SCRIPT_SEGMENT_START    10.0
-;    SCRIPT_PLAY fx_copybuffer_update
+;    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_rotozoom1, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT     
 SCRIPT_SEGMENT_END
@@ -411,7 +411,7 @@ SCRIPT_SEGMENT_END
 IF 0
 ; was just a technical concept really - dump it
 SCRIPT_SEGMENT_START    10.0
-;    SCRIPT_PLAY fx_copybuffer_update
+;    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_rotozoom2, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT         
 SCRIPT_SEGMENT_END
@@ -447,7 +447,7 @@ SCRIPT_CALL fx_music_init_exception ; exception
 SCRIPT_CALL fx_music_start
 
 SCRIPT_SEGMENT_START    35.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_creditscroll_update, FX_CREDITSCROLL_SLOT 
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
@@ -481,8 +481,6 @@ SCRIPT_CALL fx_music_stop
 SCRIPT_END
 
 .demo_script_end
-
-PRINT "Demo Sequence data from", ~demo_script_start, "to", ~demo_script_end, ", size is", (demo_script_end-demo_script_start), "bytes"
 
 
 
