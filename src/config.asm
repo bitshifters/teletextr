@@ -20,7 +20,6 @@ SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
 
 
-
 ;-----------------------------------------------------------
 ; If Abug demo then we just play the following segment
 ;-----------------------------------------------------------
@@ -229,7 +228,58 @@ SCRIPT_SEGMENT_END
 ; etc. 
 
 
+;-----------------------------------------------------------
+; Particles!
+;-----------------------------------------------------------
 
+SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
+SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
 
 
 
@@ -292,6 +342,7 @@ SCRIPT_CALL fx_buffer_clear
 ;-----------------------------------------------------------
 ; Cant help feeling we should switch to a rave track for this one
 ;  and inject this in a high speed pulsing fashion with the dancing man GIF!!
+;  Agree :) - KC
 
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_buffer_copy
