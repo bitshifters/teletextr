@@ -5,6 +5,7 @@ FX_MUSICBARS_BEAT_HEIGHT = 2    ; num lines to set
 FX_MUSICBARS_BEAT_FADE = 3      ; fade speed, down from 9
 
 FX_MUSICBARS_FREQ_FADE = 3      ; fade speed, down from 15
+FX_MUSICBARS_FREQ_TOP_ROW = 1
 
 FX_MUSICBARS_SOLID = FALSE      ; **BROKEN (doesn't reset fg col yet)
 
@@ -13,7 +14,7 @@ FX_MUSICBARS_SOLID = FALSE      ; **BROKEN (doesn't reset fg col yet)
 	JSR fx_rasterbars_reset_bg
 
     {
-        LDX #0
+        LDX #FX_MUSICBARS_FREQ_TOP_ROW
         LDY #VGM_FX_num_freqs-1
         .loop
         LDA vgm_freq_array, Y
@@ -45,7 +46,7 @@ FX_MUSICBARS_SOLID = FALSE      ; **BROKEN (doesn't reset fg col yet)
     }
 
     {
-        LDX #0
+        LDX #FX_MUSICBARS_FREQ_TOP_ROW
         LDY #VGM_FX_num_freqs-1
         .loop
         LDA vgm_freq_array+VGM_FX_num_freqs, Y
@@ -77,7 +78,7 @@ FX_MUSICBARS_SOLID = FALSE      ; **BROKEN (doesn't reset fg col yet)
     }
 
     {
-        LDX #0
+        LDX #FX_MUSICBARS_FREQ_TOP_ROW
         LDY #VGM_FX_num_freqs-1
         .loop
         LDA vgm_freq_array+(VGM_FX_num_freqs*2), Y

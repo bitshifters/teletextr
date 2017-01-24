@@ -5,6 +5,7 @@ SCRIPTID_SEGMENT_END=2
 SCRIPTID_CALL=3
 SCRIPTID_PLAY=4
 SCRIPTID_PLAYV=5
+SCRIPTID_SLOT=6
 SCRIPTID_END=255
 
 
@@ -42,6 +43,20 @@ MACRO SCRIPT_PLAYV   effect_ptr, offset, duration
     EQUW    duration*50
     EQUW    effect_ptr
 ENDMACRO
+
+
+; Select a SWR slot (not bank)
+MACRO SCRIPT_SLOT   swr_slot
+    EQUB    SCRIPTID_SLOT
+    EQUB    swr_slot
+ENDMACRO
+
+MACRO SCRIPT_CALLSLOT   effect_addr, swr_slot
+    SCRIPT_SLOT swr_slot
+    SCRIPT_CALL effect_addr
+ENDMACRO
+
+
 
 ; End of script marker. All scripts must have exactly one of these commands.
 MACRO SCRIPT_END
@@ -141,7 +156,7 @@ ENDMACRO
     jmp &ffff   ; use subroutine rts
 }
 
-
+IF 0
 ; Debug text
 .script_text 
     EQUS "DT:%w"
@@ -172,6 +187,7 @@ ENDIF
     
 
     EQUB 0
+ENDIF
 
 
 ; Update the sequencer script
@@ -182,7 +198,16 @@ ENDIF
 
  ;   MPRINTMEM script_text,&7800
 
+    ; DEBUG CODE
+    ; check for N key pressed to skip segment
+    lda #&81:ldx #LO(-86):ldy #&FF:jsr &FFF4
+    tya:beq nopress:lda debounce:bne nopress
+    lda #0:sta script_segment_duration+0:sta script_segment_duration+1
+    lda #1:.nopress sta debounce
+
+
     rts
+.debounce EQUB 0
 }
 
 .script_process
@@ -202,7 +227,8 @@ ENDIF
 
     ; we are in a segment
 
-    
+; hack to force infinite loop    
+IF _ABUG == FALSE
 
     ; script_segment_time += delta_time
     lda script_segment_time+0
@@ -212,6 +238,7 @@ ENDIF
     lda script_segment_time+1
     adc #0
     sta script_segment_time+1
+ENDIF
 
     ; if script_segment_time >= duration
     ;   segment finished, leave sequence ptr    
@@ -309,13 +336,23 @@ ENDIF
     
     jmp command_loop
 
+
+
+
 .command_segment_end
     cmp #SCRIPTID_SEGMENT_END
-    bne command_unknown
+    bne command_slot
 
     ; end of segment reached
     ; next update we will either repeat the segment or advance to next command
     rts
+
+.command_slot
+    cmp #SCRIPTID_SLOT
+    bne command_unknown
+    jsr script_fetch_byte   ; SWR slot id
+    jsr swr_select_slot
+    jmp command_loop
 
 .command_unknown
     rts

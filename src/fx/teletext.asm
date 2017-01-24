@@ -1,5 +1,8 @@
+.start_fx_teletext
 
 .teletext_data  
+.teletext_page0
+INCBIN "data/pages/testpage.txt.bin"
 .teletext_page1
 INCBIN "data/pages/edittf.txt.bin"
 .teletext_page2
@@ -10,26 +13,54 @@ INCBIN "data/pages/heman.txt.bin"
 INCBIN "data/pages/heisenburg.txt.bin"
 
 
-.teletext_header
-;"0123456789012345678901234567890123456789"
-EQUS "P100   ",130,"CEEFAX "
-.page
-EQUS "100  Tue 15 Nov ",131,"20:49/1"
-.second EQUS "0"
-.counter EQUB 0
+
 
 .page_table
+    EQUW teletext_page0
     EQUW teletext_page1
     EQUW teletext_page2
     EQUW teletext_page3
     EQUW teletext_page4
 
-.page_num EQUB 0
 
 
-.fx_teletext
+
+
+
+; render the ceefax header at top of current draw buffer
+.fx_teletext_drawheader
 {
-    lda page_num
+    lda draw_buffer_addr
+    sta write_adr+2
+
+    ldx #0
+.loop2
+    lda teletext_header,x
+.write_adr
+    sta &7c00,x
+    inx
+    cpx #40
+    bne loop2
+
+    rts
+}
+
+.fx_teletext_drawheader2
+{
+    ldx #0
+.loop2
+    lda teletext_header,x
+    sta &7c00,x
+    inx
+    cpx #40
+    bne loop2
+    rts
+}
+
+
+; on entry, A=page num
+.fx_teletext_drawpage
+{
     asl a
     tax
     lda page_table+0,x
@@ -50,16 +81,25 @@ EQUS "100  Tue 15 Nov ",131,"20:49/1"
 
 
 
+    lda draw_buffer_addr
+    tax:stx write0+2
+    inx:stx write1+2
+    inx:stx write2+2
+    inx:stx write3+2
 
     ldy #0
 .loop
     lda (&90),y
+.write0
     sta &7c00,y
     lda (&92),y
+.write1
     sta &7d00,y
     lda (&94),y
+.write2
     sta &7e00,y
     lda (&96),y
+.write3
     sta &7f00,y
     
 
@@ -74,51 +114,26 @@ EQUS "100  Tue 15 Nov ",131,"20:49/1"
     iny
     bne loop
 
-    ldx #0
-.loop2
-    lda teletext_header,x
-    sta &7c00,x
-    inx
-    cpx #40
-    bne loop2
+    rts
+}
 
-    inc counter
-    lda counter
-    cmp #50
-    bne skip
-    inc page_num
-    lda page_num
-    and #3
-    sta page_num
-    inc second
+
+.fx_teletext_showtestcard
+{
     lda #0
-    sta counter
-.skip
+    jsr fx_teletext_drawpage
+    rts
+}
 
-    and #3
-    bne ok1
-
-    inc page+2
-    lda page+2
-    cmp #48+10
-    bne ok1
-    lda #48
-    sta page+2
-    inc page+1
+.fx_teletext_showpages
+{
     lda page+1
-    cmp #48+10
-    bne ok1
-    lda #48
-    sta page+1
-    inc page+0
-    lda page+0
-    cmp #48+10
-    bne ok1
-    lda #49
-    sta page+0
-
-.ok1
+    and #3
+    clc
+    adc #1
+    jsr fx_teletext_drawpage
 
     rts
-
 }
+
+.end_fx_teletext

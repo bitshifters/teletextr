@@ -1,4 +1,6 @@
 
+.start_fx_vectorballs
+
 
 ZSORT = TRUE    ; turn zsorting on or off
 
@@ -241,3 +243,7 @@ NEXT
 INCLUDE "src\sprites\ball7.asm"
 INCLUDE "src\sprites\ball11.asm"
 INCLUDE "src\sprites\ball15.asm"
+
+
+
+.end_fx_vectorballs
