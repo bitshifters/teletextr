@@ -2,7 +2,7 @@
 \\ 6502 include file
 \\ DISPLAY_MODE variable must be set prior to inclusion
 
-; [ 1][ 2] + 160
+; [ 1][ 2] + 160 - NB. Doesn't have to be +160 can just be +32
 ; [ 4][ 8]
 ; [16][64]
 

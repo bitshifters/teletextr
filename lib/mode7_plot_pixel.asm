@@ -34,11 +34,11 @@ ENDIF
 .plot_pixel_ytable_chr
 	FOR n, 0, PLOT_PIXEL_RANGE_Y-1
 		IF (n MOD 3) == 0
-			EQUB 160+1+2
+			EQUB 32+1+2
 		ELIF (n MOD 3) == 1
-			EQUB 160+4+8
+			EQUB 32+4+8
 		ELSE
-			EQUB 160+16+64			
+			EQUB 32+16+64			
 		ENDIF	
 	NEXT
 OUTPUT_SIZE mode7_tables_start
@@ -54,9 +54,9 @@ ALIGN 256
 .plot_pixel_xtable_chr
 	FOR n, 0, PLOT_PIXEL_RANGE_X-1
 		IF (n AND 1) == 0
-			EQUB 160+1+4+16			; left hand column mask (even pixels)
+			EQUB 32+1+4+16			; left hand column mask (even pixels)
 		ELSE
-			EQUB 160+2+8+64			; right hand column mask (odd pixels)
+			EQUB 32+2+8+64			; right hand column mask (odd pixels)
 		ENDIF	
 	NEXT
 .mode7_tables_end
