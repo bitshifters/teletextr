@@ -409,6 +409,7 @@ EQUB 0
 }
 ENDIF
 
+\\ Would be better if we could call this from config directly with a parameter
 .fx_particles_set_fx_A
 {
 	ASL A
