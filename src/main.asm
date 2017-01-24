@@ -16,7 +16,8 @@ ENDIF
 .bank_file3a   EQUS "Bank3  $"
 
 
-
+.intro_text0 EQUS "Teletextr OS V1.0", 13, 10, 0
+.intro_text1 EQUS "Initializing Teletext system...", 13, 10, 0
 
 .main
 {
@@ -27,6 +28,8 @@ ENDIF
 	LDX #3
 	JSR osbyte			
 
+    MPRINT    intro_text0
+    MPRINT    intro_text1
 
     jsr swr_init
     bne swr_ok
