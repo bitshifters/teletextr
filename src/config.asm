@@ -20,6 +20,13 @@ SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
 
 
+SCRIPT_SEGMENT_START    35.0
+    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALLSLOT fx_creditscroll_update, FX_CREDITSCROLL_SLOT 
+    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+SCRIPT_SEGMENT_END
+
 
 ;-----------------------------------------------------------
 ; If Abug demo then we just play the following segment

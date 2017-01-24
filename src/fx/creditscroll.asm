@@ -155,6 +155,9 @@ EQUB 0
 .fx_creditscroll_text_idx
 EQUB 0
 
+.fx_creditscroll_glyph_bytes
+EQUB 0, 0, 0
+
 .fx_creditscroll_write_text_line
 {
 	\\ Write text into our new line
@@ -189,7 +192,7 @@ EQUB 0
 	JMP reached_end_of_row
 
 	.not_end_of_string
-	JSR fx_creditscroll_get_char		; preserves X&Y
+	;JSR fx_creditscroll_get_char		; preserves X&Y
 
 	\\ Just bit-shift for now - we have time & its our name :)
 
@@ -201,21 +204,45 @@ EQUB 0
 	\\ 0,0,0,40,40,40
 	\\ 3,12,80,3,12,80
 
-	IF _CREDITS_NARROW_FONT
-	\\ 128 -> 1
+	CPY #3
+	BCC first_row
+	TAY
+	LDA mode7_font_data_second_row, Y
+	STA fx_creditscroll_glyph_bytes+0
+	INX
+	LDA mode7_font_data_second_row, Y
+	STA fx_creditscroll_glyph_bytes+1
+	INX
+	LDA mode7_font_data_second_row, Y
+	STA fx_creditscroll_glyph_bytes+2
+	JMP plot_row
+
+	.first_row
+	TAY
+	LDA mode7_font_data, Y
+	STA fx_creditscroll_glyph_bytes+0
+	INX
+	LDA mode7_font_data, Y
+	STA fx_creditscroll_glyph_bytes+1
+	INX
+	LDA mode7_font_data, Y
+	STA fx_creditscroll_glyph_bytes+2
+
+	.plot_row
+
+	LDY fx_creditscroll_text_row
+
 	{
-		LDA fx_creditscroll_def, Y
-		AND #128
+		LDA fx_creditscroll_glyph_bytes+0
+		AND fx_creditscroll_glyph_mask_1, Y
 		BEQ no_bit
 		LDA #1
 		STA fx_creditscroll_new_line, X
 		.no_bit
 	}
-
-	\\ 32 -> 2
 	{
-		LDA fx_creditscroll_def, Y
-		AND #32
+		LDA fx_creditscroll_glyph_bytes+0
+		AND fx_creditscroll_glyph_mask_2, Y
 		BEQ no_bit
 		LDA #2
 		ORA fx_creditscroll_new_line, X
@@ -228,40 +255,17 @@ EQUB 0
 	CPX #MODE7_char_width
 	BCS reached_end_of_row
 
-	\\ 8 -> 1
 	{
-		LDA fx_creditscroll_def, Y
-		AND #8
+		LDA fx_creditscroll_glyph_bytes+1
+		AND fx_creditscroll_glyph_mask_1, Y
 		BEQ no_bit
 		LDA #1
 		STA fx_creditscroll_new_line, X
 		.no_bit
 	}
-
-	\\ 2 -> 2
 	{
-		LDA fx_creditscroll_def, Y
-		AND #2
-		BEQ no_bit
-		LDA #2
-		ORA fx_creditscroll_new_line, X
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
-	ELSE
-	\\ 128 + 64 -> 1 + 2
-	{
-		LDA fx_creditscroll_def, Y
-		AND #128
-		BEQ no_bit
-		LDA #1
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
-
-	{
-		LDA fx_creditscroll_def, Y
-		AND #64
+		LDA fx_creditscroll_glyph_bytes+1
+		AND fx_creditscroll_glyph_mask_2, Y
 		BEQ no_bit
 		LDA #2
 		ORA fx_creditscroll_new_line, X
@@ -274,76 +278,23 @@ EQUB 0
 	CPX #MODE7_char_width
 	BCS reached_end_of_row
 
-	\\ 32 + 16 -> 1 + 2
 	{
-		LDA fx_creditscroll_def, Y
-		AND #32
+		LDA fx_creditscroll_glyph_bytes+2
+		AND fx_creditscroll_glyph_mask_1, Y
 		BEQ no_bit
 		LDA #1
 		STA fx_creditscroll_new_line, X
 		.no_bit
 	}
-
 	{
-		LDA fx_creditscroll_def, Y
-		AND #16
+		LDA fx_creditscroll_glyph_bytes+2
+		AND fx_creditscroll_glyph_mask_2, Y
 		BEQ no_bit
 		LDA #2
 		ORA fx_creditscroll_new_line, X
 		STA fx_creditscroll_new_line, X
 		.no_bit
 	}
-
-	\\ Next char cell
-	INX
-	CPX #MODE7_char_width
-	BCS reached_end_of_row
-
-	\\ 8 + 4 -> 1 + 2
-	{
-		LDA fx_creditscroll_def, Y
-		AND #8
-		BEQ no_bit
-		LDA #1
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
-
-	{
-		LDA fx_creditscroll_def, Y
-		AND #4
-		BEQ no_bit
-		LDA #2
-		ORA fx_creditscroll_new_line, X
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
-
-	\\ Next char cell
-	INX
-	CPX #MODE7_char_width
-	BCS reached_end_of_row
-
-	\\ 2 + 1 -> 1 + 2
-	{
-		LDA fx_creditscroll_def, Y
-		AND #2
-		BEQ no_bit
-		LDA #1
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
-
-	{
-		LDA fx_creditscroll_def, Y
-		AND #1
-		BEQ no_bit
-		LDA #2
-		ORA fx_creditscroll_new_line, X
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
-	ENDIF
 
 	\\ Next char cell
 	INX
@@ -481,64 +432,18 @@ FOR n, 0, MODE7_char_width-1, 1
 EQUB 0
 NEXT
 
+.fx_creditscroll_glyph_mask_1
+EQUB 1, 4, 64, 1, 4, 64
+
+.fx_creditscroll_glyph_mask_2
+EQUB 2, 8, 16, 2, 8, 16
+
+
 \\ Credit text strings
 \\ First byte is character offset from left side of screen
 \\ Then text string terminted by 0
 \\ If character offset is &FF this indicates no more strings
 \\ Currently strings just loop but could just stop!
-
-.fx_creditscroll_text
-EQUS 4,"Bitshifters",0
-EQUS 5,"Presents",0
-EQUS 6,"Teletextr",0
-EQUS 4," ",0
-EQUS 4,"A new demo",0
-EQUS 5,"By Henley",0
-EQUS 6,"& Kieran..",0
-EQUS 4," ",0
-EQUS 4,"BBC rulez!",0
-EQUS 5,"Etc.",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS &FF
-
-\\ Test fn to add pixels to bottom of the screen
-
-IF 0
-.fx_creditscroll_test
-{
-	lda #144+7
-    ldx #0
-	jsr mode7_set_column_shadow_fast
-
-	LDY #4
-	.loop
-
-	LDA #(1 + 2)
-	STA fx_creditscroll_new_line, Y
-
-	INY
-	CPY #40
-	BCC loop
-
-	.return
-	RTS
-}
-ENDIF
-
-.mode7_font_data				; we use 16/25 lines of this screen
-INCBIN "data/font_5x5_shifted_trimmed.mode7.bin"
-
-.end_fx_creditscroll
-
-\\ Map character ASCII values to the byte offset into our MODE 7 font
-\\ This is "cunning" but only works because the font has fewer than 256/6 (42) glyphs..
 
 MACRO SET_TELETEXT_FONT_CHAR_MAP
 
@@ -615,3 +520,58 @@ MACRO SET_TELETEXT_FONT_CHAR_MAP
 	MAPCHAR ' ', 241
 
 ENDMACRO
+
+.fx_creditscroll_text
+EQUS 4,"Bitshifters",0
+EQUS 5,"Presents",0
+EQUS 6,"Teletextr",0
+EQUS 4," ",0
+EQUS 4,"A new demo",0
+EQUS 5,"By Henley",0
+EQUS 6,"& Kieran..",0
+EQUS 4," ",0
+EQUS 4,"BBC rulez!",0
+EQUS 5,"Etc.",0
+EQUS 4," ",0
+EQUS 4," ",0
+EQUS 4," ",0
+EQUS 4," ",0
+EQUS 4," ",0
+EQUS 4," ",0
+EQUS 4," ",0
+EQUS 4," ",0
+EQUS &FF
+
+\\ Test fn to add pixels to bottom of the screen
+
+IF 0
+.fx_creditscroll_test
+{
+	lda #144+7
+    ldx #0
+	jsr mode7_set_column_shadow_fast
+
+	LDY #4
+	.loop
+
+	LDA #(1 + 2)
+	STA fx_creditscroll_new_line, Y
+
+	INY
+	CPY #40
+	BCC loop
+
+	.return
+	RTS
+}
+ENDIF
+
+.mode7_font_data				; we use 16/25 lines of this screen
+INCBIN "data/font_5x5_shifted_trimmed.mode7.bin"
+mode7_font_data_second_row = mode7_font_data + 40
+
+.end_fx_creditscroll
+
+\\ Map character ASCII values to the byte offset into our MODE 7 font
+\\ This is "cunning" but only works because the font has fewer than 256/6 (42) glyphs..
+
