@@ -195,6 +195,12 @@ EQUB 0
 
 	LDY fx_creditscroll_text_row
 
+	\\ For BeebTracker font, "ascii" value is offset into data for first byte of glyph
+	\\ Need to convert Y row DIV 3 into 0 or 40 byte offset from that (0-2, 3-5)
+	\\ Then Y row MOD 3 gives mask 1+2, 4+8, 16+64 - just use 6 byte lookups for both
+	\\ 0,0,0,40,40,40
+	\\ 3,12,80,3,12,80
+
 	IF _CREDITS_NARROW_FONT
 	\\ 128 -> 1
 	{
@@ -526,5 +532,86 @@ IF 0
 }
 ENDIF
 
+.mode7_font_data				; we use 16/25 lines of this screen
+INCBIN "data/font_5x5_shifted_trimmed.mode7.bin"
 
 .end_fx_creditscroll
+
+\\ Map character ASCII values to the byte offset into our MODE 7 font
+\\ This is "cunning" but only works because the font has fewer than 256/6 (42) glyphs..
+
+MACRO SET_TELETEXT_FONT_CHAR_MAP
+
+	MAPCHAR 'A', 1
+	MAPCHAR 'B', 4
+	MAPCHAR 'C', 7
+	MAPCHAR 'D', 10
+	MAPCHAR 'E', 13
+	MAPCHAR 'F', 16
+	MAPCHAR 'G', 19
+	MAPCHAR 'H', 22
+	MAPCHAR 'I', 25
+	MAPCHAR 'J', 28
+	MAPCHAR 'K', 31
+	MAPCHAR 'L', 34
+	MAPCHAR 'M', 37
+
+	MAPCHAR 'a', 1
+	MAPCHAR 'b', 4
+	MAPCHAR 'c', 7
+	MAPCHAR 'd', 10
+	MAPCHAR 'e', 13
+	MAPCHAR 'f', 16
+	MAPCHAR 'g', 19
+	MAPCHAR 'h', 22
+	MAPCHAR 'i', 25
+	MAPCHAR 'j', 28
+	MAPCHAR 'k', 31
+	MAPCHAR 'l', 34
+	MAPCHAR 'm', 37
+
+	MAPCHAR 'N', 81
+	MAPCHAR 'O', 84
+	MAPCHAR 'P', 87
+	MAPCHAR 'Q', 90
+	MAPCHAR 'R', 93
+	MAPCHAR 'S', 96
+	MAPCHAR 'T', 99
+	MAPCHAR 'U', 102
+	MAPCHAR 'V', 105
+	MAPCHAR 'W', 108
+	MAPCHAR 'X', 111
+	MAPCHAR 'Y', 114
+	MAPCHAR 'Z', 117
+
+	MAPCHAR 'n', 81
+	MAPCHAR 'o', 84
+	MAPCHAR 'p', 87
+	MAPCHAR 'q', 90
+	MAPCHAR 'r', 93
+	MAPCHAR 's', 96
+	MAPCHAR 't', 99
+	MAPCHAR 'u', 102
+	MAPCHAR 'v', 105
+	MAPCHAR 'w', 108
+	MAPCHAR 'x', 111
+	MAPCHAR 'y', 114
+	MAPCHAR 'z', 117
+
+	MAPCHAR '0', 161
+	MAPCHAR '1', 164
+	MAPCHAR '2', 167
+	MAPCHAR '3', 170
+	MAPCHAR '4', 173
+	MAPCHAR '5', 176
+	MAPCHAR '6', 179
+	MAPCHAR '7', 182
+	MAPCHAR '8', 185
+	MAPCHAR '9', 188
+	MAPCHAR '?', 191
+	MAPCHAR '!', 194
+	MAPCHAR '.', 197
+
+	MAPCHAR ' ', 241
+
+ENDMACRO
