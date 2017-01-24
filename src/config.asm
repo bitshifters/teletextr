@@ -20,6 +20,7 @@ SCRIPT_CALL fx_copybuffer_init
 SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
 
 
+; ********* TEMP **********
 SCRIPT_SEGMENT_START    35.0
     SCRIPT_PLAY fx_buffer_copy
     SCRIPT_CALLSLOT fx_creditscroll_update, FX_CREDITSCROLL_SLOT 
@@ -158,9 +159,19 @@ SCRIPT_CALL fx_clear
 
 ;-----------------------------------------------------------
 ; some kind of "Bitshifters presents" sequence would be good here
+; KC: Agree - a simple & reusable intro to each fx, maybe 5x5 font?
 ;-----------------------------------------------------------
 
 ; STARFIELD NEEDED!!! :)
+; Starfield provided! :D
+
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_PLAY fx_buffer_copy              ; stars are self-erasing - optional!
+    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
+SCRIPT_SEGMENT_END
+
+
 
 IF 0
 ; SM: this effect is knacked for some reason, causes demo to hang, not sure why
@@ -182,6 +193,7 @@ ENDIF
 
 
 ; SM: gonna make the linebox demo do something more - like animated boxes/fractals etc.
+; KC: I get the line box starting in the middle of the screen when I run through?  Uninitialise start pos?
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
@@ -225,7 +237,58 @@ SCRIPT_SEGMENT_END
 ; etc. 
 
 
+;-----------------------------------------------------------
+; Particles!
+;-----------------------------------------------------------
 
+SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
+SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
 
 
 
@@ -288,6 +351,7 @@ SCRIPT_CALL fx_buffer_clear
 ;-----------------------------------------------------------
 ; Cant help feeling we should switch to a rave track for this one
 ;  and inject this in a high speed pulsing fashion with the dancing man GIF!!
+;  Agree :) - KC
 
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_PLAY fx_buffer_copy
