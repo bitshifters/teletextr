@@ -21,18 +21,6 @@ SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
 
 
 ;-----------------------------------------------------------
-; Dot scroller TEMP TEST
-;-----------------------------------------------------------
-
-SCRIPT_SEGMENT_START    30.0
-    SCRIPT_PLAY fx_copybuffer_update  
-    SCRIPT_CALLSLOT fx_dotscroller_update, FX_DOTSCROLLER_SLOT
-    SCRIPT_CALLSLOT fx_mirrorfloor_update, FX_MIRRORFLOOR_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
-SCRIPT_SEGMENT_END
-
-
-;-----------------------------------------------------------
 ; If Abug demo then we just play the following segment
 ;-----------------------------------------------------------
 IF _ABUG
