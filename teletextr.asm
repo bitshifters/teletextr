@@ -137,10 +137,6 @@ INCLUDE "src/fx/copybuffer.asm"
 
 INCLUDE "src/fx/noise.asm"
 
-; SM: these two dont work in SWR for some reason - No font data coming thru...
-;----------------------------------------------------------------------------------------------------------
-FX_DOTSCROLLER_SLOT = -1
-INCLUDE "src/fx/dotscroller.asm"
 
 ;----------------------------------------------------------------------------------------------------------
 ; Teletext effect
@@ -234,6 +230,12 @@ INCLUDE "src/fx/rotozoom1.asm"
 INCLUDE "src/fx/rotozoom2.asm"
 INCLUDE "src/fx/rotozoom3.asm"
 .end_fx_rotozoom
+
+;----------------------------------------------------------------------------------------------------------
+; Dot scroller
+FX_DOTSCROLLER_SLOT = 1
+INCLUDE "src/fx/dotscroller.asm"
+
 
 
 
