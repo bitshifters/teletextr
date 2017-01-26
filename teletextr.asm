@@ -139,11 +139,6 @@ INCLUDE "src/fx/noise.asm"
 
 ; SM: these two dont work in SWR for some reason - No font data coming thru...
 ;----------------------------------------------------------------------------------------------------------
-FX_CREDITSCROLL_SLOT = -1
-
-INCLUDE "src/fx/creditscroll.asm"
-
-;----------------------------------------------------------------------------------------------------------
 FX_DOTSCROLLER_SLOT = -1
 INCLUDE "src/fx/dotscroller.asm"
 
@@ -265,6 +260,11 @@ INCLUDE "src/fx/interference.asm"
 FX_PARTICLES_SLOT = 2
 INCLUDE "src/fx/particles.asm"
 
+;----------------------------------------------------------------------------------------------------------
+; Credit scroller
+FX_CREDITSCROLL_SLOT = 2
+INCLUDE "src/fx/creditscroll.asm"
+
 
 
 
@@ -312,7 +312,6 @@ PRINT "------------------------------------------------------------"
 PRINT " fx_code size is", (end_fx_code-start_fx_code), "bytes"
 PRINT "Main RAM effects:"
 PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "bytes"
-PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "bytes"
 PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
 PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 
@@ -330,6 +329,7 @@ PRINT " fx_linebox size is", (end_fx_linebox-start_fx_linebox), "bytes"
 PRINT " fx_copperbars size is", (end_fx_copperbars-start_fx_copperbars), "bytes"
 PRINT " fx_particles size is", (end_fx_particles-start_fx_particles), "bytes"
 PRINT " fx_starfield size is", (end_fx_starfield-start_fx_starfield), "bytes"
+PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "bytes"
 
 
 PRINT "------------------------------------------------------------"
