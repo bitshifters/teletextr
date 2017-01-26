@@ -47,7 +47,11 @@ EQUB 0
 IF _DOTSCROLL_BALL
 EQUB 10
 ELSE
-EQUB 0		; 28
+IF _DOTSCROLL_ANGLE
+EQUB 0
+ELSE
+EQUB 28
+ENDIF
 ENDIF
 
 \\ Bits in A, column# in X
@@ -226,8 +230,6 @@ ENDIF
 	STY char_idx + 1
 
 	\\ Convert char to fb
-	LDX #LO(fx_dotscroller_fb)
-	LDY #HI(fx_dotscroller_fb)
 	JSR fx_dotscroller_get_char
 
 	\\ Plot columns
@@ -235,7 +237,7 @@ ENDIF
 	LDY #0
 	.col_loop
 	STY fb_idx + 1
-	LDA fx_dotscroller_fb, Y
+	LDA (readptr), Y
 
 	LDX fx_dotscroller_cur_col
 	JSR fx_dotscroller_plot_column
@@ -294,12 +296,9 @@ ENDIF
 \ ******************************************************************
 
 \\ Pass character ASCII in A
-\\ Pass fb address to write in X (LO) & Y (HI)
+\\ Return in readptr
 .fx_dotscroller_get_char
 {
-	STX writeptr
-	STY writeptr+1
-
 	SEC
 	SBC #32
 	STA readptr
@@ -315,6 +314,8 @@ ENDIF
 	ASL readptr
 	ROL readptr+1
 
+	\\ Add font address
+
 	CLC
 	LDA #LO(bbc_font_rotated)
 	ADC readptr
@@ -323,19 +324,11 @@ ENDIF
 	ADC readptr+1
 	STA readptr+1
 
-	LDY #0
-	.loop
-	LDA (readptr), Y
-	STA (writeptr), Y
-	INY
-	CPY #8
-	BNE loop	
+	\\ Don't bother copying, just return in readptr
 
 	.return
 	RTS
 }
-
-.fx_dotscroller_fb			SKIP 8		; rotated fb
 
 
 \ ******************************************************************
