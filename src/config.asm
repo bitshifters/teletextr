@@ -61,7 +61,6 @@ SCRIPT_CALL fx_clear
 ;-----------------------------------------------------------
 ; scrolling bars
 ;-----------------------------------------------------------
-
 SCRIPT_SEGMENT_START    2.0
     SCRIPT_PLAY fx_copybuffer_update
     SCRIPT_CALLSLOT fx_copperbars_update, FX_COPPERBARS_SLOT   
@@ -184,7 +183,7 @@ ENDIF
 
 
 ; SM: gonna make the linebox demo do something more - like animated boxes/fractals etc.
-; KC: I get the line box starting in the middle of the screen when I run through?  Uninitialise start pos?
+; KC: I get the line box starting in the middle of the screen when I run through?  Uninitialised start pos?
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
