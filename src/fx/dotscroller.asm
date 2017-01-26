@@ -3,14 +3,14 @@
 ; written to try out Simon's fast PLOT_PIXEL macro
 ; was thinking about a fixed position (sparse) sprite plot routine for interesting scrollers
 ; but figured I would get it working with dots first to see if I like it
-; uses OSWORD to get char definitions at runtime so clearly not optimal!
-; need a 8x8 font but can't be bothered to convert one
-; could also just convert the entire BBC font at initialisation time
+; now uses own font (pre-rotated) but currently takes up 3 pages (96 characters)
+; entire dot map can be moved at runtime by updating cx, cy but that isn't required can optimise out
 
 .start_fx_dotscroller
 
 _DOTSCROLL_SMOOTH = FALSE			; don't like this effect
 _DOTSCROLL_BALL = FALSE				; not compatible with _SMOOTH!
+_DOTSCROLL_ANGLE = TRUE				; otherwise half circle
 
 \\ Definitions
 DOTSCROLL_shadow_addr = &7800
@@ -47,7 +47,11 @@ EQUB 0
 IF _DOTSCROLL_BALL
 EQUB 10
 ELSE
+IF _DOTSCROLL_ANGLE
+EQUB 0
+ELSE
 EQUB 28
+ENDIF
 ENDIF
 
 \\ Bits in A, column# in X
@@ -148,7 +152,7 @@ ENDIF
 
 \\ NB. Can only have 255 characters max at the moment
 .fx_dotscroller_msg
-EQUS "HELLO WORLD! THIS IS A DOT SCROLLER WHICH IS SOMEHWAT UNREADABLE BUT BETTER IN UPPERCASE!... 0123456789    "
+EQUS "HELLO WORLD! THIS IS A DOT SCROLLER WHICH IS SOMEWHAT UNREADABLE BUT BETTER IN UPPERCASE!... 0123456789    "
 EQUB 0
 
 .fx_dotscroller_char_idx
@@ -226,8 +230,6 @@ ENDIF
 	STY char_idx + 1
 
 	\\ Convert char to fb
-	LDX #LO(fx_dotscroller_fb)
-	LDY #HI(fx_dotscroller_fb)
 	JSR fx_dotscroller_get_char
 
 	\\ Plot columns
@@ -235,7 +237,7 @@ ENDIF
 	LDY #0
 	.col_loop
 	STY fb_idx + 1
-	LDA fx_dotscroller_fb, Y
+	LDA (readptr), Y
 
 	LDX fx_dotscroller_cur_col
 	JSR fx_dotscroller_plot_column
@@ -294,65 +296,39 @@ ENDIF
 \ ******************************************************************
 
 \\ Pass character ASCII in A
-\\ Pass fb address to write in X (LO) & Y (HI)
+\\ Return in readptr
 .fx_dotscroller_get_char
 {
-	\\ Store passed in variables
-	STA fx_dotscroller_char
-	STX writeptr
-	STY writeptr+1
-	
-	\\ Set up OSWORD call to obtain character definition
-	LDX #LO(fx_dotscroller_char)
-	LDY #HI(fx_dotscroller_char)
-	LDA #&A
-	JSR osword				; osword call
-	\\ Or could use predefined font
-	
-	LDY #0					; index into our write buffer
-	
-	LDA #&80				; mask for char column, start top bit set
-	STA fx_dotscroller_charmask
-
-	.rowtocol
-	LDA #1					; mask for fb col byte, start bottom bit set
-	STA fx_dotscroller_fbmask
-
+	SEC
+	SBC #32
+	STA readptr
 	LDA #0
-	STA (writeptr),Y		; blank fb col byte first
+	STA readptr+1
 
-	LDX #0
-	.rowtoloop
-	LDA fx_dotscroller_charmask			; load mask for column
-	AND fx_dotscroller_def,X		; mask against char row
-	BEQ norowbit
+	\\ Multiply by 8
 
-	LDA (writeptr),Y		; load existing fb byte
-	ORA fx_dotscroller_fbmask			; mask in our bit
-	STA (writeptr),Y		; store back
+	ASL readptr
+	ROL readptr+1
+	ASL readptr
+	ROL readptr+1
+	ASL readptr
+	ROL readptr+1
 
-	.norowbit
-	ASL fx_dotscroller_fbmask			; next bit in fb mask
-	INX
-	CPX #8
-	BNE rowtoloop
+	\\ Add font address
 
-	INY						; next fb row
-	BEQ endofloop			; break if overflow
-	
-	LSR fx_dotscroller_charmask			; shift char mask right
-	BNE rowtocol			; until zero
-	
-	.endofloop
+	CLC
+	LDA #LO(bbc_font_rotated)
+	ADC readptr
+	STA readptr
+	LDA #HI(bbc_font_rotated)
+	ADC readptr+1
+	STA readptr+1
+
+	\\ Don't bother copying, just return in readptr
+
+	.return
 	RTS
 }
-
-\\ Temporary workspace for character conversion
-.fx_dotscroller_charmask	SKIP 1		; character mask
-.fx_dotscroller_fbmask		SKIP 1		; framebuffer mask
-.fx_dotscroller_char		SKIP 1		; character definition required
-.fx_dotscroller_def			SKIP 8		; character definition bytes
-.fx_dotscroller_fb			SKIP 8		; rotated fb
 
 
 \ ******************************************************************
@@ -464,6 +440,18 @@ ENDIF
 ALIGN &100
 .fx_dotscroll_x
 {
+IF _DOTSCROLL_ANGLE
+	FOR c, 0, DOTSCROLL_num_columns-1, 1
+	FOR r, 0, DOTSCROLL_num_rows-1, 1
+
+	dx=(c - (DOTSCROLL_num_columns/2))*2
+	dy=(r - (DOTSCROLL_num_rows/2))*2
+
+	EQUB DOTSCROLL_dot_centre_x + dx * SIN(3*PI/4) + dy * COS(3*PI/4)
+
+	NEXT
+	NEXT
+ELSE	; half circle
 	FOR c, 0, DOTSCROLL_num_columns-1, 1
 	FOR r, 0, DOTSCROLL_num_rows-1, 1
 
@@ -485,10 +473,23 @@ ALIGN &100
 
 	NEXT
 	NEXT
+ENDIF
 }
 
 .fx_dotscroll_y
 {
+IF _DOTSCROLL_ANGLE
+	FOR c, 0, DOTSCROLL_num_columns-1, 1
+	FOR r, 0, DOTSCROLL_num_rows-1, 1
+
+	dx=(c - (DOTSCROLL_num_columns/2))*2
+	dy=(r - (DOTSCROLL_num_rows/2))*2
+
+	EQUB DOTSCROLL_dot_centre_y - dy * SIN(3*PI/4) + dx * COS(3*PI/4)
+
+	NEXT
+	NEXT
+ELSE	; half circle
 	FOR c, 0, DOTSCROLL_num_columns-1, 1
 	FOR r, 0, DOTSCROLL_num_rows-1, 1
 
@@ -510,6 +511,7 @@ ALIGN &100
 
 	NEXT
 	NEXT
+ENDIF
 }
 
 IF _DOTSCROLL_SMOOTH
@@ -550,5 +552,9 @@ IF _DOTSCROLL_SMOOTH
 }
 ENDIF
 
+.bbc_font_rotated
+;INCBIN ".\data\bbc_font_90_deg_cw.bin"
+;INCBIN ".\data\bold_font_90_deg_cw.bin"
+INCBIN ".\data\square_font_90_deg_cw.bin"
 
 .end_fx_dotscroller
