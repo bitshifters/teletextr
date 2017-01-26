@@ -215,3 +215,16 @@ EQUS "100  Fri 19 Jan ",131,"20:49/1"
     rts
 .page_count EQUB 0
 }
+
+
+.sfx_noise_on
+{
+    CHIPNOISE 5,7
+    rts   
+}
+
+.sfx_noise_off
+{
+    CHIPNOISE 5,0
+    rts   
+}
