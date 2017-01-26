@@ -9,6 +9,52 @@
 ;   set specific start times for segments (so effects can be timed to the music track) 
 ;   wait command?
 
+;-----------------------------------------------
+; Let's go mad with macros
+; Here's some helpers to neaten things up a bit
+;-----------------------------------------------
+
+
+; quick segment containing one double buffered effect
+MACRO RUN_EFFECT duration, routine, slot
+    SCRIPT_SEGMENT_START    duration
+        SCRIPT_CALL fx_buffer_copy 
+        SCRIPT_CALLSLOT routine, slot
+        SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+    SCRIPT_SEGMENT_END
+ENDMACRO
+
+
+; quick segment containing one double buffered effect, with a value
+MACRO RUN_EFFECTV duration, routine, slot, value
+    SCRIPT_SEGMENT_START    duration
+        SCRIPT_CALL fx_buffer_copy 
+        SCRIPT_CALLSLOTV routine, slot, value
+        SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+    SCRIPT_SEGMENT_END
+ENDMACRO
+
+; gif animation macro, just pass in duration and the id of the gif anim to play
+MACRO GIF_SEGMENT duration, gifid
+    SCRIPT_CALL fx_buffer_clear
+    SCRIPT_CALLSLOTV fx_playgifs_init, FX_PLAYGIFS_SLOT, gifid
+    RUN_EFFECTV duration, fx_playgifs_playanim, FX_PLAYGIFS_SLOT, gifid
+    SCRIPT_CALL fx_clear
+ENDMACRO
+
+; hide the screen for duration, then clear it and show again
+MACRO BLANK_DISPLAY duration
+    SCRIPT_SEGMENT_START    duration
+        SCRIPT_CALL hide_vram
+    SCRIPT_SEGMENT_END
+    SCRIPT_CALL fx_clear    
+    SCRIPT_CALL show_vram
+ENDMACRO
+
+
+;------------------------------------------------------------------------
+; Demo script begins
+;------------------------------------------------------------------------
 
 
 .demo_script_start
@@ -27,7 +73,7 @@ IF _ABUG
 ; vector text effect
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
 SCRIPT_SEGMENT_START    1000.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
@@ -40,21 +86,17 @@ ENDIF
 ;-----------------------------------------------------------
 ; Screen off/on
 ;-----------------------------------------------------------
-SCRIPT_SEGMENT_START    2.0
-    SCRIPT_CALL hide_vram
-SCRIPT_SEGMENT_END
-SCRIPT_CALL show_vram
-
-
-
+BLANK_DISPLAY 2.0
 
 ;-----------------------------------------------------------
 ; Tuning in....
 ;-----------------------------------------------------------
+SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALL fx_noise_update
 SCRIPT_SEGMENT_END
+SCRIPT_CALL sfx_noise_off
 SCRIPT_CALL fx_clear
 
 
@@ -62,9 +104,17 @@ SCRIPT_CALL fx_clear
 ; scrolling bars
 ;-----------------------------------------------------------
 SCRIPT_SEGMENT_START    2.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_buffer_copy
+    SCRIPT_CALLSLOT fx_copperbars_update, FX_COPPERBARS_SLOT
+SCRIPT_SEGMENT_END
+
+
+IF 0
+SCRIPT_SEGMENT_START    2.0
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_copperbars_update, FX_COPPERBARS_SLOT   
 SCRIPT_SEGMENT_END
+ENDIF
 
 ;----------------------------------------------------------- 
 ; Tuned - show testcard
@@ -79,10 +129,7 @@ SCRIPT_SEGMENT_END
 ; Screen off/on
 ;-----------------------------------------------------------
 SCRIPT_CALL fx_music_stop   ; kill testcard tone
-SCRIPT_SEGMENT_START    2.0
-    SCRIPT_CALL hide_vram
-SCRIPT_SEGMENT_END
-SCRIPT_CALL show_vram
+BLANK_DISPLAY 2.0
 
 ;-----------------------------------------------------------
 ; teletext intro & jaunty ceefax type music
@@ -92,18 +139,18 @@ SCRIPT_CALL fx_music_init_reg  ; reg
 SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_clear
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_teletext_showtestcard, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_teletext_showpages, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
@@ -126,25 +173,45 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL fx_music_stop
 
 
-
+SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALL fx_colournoise_update
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
-
+SCRIPT_CALL sfx_noise_off
 
 SCRIPT_CALL fx_music_init_en ; en
 SCRIPT_CALL fx_music_start
 
+;-----------------------------------------------------------
+; Weather breaking
+;-----------------------------------------------------------
+GIF_SEGMENT 4.0, PLAYGIFS_WEATHER
+
+;-----------------------------------------------------------
+; look like we're loading/configuring
+;-----------------------------------------------------------
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALL fx_clear
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ;-----------------------------------------------------------
@@ -156,7 +223,7 @@ SCRIPT_CALL fx_clear
 ; Starfield provided! :D
 
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_buffer_copy              ; stars are self-erasing - optional!
+    SCRIPT_CALL fx_buffer_copy              ; stars are self-erasing - optional!
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
@@ -172,7 +239,7 @@ IF 0
 
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
 SCRIPT_SEGMENT_START    30.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
@@ -182,12 +249,15 @@ ENDIF
 
 
 
+
+
+
 ; SM: gonna make the linebox demo do something more - like animated boxes/fractals etc.
 ; KC: I get the line box starting in the middle of the screen when I run through?  Uninitialised start pos?
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
     SCRIPT_CALLSLOT fx_linebox_update, FX_LINEBOX_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
@@ -196,7 +266,7 @@ SCRIPT_SEGMENT_END
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
@@ -210,7 +280,7 @@ SCRIPT_SEGMENT_END
 ; SM: need to cycle through the various shapes & animate the sequence better
 SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
@@ -235,7 +305,7 @@ SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
 SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -243,7 +313,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -251,7 +321,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -259,7 +329,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -267,7 +337,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -275,12 +345,13 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
 
 
+GIF_SEGMENT 5.0, PLAYGIFS_BIRD
 
 ;-----------------------------------------------------------
 ; Vector balls
@@ -296,7 +367,7 @@ SCRIPT_CALLSLOT fx_vectorballs_init, FX_VECTORBALLS_SLOT
 SCRIPT_CALLSLOT fx_vectorballs_set_small, FX_VECTORBALLS_SLOT
 
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
@@ -304,14 +375,14 @@ SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT fx_vectorballs_set_medium, FX_VECTORBALLS_SLOT
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_copybuffer_update 
+    SCRIPT_CALL fx_copybuffer_update 
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT fx_vectorballs_set_large, FX_VECTORBALLS_SLOT
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_copybuffer_update
+    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
@@ -326,15 +397,16 @@ SCRIPT_SEGMENT_END
 ; SM: it would be good to be able to play different animations on demand
 ; so we can inject these through the whole sequence.
 ; Plus we should have MOAR animations - these are ACE!
-
+IF 0
 SCRIPT_CALLSLOT fx_playgifs_init, FX_PLAYGIFS_SLOT
 SCRIPT_SEGMENT_START    20.0
-    SCRIPT_PLAY fx_buffer_copy 
+    SCRIPT_CALL fx_buffer_copy 
     SCRIPT_CALLSLOT fx_playgifs_update, FX_PLAYGIFS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALL fx_buffer_clear
+ENDIF
 
 ;-----------------------------------------------------------
 ; Interference
@@ -343,8 +415,29 @@ SCRIPT_CALL fx_buffer_clear
 ;  and inject this in a high speed pulsing fashion with the dancing man GIF!!
 ;  Agree :) - KC
 
+
+
+GIF_SEGMENT 2.0, PLAYGIFS_BLUEBLOB
+
+
+RUN_EFFECT 5.0, fx_interference_update, FX_INTERFERENCE_SLOT
+
+GIF_SEGMENT 4.0, PLAYGIFS_DANCER
+
+SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
+RUN_EFFECT 5.0, fx_interference_update, FX_INTERFERENCE_SLOT
+
+GIF_SEGMENT 4.0, PLAYGIFS_DANCER
+RUN_EFFECT 2.0, fx_interference_update, FX_INTERFERENCE_SLOT
+GIF_SEGMENT 2.0, PLAYGIFS_DANCER
+RUN_EFFECT 1.0, fx_interference_update, FX_INTERFERENCE_SLOT
+GIF_SEGMENT 1.0, PLAYGIFS_DANCER
+RUN_EFFECT 0.5, fx_interference_update, FX_INTERFERENCE_SLOT
+GIF_SEGMENT 0.5, PLAYGIFS_DANCER
+
+IF 0
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
@@ -352,18 +445,18 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
 
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
-
+ENDIF
 
 ;-----------------------------------------------------------
 ; Dot scroller
 ;-----------------------------------------------------------
 
 SCRIPT_SEGMENT_START    20.0
-    SCRIPT_PLAY fx_copybuffer_update  
+    SCRIPT_CALL fx_copybuffer_update  
     SCRIPT_CALLSLOT fx_dotscroller_update, FX_DOTSCROLLER_SLOT
     SCRIPT_CALLSLOT fx_mirrorfloor_update, FX_MIRRORFLOOR_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
@@ -381,7 +474,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOT fx_plasma_init, FX_PLASMA_SLOT
 SCRIPT_SEGMENT_START    30.0
-    SCRIPT_PLAY fx_buffer_copy
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_plasma, FX_PLASMA_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
@@ -394,7 +487,7 @@ SCRIPT_SEGMENT_END
 
 SCRIPT_CALL fx_clear
 SCRIPT_SEGMENT_START    60.0
-;    SCRIPT_PLAY fx_copybuffer_update
+;    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_rotozoom3, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
@@ -402,7 +495,7 @@ SCRIPT_SEGMENT_END
 
 ; Might kill this one - technically interesting, but way too slow
 SCRIPT_SEGMENT_START    10.0
-;    SCRIPT_PLAY fx_copybuffer_update
+;    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_rotozoom1, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT     
 SCRIPT_SEGMENT_END
@@ -410,7 +503,7 @@ SCRIPT_SEGMENT_END
 IF 0
 ; was just a technical concept really - dump it
 SCRIPT_SEGMENT_START    10.0
-;    SCRIPT_PLAY fx_copybuffer_update
+;    SCRIPT_CALL fx_copybuffer_update
     SCRIPT_CALLSLOT fx_rotozoom2, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT         
 SCRIPT_SEGMENT_END
@@ -445,8 +538,8 @@ SCRIPT_CALL fx_copybuffer_update
 SCRIPT_CALL fx_music_init_exception ; exception
 SCRIPT_CALL fx_music_start
 
-SCRIPT_SEGMENT_START    35.0
-    SCRIPT_PLAY fx_buffer_copy
+SCRIPT_SEGMENT_START    34.5
+    SCRIPT_CALL fx_buffer_copy
     SCRIPT_CALLSLOT fx_creditscroll_update, FX_CREDITSCROLL_SLOT 
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
@@ -480,8 +573,6 @@ SCRIPT_CALL fx_music_stop
 SCRIPT_END
 
 .demo_script_end
-
-PRINT "Demo Sequence data from", ~demo_script_start, "to", ~demo_script_end, ", size is", (demo_script_end-demo_script_start), "bytes"
 
 
 

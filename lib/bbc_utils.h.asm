@@ -69,3 +69,23 @@ ENDMACRO
 MACRO OUTPUT_SIZE label
 PRINT " code size=", *-label
 ENDMACRO
+
+
+; Emit some sound from the SN76489
+; Freq=Hz
+; channel=0 to 3, where 3 is noise channel
+; volume=0 to 15 where 15 is loudest 
+MACRO CHIPSOUND freq, channel, volume
+    SNV = 4000000 / (2.0 * freq * 16.0 )
+;	LDA #&9F + (channel<<5): JSR psg_strobe    ; ch zero vol
+    LDA #&90 + (channel<<5) + (15-volume): JSR psg_strobe    ; ch vol	
+	LDA #&80 + (channel<<5) + (SNV AND 15): JSR psg_strobe    ; ch tone bits 0-4
+	LDA #SNV/16: JSR psg_strobe    ; ch0 tone bits 5-10
+ENDMACRO
+
+; freq=0 to 7, where bit 0-1 is freq, bit 2=1=white noise
+MACRO CHIPNOISE freq, volume
+    LDA #&90 + (3<<5) + (15-volume): JSR psg_strobe    ; ch vol
+	LDA #&80 + (3<<5) + (freq AND 7): JSR psg_strobe    ; ch tone bits 0-3
+	; no need to write data byte for noise channel
+ENDMACRO

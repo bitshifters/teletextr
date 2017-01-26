@@ -311,6 +311,7 @@ SAVE "Bank3", bank3_start, bank3_end, &8000
 ; Effect stats
 ;----------------------------------------------------------------------------------------------------------
 PRINT "------------------------------------------------------------"
+PRINT "Demo Sequence data from", ~demo_script_start, "to", ~demo_script_end, ", size is", (demo_script_end-demo_script_start), "bytes"
 PRINT " fx_code size is", (end_fx_code-start_fx_code), "bytes"
 PRINT "Main RAM effects:"
 PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"

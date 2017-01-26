@@ -3,15 +3,32 @@
 SCRIPTID_SEGMENT_START=1
 SCRIPTID_SEGMENT_END=2
 SCRIPTID_CALL=3
-SCRIPTID_PLAY=4
-SCRIPTID_PLAYV=5
+;SCRIPTID_PLAY=4
+;SCRIPTID_PLAYV=5
 SCRIPTID_SLOT=6
+SCRIPTID_CALLSLOT=7
+SCRIPTID_CALLV=8
+
 SCRIPTID_END=255
 
 
 ; Calls a routine directly
 MACRO SCRIPT_CALL    effect_addr
     EQUB    SCRIPTID_CALL
+    EQUW    effect_addr
+ENDMACRO
+
+; Calls a routine directly with effect_value passed in A
+MACRO SCRIPT_CALLV    effect_addr, effect_value
+    EQUB    SCRIPTID_CALLV
+    EQUB    effect_value
+    EQUW    effect_addr
+ENDMACRO
+
+; Call a routine in a given slot 
+MACRO SCRIPT_CALLSLOT   effect_addr, swr_slot
+    EQUB    SCRIPTID_CALLSLOT
+    EQUB    swr_slot
     EQUW    effect_addr
 ENDMACRO
 
@@ -27,7 +44,7 @@ MACRO SCRIPT_SEGMENT_END
     EQUB    SCRIPTID_SEGMENT_END
 ENDMACRO
 
-
+IF 0
 ; Play an effect within a segment, no arguments
 MACRO SCRIPT_PLAY   effect_ptr
     EQUB    SCRIPTID_PLAY
@@ -43,7 +60,7 @@ MACRO SCRIPT_PLAYV   effect_ptr, offset, duration
     EQUW    duration*50
     EQUW    effect_ptr
 ENDMACRO
-
+ENDIF
 
 ; Select a SWR slot (not bank)
 MACRO SCRIPT_SLOT   swr_slot
@@ -51,10 +68,7 @@ MACRO SCRIPT_SLOT   swr_slot
     EQUB    swr_slot
 ENDMACRO
 
-MACRO SCRIPT_CALLSLOT   effect_addr, swr_slot
-    SCRIPT_SLOT swr_slot
-    SCRIPT_CALL effect_addr
-ENDMACRO
+
 
 
 
@@ -65,13 +79,24 @@ ENDMACRO
 
 
 
+; Macro macros
+
+
+; Call a routine in a given slot with a value parameter
+MACRO SCRIPT_CALLSLOTV   effect_addr, swr_slot, value
+    SCRIPT_SLOT swr_slot
+    SCRIPT_CALLV effect_addr, value
+ENDMACRO
+
+
+
 .script_time              EQUW 0    ; elapsed time in 1/50th secs
 .script_ptr               EQUW 0    ; current command ptr in the script
 .script_segment_ptr       EQUW 0    ; ptr to the first command in the current segment that is processing
 .script_segment_time      EQUW 0    ; elapsed time in the current segment
 .script_segment_duration  EQUW 0    ; duration of the current segment
 .script_segment_id        EQUB 0    ; id of the current segment (was mainly for debugging)
-
+.script_value             EQUB 0    ; value passed in A to a called function
 
 
 ; Setup new script to run
@@ -152,8 +177,9 @@ ENDMACRO
     sta call+1
     jsr script_fetch_byte
     sta call+2
+    lda script_value
 .call
-    jmp &ffff   ; use subroutine rts
+    jmp &ffff   ; use subroutine's rts
 }
 
 IF 0
@@ -288,12 +314,37 @@ ENDIF
 
 .command_init
     cmp #SCRIPTID_CALL
-    bne command_play
+    bne command_callv
 
     jsr script_call
     jmp command_loop
 
+.command_callv
+    cmp #SCRIPTID_CALLV
+    bne command_callslot
+
+    jsr script_fetch_byte
+    sta script_value
+    jsr script_call
+    jmp command_loop    
+
+
+.command_callslot
+    cmp #SCRIPTID_CALLSLOT
+    bne command_play
+
+    jsr script_fetch_byte   ; SWR slot id
+    jsr swr_select_slot
+    jsr script_call
+    jmp command_loop 
+
+
 .command_play
+
+
+    ;TODO!
+IF 0
+
     cmp #SCRIPTID_PLAY
     bne command_playv
 
@@ -304,7 +355,6 @@ ENDIF
     cmp #SCRIPTID_PLAYV
     bne command_segment_start
 
-    ;TODO!
 
     jsr script_fetch_word   ; offset
     jsr script_fetch_word   ; duration
@@ -313,6 +363,7 @@ ENDIF
     ;   jsr script_call
     jsr script_fetch_word  ; effect routine
     jmp command_loop
+ENDIF
 
 .command_segment_start
     cmp #SCRIPTID_SEGMENT_START
