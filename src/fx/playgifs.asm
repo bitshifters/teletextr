@@ -3,10 +3,14 @@
 
 .start_fx_playgifs
 
-PLAYGIFS_shadow_addr = &7800
+PLAYGIFS_shadow_addr = &7800+40
 PLAYGIFS_num = 4
 PLAYGIFS_time = 25 * 8
 
+PLAYGIFS_BIRD = 0
+PLAYGIFS_WEATHER = 1
+PLAYGIFS_DANCER = 2
+PLAYGIFS_BLUEBLOB = 3
 
 .fx_playgifs_data
 {
@@ -42,11 +46,10 @@ EQUB 0
 .fx_playgifs_timer
 EQUB 0
 
+; A contains animation to play
 .fx_playgifs_init
 {
-
 	\\ Get GIF data
-	LDA fx_playgifs_num
 	ASL A
 	TAX
 	LDA fx_playgifs_data, X
@@ -100,6 +103,25 @@ EQUB 0
 
 	.return
 	RTS
+}
+
+.fx_playgifs_playanim
+{
+	cmp sequence
+	beq sameanim
+
+	sta fx_playgifs_num
+	sta sequence
+	JSR fx_buffer_clear
+	lda fx_playgifs_num
+	JSR fx_playgifs_init
+
+.sameanim
+	\\ Update GIF player
+	JSR mode7_gif_anim_update
+	rts
+
+.sequence EQUB 255
 }
 
 
