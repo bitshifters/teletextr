@@ -13,8 +13,6 @@ CREDITS_end_addr = CREDITS_shadow_addr + (MODE7_char_width * MODE7_char_height)
 CREDITS_first_char = 4
 CREDITS_last_char = MODE7_char_width
 
-_CREDITS_NARROW_FONT = TRUE		; don't get many glyphs on screen at 8x8 teletext pixels
-
 
 \ ******************************************************************
 \ *	Credit Scroll FX
@@ -100,12 +98,18 @@ _CREDITS_NARROW_FONT = TRUE		; don't get many glyphs on screen at 8x8 teletext p
 	LDY #CREDITS_first_char
 	.last_loop
 
+	\\ Mask in top pixels from our new line
+	LDA fx_creditscroll_new_line, Y
+	AND #&3
+	STA top_bits_last+1
+
 	\\ Load last line bottom pixels
 	LDA (writeptr), Y
 	AND #&FC
 
-	\\ Mask in top pixesl from our new line
-	ORA fx_creditscroll_new_line, Y
+	\\ Merge them together
+	.top_bits_last
+	ORA #0
 
 	\\ Always add 32...
 	ORA #32
@@ -126,11 +130,43 @@ _CREDITS_NARROW_FONT = TRUE		; don't get many glyphs on screen at 8x8 teletext p
 	RTS
 }
 
+.fx_creditscroll_rotate_new_line
+{
+	\\ First char in row
+	LDY #CREDITS_first_char
+	.x_loop
+
+	\\ Get bottom pixels from current row
+	LDA fx_creditscroll_new_line, Y
+	AND #&FC
+
+	ORA #32
+
+	\\ Rotate the pixels to scroll up
+	TAX
+	LDA fx_creditscroll_rotate, X
+
+	\\ Write the byte back to the screen
+	STA fx_creditscroll_new_line, Y
+
+	\\ Full width
+	.skip
+	INY
+	CPY #CREDITS_last_char
+	BCC x_loop
+
+	.return
+	RTS
+}
 
 \\ Main update function
 
 .fx_creditscroll_update
 {
+	\\ Set graphics white
+	lda #144+7
+	jsr mode7_set_graphics_shadow_fast			; can remove this if other routine handling colours	
+
 	\\ Write new line of text to array
 	JSR fx_creditscroll_write_text_line
 
@@ -155,9 +191,6 @@ EQUB 0
 .fx_creditscroll_text_idx
 EQUB 0
 
-.fx_creditscroll_glyph_bytes
-EQUB 0, 0, 0
-
 .fx_creditscroll_write_text_line
 {
 	\\ Write text into our new line
@@ -165,6 +198,17 @@ EQUB 0, 0, 0
 	STA readptr
 	LDA fx_creditscroll_text_ptr+1
 	STA readptr+1
+
+	LDX fx_creditscroll_text_row
+	BEQ write_new_text
+	CPX #3
+	BEQ write_new_text
+
+	\\ Just rotate existing line
+	JSR fx_creditscroll_rotate_new_line
+	JMP reached_end_of_row
+
+	.write_new_text
 
 	LDX #MODE7_char_width-1
 	LDA #0
@@ -194,107 +238,33 @@ EQUB 0, 0, 0
 	.not_end_of_string
 	;JSR fx_creditscroll_get_char		; preserves X&Y
 
-	\\ Just bit-shift for now - we have time & its our name :)
-
-	LDY fx_creditscroll_text_row
-
-	\\ For BeebTracker font, "ascii" value is offset into data for first byte of glyph
-	\\ Need to convert Y row DIV 3 into 0 or 40 byte offset from that (0-2, 3-5)
-	\\ Then Y row MOD 3 gives mask 1+2, 4+8, 16+64 - just use 6 byte lookups for both
-	\\ 0,0,0,40,40,40
-	\\ 3,12,80,3,12,80
-
-	CPY #3
-	BCC first_row
+	\\ A is index into our font data
 	TAY
-	LDA mode7_font_data_second_row, Y
-	STA fx_creditscroll_glyph_bytes+0
-	INX
-	LDA mode7_font_data_second_row, Y
-	STA fx_creditscroll_glyph_bytes+1
-	INX
-	LDA mode7_font_data_second_row, Y
-	STA fx_creditscroll_glyph_bytes+2
-	JMP plot_row
 
-	.first_row
-	TAY
+	.font_addr_1
 	LDA mode7_font_data, Y
-	STA fx_creditscroll_glyph_bytes+0
-	INX
-	LDA mode7_font_data, Y
-	STA fx_creditscroll_glyph_bytes+1
-	INX
-	LDA mode7_font_data, Y
-	STA fx_creditscroll_glyph_bytes+2
-
-	.plot_row
-
-	LDY fx_creditscroll_text_row
-
-	{
-		LDA fx_creditscroll_glyph_bytes+0
-		AND fx_creditscroll_glyph_mask_1, Y
-		BEQ no_bit
-		LDA #1
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
-	{
-		LDA fx_creditscroll_glyph_bytes+0
-		AND fx_creditscroll_glyph_mask_2, Y
-		BEQ no_bit
-		LDA #2
-		ORA fx_creditscroll_new_line, X
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
+	INY
+	STA fx_creditscroll_new_line, X
 
 	\\ Next char cell
 	INX
 	CPX #MODE7_char_width
 	BCS reached_end_of_row
 
-	{
-		LDA fx_creditscroll_glyph_bytes+1
-		AND fx_creditscroll_glyph_mask_1, Y
-		BEQ no_bit
-		LDA #1
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
-	{
-		LDA fx_creditscroll_glyph_bytes+1
-		AND fx_creditscroll_glyph_mask_2, Y
-		BEQ no_bit
-		LDA #2
-		ORA fx_creditscroll_new_line, X
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
+	.font_addr_2
+	LDA mode7_font_data, Y
+	INY
+	STA fx_creditscroll_new_line, X
 
 	\\ Next char cell
 	INX
 	CPX #MODE7_char_width
 	BCS reached_end_of_row
 
-	{
-		LDA fx_creditscroll_glyph_bytes+2
-		AND fx_creditscroll_glyph_mask_1, Y
-		BEQ no_bit
-		LDA #1
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
-	{
-		LDA fx_creditscroll_glyph_bytes+2
-		AND fx_creditscroll_glyph_mask_2, Y
-		BEQ no_bit
-		LDA #2
-		ORA fx_creditscroll_new_line, X
-		STA fx_creditscroll_new_line, X
-		.no_bit
-	}
+	.font_addr_3
+	LDA mode7_font_data, Y
+	INY
+	STA fx_creditscroll_new_line, X
 
 	\\ Next char cell
 	INX
@@ -312,7 +282,22 @@ EQUB 0, 0, 0
 	\\ Next time do next row
 	LDX fx_creditscroll_text_row
 	INX
-	CPX #8
+	CPX #3
+	BNE not_three
+
+	\\ At row 3 need to swap to next line of font data
+	LDA #LO(mode7_font_data_second_row)
+	STA font_addr_1+1
+	STA font_addr_2+1
+	STA font_addr_3+1
+	LDA #HI(mode7_font_data_second_row)
+	STA font_addr_1+2
+	STA font_addr_2+2
+	STA font_addr_3+2
+
+	\\ There are 6 rows in total	
+	.not_three
+	CPX #6	
 	BCC still_same_text
 
 	\\ Next line of text
@@ -353,8 +338,20 @@ EQUB 0, 0, 0
 	ADC #0
 	STA fx_creditscroll_text_ptr+1
 
-	\\ Start from first row
+	\\ Next line of text
 	.continue_text
+
+	\\ Need to reset font data
+	LDA #LO(mode7_font_data)
+	STA font_addr_1+1
+	STA font_addr_2+1
+	STA font_addr_3+1
+	LDA #HI(mode7_font_data)
+	STA font_addr_1+2
+	STA font_addr_2+2
+	STA font_addr_3+2
+
+	\\ Start from row 0
 	LDX #0
 
 	.still_same_text
@@ -362,42 +359,12 @@ EQUB 0, 0, 0
 
 	.return
 	RTS
-
-	
-	\\ Could stop adding text...
-	RTS
 }
 
 
 \ ******************************************************************
 \ *	Credit Font FX
 \ ******************************************************************
-
-\\ Uses system font definition
-\\ Needlessly calls OSWORD each time character referenced
-\\ Should use a fixed predefined font
-\\ Most likely the 5x5 font from BeebTracker
-\\ But would need some juggling of routine above
-
-.fx_creditscroll_get_char
-{
-	\\ Set up OSWORD call to obtain character definition
-	STA fx_creditscroll_char
-	TXA:PHA:TYA:PHA
-
-	LDX #LO(fx_creditscroll_char)
-	LDY #HI(fx_creditscroll_char)
-	LDA #&A
-	JSR osword				; osword call
-	\\ Or could use predefined font
-
-	PLA:TAY:PLA:TAX
-	.return
-	RTS
-}
-
-.fx_creditscroll_char		SKIP 1			; character definition required
-.fx_creditscroll_def		SKIP 8			; character definition bytes
 
 .fx_creditscroll_rotate
 {
@@ -424,26 +391,17 @@ EQUB 0, 0, 0
 }
 
 \\ Spare character row which will get added to bottom of scroll
-\\ NB. If anything other than top two pixels set here (1 + 2)
-\\ then behaviour is undefined!
+\\ Update fn so only top two pixels (1+2) get added to bottom of scroll
+\\ Can rotate this row itself to shuffle new pixels onto bottom of screen
 
 .fx_creditscroll_new_line
 FOR n, 0, MODE7_char_width-1, 1
 EQUB 0
 NEXT
 
-.fx_creditscroll_glyph_mask_1
-EQUB 1, 4, 64, 1, 4, 64
 
-.fx_creditscroll_glyph_mask_2
-EQUB 2, 8, 16, 2, 8, 16
-
-
-\\ Credit text strings
-\\ First byte is character offset from left side of screen
-\\ Then text string terminted by 0
-\\ If character offset is &FF this indicates no more strings
-\\ Currently strings just loop but could just stop!
+\\ Map character ASCII values to the byte offset into our MODE 7 font
+\\ This is "cunning" but only works because the font has fewer than 256/6 (42) glyphs..
 
 MACRO SET_TELETEXT_FONT_CHAR_MAP
 
@@ -521,14 +479,29 @@ MACRO SET_TELETEXT_FONT_CHAR_MAP
 
 ENDMACRO
 
+SET_TELETEXT_FONT_CHAR_MAP
+
+\\ Credit text strings
+\\ First byte is character offset from left side of screen
+\\ Then text string terminted by 0
+\\ If character offset is &FF this indicates no more strings
+\\ Currently strings just loop but could just stop!
+
+\\ New font is 3 chars wide = max 13 letters per line from 1
+
 .fx_creditscroll_text
+EQUS 4,"ABCDEFGHIJKL",0
+EQUS 4,"MNOPQRSTUVWX",0
+EQUS 4,"YZ0123456789",0
+EQUS 4,"?!.",0
+EQUS 4," ",0
 EQUS 4,"Bitshifters",0
 EQUS 5,"Presents",0
 EQUS 6,"Teletextr",0
 EQUS 4," ",0
 EQUS 4,"A new demo",0
 EQUS 5,"By Henley",0
-EQUS 6,"& Kieran..",0
+EQUS 6,"and Kieran..",0
 EQUS 4," ",0
 EQUS 4,"BBC rulez!",0
 EQUS 5,"Etc.",0
@@ -542,36 +515,10 @@ EQUS 4," ",0
 EQUS 4," ",0
 EQUS &FF
 
-\\ Test fn to add pixels to bottom of the screen
-
-IF 0
-.fx_creditscroll_test
-{
-	lda #144+7
-    ldx #0
-	jsr mode7_set_column_shadow_fast
-
-	LDY #4
-	.loop
-
-	LDA #(1 + 2)
-	STA fx_creditscroll_new_line, Y
-
-	INY
-	CPY #40
-	BCC loop
-
-	.return
-	RTS
-}
-ENDIF
+RESET_MAPCHAR
 
 .mode7_font_data				; we use 16/25 lines of this screen
 INCBIN "data/font_5x5_shifted_trimmed.mode7.bin"
 mode7_font_data_second_row = mode7_font_data + 40
 
 .end_fx_creditscroll
-
-\\ Map character ASCII values to the byte offset into our MODE 7 font
-\\ This is "cunning" but only works because the font has fewer than 256/6 (42) glyphs..
-
