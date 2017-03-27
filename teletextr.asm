@@ -80,12 +80,14 @@ ALIGN 256
 WIREFRAME=TRUE
 MODE7=TRUE
 ; included first to ensure page alignment
+.graphics_3d_start
 INCLUDE "lib/3d/fastmultiply.asm"
 INCLUDE "lib/3d/sincos.asm"
 INCLUDE "lib/3d/maths.asm"
 INCLUDE "lib/3d/culling.asm"
 INCLUDE "lib/3d/zsort.asm"
-
+INCLUDE "lib/3d/model.asm"
+.graphics_3d_end
 
 INCLUDE "lib/mode7_graphics.asm"
 INCLUDE "lib/mode7_plot_pixel.asm"
@@ -93,7 +95,7 @@ INCLUDE "lib/mode7_sprites.asm"
 INCLUDE "lib/mode7_gif_anim.asm"
 INCLUDE "lib/bresenham.asm"
 
-INCLUDE "lib/3d/model.asm"
+
 
 INCLUDE "lib/shadowram.asm"
 INCLUDE "lib/print.asm"
@@ -173,9 +175,19 @@ ORG &8000
 GUARD &BFFF
 .bank0_start
 
-MUSIC_EN_SLOT = 0
+
 .music_en
+; hack demo to temporarily use small music track to free up 16Kb SWR bank, and put music in main RAM instead
+IF FALSE
+MUSIC_EN_SLOT = 0
 INCBIN "data/music_en.raw.exo" ; 16362 bytes
+ELSE
+MUSIC_EN_SLOT = 0
+INCBIN "data/music_reg.raw.exo"         ; 1548
+ENDIF
+
+
+
 
 
 
@@ -208,14 +220,18 @@ INCBIN "data/music_exception.raw.exo"   ; 4297
 
 FX_MIRRORFLOOR_SLOT = 1
 INCLUDE "src/fx/mirrorfloor.asm"
+
 FX_3DSHAPE_SLOT = 1
 INCLUDE "src/fx/3dshape.asm"
+FX_LINEBOX_SLOT = 1
+INCLUDE "src/fx/linebox.asm"
+
+
 FX_GREENSCREEN_SLOT = 1
 INCLUDE "src/fx/greenscreen.asm"
 FX_COPPERBARS_SLOT = 1
 INCLUDE "src/fx/copperbars.asm"
-FX_LINEBOX_SLOT = 1
-INCLUDE "src/fx/linebox.asm"
+
 FX_RASTERBARS_SLOT = 1
 INCLUDE "src/fx/rasterbars.asm"
 FX_STARFIELD_SLOT = 1
@@ -337,6 +353,10 @@ PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "byt
 
 PRINT "------------------------------------------------------------"
 
+PRINT " mode7_graphics.asm lib size is", (mode7_graphics_end-mode7_graphics_start), "bytes"
+PRINT " graphics_3d lib size is ", (graphics_3d_end-graphics_3d_start), "bytes" 
+PRINT "------------------------------------------------------------"
+
 ;----------------------------------------------------------------------------------------------------------
 ; Build stats
 ;----------------------------------------------------------------------------------------------------------
@@ -365,3 +385,14 @@ PUTBASIC "src/fx/6845.txt", "6845"
 
 
 PRINT "Build successful."
+
+
+; need to free up 10Kb in main RAM.
+
+; move 3d stuff into one SWR bank0
+
+; 3d routines
+; fx_vectorballs
+; fx_linebox
+; fx_3dshape
+; fx_vectortext
