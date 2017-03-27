@@ -136,6 +136,7 @@ INCLUDE "src/fx/music.asm"
 INCLUDE "src/fx/copybuffer.asm"
 
 INCLUDE "src/fx/noise.asm"
+INCLUDE "src/fx/logowibble.asm"
 
 
 ;----------------------------------------------------------------------------------------------------------
