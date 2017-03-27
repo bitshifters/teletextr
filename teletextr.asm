@@ -95,7 +95,7 @@ INCLUDE "lib/bresenham.asm"
 
 INCLUDE "lib/3d/model.asm"
 
-
+INCLUDE "lib/shadowram.asm"
 INCLUDE "lib/print.asm"
 INCLUDE "lib/exomiser.asm"
 INCLUDE "lib/vgmplayer.h.asm"

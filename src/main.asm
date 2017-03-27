@@ -18,6 +18,7 @@ ENDIF
 
 .intro_text0 EQUS "Teletextr OS V1.0", 13, 10, 0
 .intro_text1 EQUS "Initializing Teletext system...", 13, 10, 0
+.master_text EQUS "This demo is compatible with BBC Master 128 Only. :(", 13, 10, 0
 
 .main
 {
@@ -26,7 +27,16 @@ ENDIF
 	\\ *FX 200,3 - clear memory on break as we use OS memory areas and can cause nasty effects
 	LDA #200
 	LDX #3
-	JSR osbyte			
+	JSR osbyte		
+
+
+    jsr shadow_check_master
+    beq is_master
+    MPRINT    master_text
+    rts
+.is_master
+
+
 
     MPRINT    intro_text0
     MPRINT    intro_text1
