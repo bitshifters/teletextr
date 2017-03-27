@@ -61,9 +61,10 @@ ENDMACRO
 
 ; initialise routines
 SCRIPT_CALL fx_copybuffer_init
-
+SCRIPT_CALL  initialise_multiply    ; TODO: move into SWR. Also, compute the values in BeebAsm so no need to initialize.
+; 
 ; not sure if this is necessary here yet but hey ho
-SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
+;SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
 
 
 ;-----------------------------------------------------------
@@ -251,7 +252,7 @@ ENDIF
 
 
 
-
+IF 1
 ; SM: gonna make the linebox demo do something more - like animated boxes/fractals etc.
 ; KC: I get the line box starting in the middle of the screen when I run through?  Uninitialised start pos?
 
@@ -262,7 +263,7 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_linebox_update, FX_LINEBOX_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
-
+ENDIF
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
@@ -273,7 +274,7 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
-
+IF 1
 ;-----------------------------------------------------------
 \\ And now combine with 3D shape
 ;-----------------------------------------------------------
@@ -287,7 +288,7 @@ SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
-
+ENDIF
 
 
 ; SM: might be good to inject a scroll text in between each segment
@@ -353,6 +354,8 @@ SCRIPT_SEGMENT_END
 
 GIF_SEGMENT 5.0, PLAYGIFS_BIRD
 
+
+IF 1
 ;-----------------------------------------------------------
 ; Vector balls
 ;-----------------------------------------------------------
@@ -387,7 +390,7 @@ SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
-
+ENDIF
 
 ;-----------------------------------------------------------
 ; GIF player

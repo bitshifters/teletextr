@@ -79,21 +79,13 @@ GUARD &7800
 ALIGN 256
 WIREFRAME=TRUE
 MODE7=TRUE
-; included first to ensure page alignment
-.graphics_3d_start
 INCLUDE "lib/3d/fastmultiply.asm"
-INCLUDE "lib/3d/sincos.asm"
-INCLUDE "lib/3d/maths.asm"
-INCLUDE "lib/3d/culling.asm"
-INCLUDE "lib/3d/zsort.asm"
-INCLUDE "lib/3d/model.asm"
-.graphics_3d_end
 
 INCLUDE "lib/mode7_graphics.asm"
 INCLUDE "lib/mode7_plot_pixel.asm"
 INCLUDE "lib/mode7_sprites.asm"
 INCLUDE "lib/mode7_gif_anim.asm"
-INCLUDE "lib/bresenham.asm"
+
 
 
 
@@ -107,6 +99,11 @@ INCLUDE "lib/filesys.asm"
 INCLUDE "lib/irq.asm"
 INCLUDE "lib/vram.asm"
 INCLUDE "lib/disksys.asm"
+
+
+
+ALIGN 256
+
 
 ;----------------------------------------------------------------------------------------------------------
 ; demo config
@@ -145,9 +142,7 @@ INCLUDE "src/fx/noise.asm"
 FX_TELETEXT_SLOT = -1
 INCLUDE "src/fx/teletext.asm"
 
-;----------------------------------------------------------------------------------------------------------
-FX_VECTORTEXT_SLOT = -1
-INCLUDE "src/fx/vectortext.asm"
+
 
 
 
@@ -175,7 +170,40 @@ ORG &8000
 GUARD &BFFF
 .bank0_start
 
+IF TRUE
+; included first to ensure page alignment
+.graphics_3d_start
 
+
+INCLUDE "lib/3d/sincos.asm"
+INCLUDE "lib/3d/maths.asm"
+INCLUDE "lib/3d/culling.asm"
+INCLUDE "lib/3d/zsort.asm"
+INCLUDE "lib/3d/model.asm"
+INCLUDE "lib/bresenham.asm"
+.graphics_3d_end
+
+
+; All of the following effects make use of the 3d & bresenham routines which are now in SWR
+
+;----------------------------------------------------------------------------------------------------------
+FX_VECTORBALLS_SLOT = 0
+INCLUDE "src/fx/vectorballs.asm"
+
+;----------------------------------------------------------------------------------------------------------
+FX_3DSHAPE_SLOT = 0
+INCLUDE "src/fx/3dshape.asm"
+
+;----------------------------------------------------------------------------------------------------------
+FX_LINEBOX_SLOT = 0
+INCLUDE "src/fx/linebox.asm"
+
+;----------------------------------------------------------------------------------------------------------
+FX_VECTORTEXT_SLOT = 0
+INCLUDE "src/fx/vectortext.asm"
+ENDIF
+
+;----------------------------------------------------------------------------------------------------------
 .music_en
 ; hack demo to temporarily use small music track to free up 16Kb SWR bank, and put music in main RAM instead
 IF FALSE
@@ -221,10 +249,6 @@ INCBIN "data/music_exception.raw.exo"   ; 4297
 FX_MIRRORFLOOR_SLOT = 1
 INCLUDE "src/fx/mirrorfloor.asm"
 
-FX_3DSHAPE_SLOT = 1
-INCLUDE "src/fx/3dshape.asm"
-FX_LINEBOX_SLOT = 1
-INCLUDE "src/fx/linebox.asm"
 
 
 FX_GREENSCREEN_SLOT = 1
@@ -304,9 +328,7 @@ GUARD &BFFF
 FX_PLAYGIFS_SLOT = 3
 INCLUDE "src/fx/playgifs.asm"
 
-;----------------------------------------------------------------------------------------------------------
-FX_VECTORBALLS_SLOT = 3
-INCLUDE "src/fx/vectorballs.asm"
+
 
 ;----------------------------------------------------------------------------------------------------------
 FX_PLASMA_SLOT = 3
@@ -331,19 +353,19 @@ PRINT "Demo Sequence data from", ~demo_script_start, "to", ~demo_script_end, ", 
 PRINT " fx_code size is", (end_fx_code-start_fx_code), "bytes"
 PRINT "Main RAM effects:"
 PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
-PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
+;PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 
 PRINT "SW RAM effects:"
 PRINT " fx_plasma size is", (end_fx_plasma-start_fx_plasma), "bytes"
-PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
+;PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
 PRINT " fx_rotozoom size is", (end_fx_rotozoom-start_fx_rotozoom), "bytes"
 PRINT " fx_interference size is", (end_fx_interference-start_fx_interference), "bytes"
 PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
 PRINT " fx_testcard size is", (end_fx_testcard-start_fx_testcard), "bytes"
-PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
+;PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
 PRINT " fx_rasterbars size is", (end_fx_rasterbars-start_fx_rasterbars), "bytes"
 PRINT " fx_mirrorfloor size is", (end_fx_mirrorfloor-start_fx_mirrorfloor), "bytes"
-PRINT " fx_linebox size is", (end_fx_linebox-start_fx_linebox), "bytes"
+;PRINT " fx_linebox size is", (end_fx_linebox-start_fx_linebox), "bytes"
 PRINT " fx_copperbars size is", (end_fx_copperbars-start_fx_copperbars), "bytes"
 PRINT " fx_particles size is", (end_fx_particles-start_fx_particles), "bytes"
 PRINT " fx_starfield size is", (end_fx_starfield-start_fx_starfield), "bytes"
@@ -354,7 +376,7 @@ PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "byt
 PRINT "------------------------------------------------------------"
 
 PRINT " mode7_graphics.asm lib size is", (mode7_graphics_end-mode7_graphics_start), "bytes"
-PRINT " graphics_3d lib size is ", (graphics_3d_end-graphics_3d_start), "bytes" 
+;PRINT " graphics_3d lib size is ", (graphics_3d_end-graphics_3d_start), "bytes" 
 PRINT "------------------------------------------------------------"
 
 ;----------------------------------------------------------------------------------------------------------
