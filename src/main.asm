@@ -192,7 +192,12 @@ ENDIF
 	CLI	
 
 
-
+    ; initialise shadow ram
+    ; CAN ONLY DO THIS ONCE CODE IS IN PLACE TO ENSURE MEMORY &3000-&7C00 does not contain executable code
+    jsr shadow_enable_hiram
+IF USE_SHADOW_RAM
+    jsr shadow_init_buffers
+ENDIF
 
 
 

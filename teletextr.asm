@@ -7,7 +7,7 @@
 DEBUG = TRUE
 _ABUG = FALSE
 _HEADER = TRUE  ; teletext header is visible, so adjust line offsets +1 in effects
-
+USE_SHADOW_RAM = FALSE
 
 
 
@@ -61,8 +61,11 @@ INCLUDE "src/main.h.asm"
 \ *	Code
 \ ******************************************************************
 
-ORG &1100
-GUARD &7800
+ORG &1100 ; could be &0E00 on a master, but disksys and filesys currently use &0e00-&10ff as scratch ram
+
+; new guard position of &3000 which is where shadow ram begins
+; we cannot put code into video ram address range if we are to use shadow ram
+GUARD &3000
 
 .start
 
