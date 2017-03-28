@@ -61,7 +61,7 @@ ENDMACRO
 
 ; initialise routines
 SCRIPT_CALL fx_copybuffer_init
-SCRIPT_CALLSLOT  initialise_multiply, FX_3DCODE_SLOT    ; TODO: move into SWR. Also, compute the values in BeebAsm so no need to initialize.
+SCRIPT_CALLSLOT  initialise_multiply, FX_3DCODE_SLOT
 ; 
 ; not sure if this is necessary here yet but hey ho
 ;SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
@@ -231,9 +231,10 @@ SCRIPT_SEGMENT_END
 
 
 
-IF 0
+IF 1
 ; SM: this effect is knacked for some reason, causes demo to hang, not sure why
-;-----------------------------------------------------------
+; SM: think its fixed now. not sure what it was tho. suspicious about some filesys code overwriting pages &0e00-&10ff
+;----------------------------------------------------------
 ; vector text effect
 ;-----------------------------------------------------------
 ; SM: I'd like to get a full vector font in so we can show any text string with it
@@ -241,6 +242,7 @@ IF 0
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
 SCRIPT_SEGMENT_START    30.0
     SCRIPT_CALL fx_copybuffer_update
+    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT    
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
