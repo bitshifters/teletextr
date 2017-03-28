@@ -61,7 +61,7 @@ ENDMACRO
 
 ; initialise routines
 SCRIPT_CALL fx_copybuffer_init
-SCRIPT_CALL  initialise_multiply    ; TODO: move into SWR. Also, compute the values in BeebAsm so no need to initialize.
+SCRIPT_CALLSLOT  initialise_multiply, FX_3DCODE_SLOT    ; TODO: move into SWR. Also, compute the values in BeebAsm so no need to initialize.
 ; 
 ; not sure if this is necessary here yet but hey ho
 ;SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT

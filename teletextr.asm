@@ -79,7 +79,7 @@ GUARD &7800
 ALIGN 256
 WIREFRAME=TRUE
 MODE7=TRUE
-INCLUDE "lib/3d/fastmultiply.asm"
+
 
 INCLUDE "lib/mode7_graphics.asm"
 INCLUDE "lib/mode7_plot_pixel.asm"
@@ -172,9 +172,9 @@ GUARD &BFFF
 
 IF TRUE
 ; included first to ensure page alignment
+FX_3DCODE_SLOT = 0
 .graphics_3d_start
-
-
+INCLUDE "lib/3d/fastmultiply.asm"
 INCLUDE "lib/3d/sincos.asm"
 INCLUDE "lib/3d/maths.asm"
 INCLUDE "lib/3d/culling.asm"
@@ -202,6 +202,15 @@ INCLUDE "src/fx/linebox.asm"
 FX_VECTORTEXT_SLOT = 0
 INCLUDE "src/fx/vectortext.asm"
 ENDIF
+
+;----------------------------------------------------------------------------------------------------------
+FX_ROTOZOOM_SLOT = 0
+.start_fx_rotozoom
+INCLUDE "src/fx/rotozoom.asm"
+INCLUDE "src/fx/rotozoom1.asm"
+INCLUDE "src/fx/rotozoom2.asm"
+INCLUDE "src/fx/rotozoom3.asm"
+.end_fx_rotozoom
 
 ;----------------------------------------------------------------------------------------------------------
 .music_en
@@ -262,14 +271,6 @@ FX_STARFIELD_SLOT = 1
 INCLUDE "src/fx/starfield.asm"
 
 
-
-FX_ROTOZOOM_SLOT = 1
-.start_fx_rotozoom
-INCLUDE "src/fx/rotozoom.asm"
-INCLUDE "src/fx/rotozoom1.asm"
-INCLUDE "src/fx/rotozoom2.asm"
-INCLUDE "src/fx/rotozoom3.asm"
-.end_fx_rotozoom
 
 ;----------------------------------------------------------------------------------------------------------
 ; Dot scroller
