@@ -137,10 +137,7 @@ INCLUDE "src/fx/copybuffer.asm"
 INCLUDE "src/fx/noise.asm"
 
 
-;----------------------------------------------------------------------------------------------------------
-; Teletext effect
-FX_TELETEXT_SLOT = -1
-INCLUDE "src/fx/teletext.asm"
+
 
 
 
@@ -277,7 +274,10 @@ INCLUDE "src/fx/starfield.asm"
 FX_DOTSCROLLER_SLOT = 1
 INCLUDE "src/fx/dotscroller.asm"
 
-
+;----------------------------------------------------------------------------------------------------------
+; Teletext effect
+FX_TELETEXT_SLOT = 1
+INCLUDE "src/fx/teletext.asm"
 
 
 .bank1_end
@@ -353,20 +353,20 @@ PRINT "------------------------------------------------------------"
 PRINT "Demo Sequence data from", ~demo_script_start, "to", ~demo_script_end, ", size is", (demo_script_end-demo_script_start), "bytes"
 PRINT " fx_code size is", (end_fx_code-start_fx_code), "bytes"
 PRINT "Main RAM effects:"
-PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
-;PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 
 PRINT "SW RAM effects:"
+PRINT " fx_teletext size is", (end_fx_teletext-start_fx_teletext), "bytes"
+PRINT " fx_vectortext size is", (end_fx_vectortext-start_fx_vectortext), "bytes"
 PRINT " fx_plasma size is", (end_fx_plasma-start_fx_plasma), "bytes"
-;PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
+PRINT " fx_vectorballs size is", (end_fx_vectorballs-start_fx_vectorballs), "bytes"
 PRINT " fx_rotozoom size is", (end_fx_rotozoom-start_fx_rotozoom), "bytes"
 PRINT " fx_interference size is", (end_fx_interference-start_fx_interference), "bytes"
 PRINT " fx_playgifs size is", (end_fx_playgifs-start_fx_playgifs), "bytes"
 PRINT " fx_testcard size is", (end_fx_testcard-start_fx_testcard), "bytes"
-;PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
+PRINT " fx_3dshape size is", (end_fx_3dshape-start_fx_3dshape), "bytes"
 PRINT " fx_rasterbars size is", (end_fx_rasterbars-start_fx_rasterbars), "bytes"
 PRINT " fx_mirrorfloor size is", (end_fx_mirrorfloor-start_fx_mirrorfloor), "bytes"
-;PRINT " fx_linebox size is", (end_fx_linebox-start_fx_linebox), "bytes"
+PRINT " fx_linebox size is", (end_fx_linebox-start_fx_linebox), "bytes"
 PRINT " fx_copperbars size is", (end_fx_copperbars-start_fx_copperbars), "bytes"
 PRINT " fx_particles size is", (end_fx_particles-start_fx_particles), "bytes"
 PRINT " fx_starfield size is", (end_fx_starfield-start_fx_starfield), "bytes"
@@ -377,7 +377,7 @@ PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "byt
 PRINT "------------------------------------------------------------"
 
 PRINT " mode7_graphics.asm lib size is", (mode7_graphics_end-mode7_graphics_start), "bytes"
-;PRINT " graphics_3d lib size is ", (graphics_3d_end-graphics_3d_start), "bytes" 
+PRINT " graphics_3d lib size is ", (graphics_3d_end-graphics_3d_start), "bytes" 
 PRINT "------------------------------------------------------------"
 
 ;----------------------------------------------------------------------------------------------------------
