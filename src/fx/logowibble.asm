@@ -2,6 +2,8 @@
 ; wibbling logo
 ; using sprite data from mode7-sprites cracktro wip
 
+_LOGOWIBBLE_SPARSE_DATA = FALSE			; uses 3x as much space for data
+
 .start_fx_logowibble
 
 LOGOWIBBLE_shadow_addr = &7800
@@ -63,7 +65,13 @@ EQUB 0
 	ORA mode7_sprites_mod3_table, Y		; gives us 0-5 offset
 	TAX
 
+	IF _LOGOWIBBLE_SPARSE_DATA = FALSE
+	LDA fx_logowibble_row_mask, X
+	STA fx_logowibble_data_mask + 1
+	ENDIF
+
 	\\ Sprite address = logo_data_XY + char_row
+	\\ There's probably a quicker way to do this by toggling sprite data index depending on X parity
 	CLC
 	LDA fx_logowibble_sprite_table_LO, X
 	ADC fx_logowibble_y_mult_table, Y
@@ -87,6 +95,12 @@ EQUB 0
 
 	.fx_logowibble_data_addr
 	LDA &2000, Y
+
+	IF _LOGOWIBBLE_SPARSE_DATA = FALSE
+	.fx_logowibble_data_mask
+	AND #0
+	ENDIF
+
 	BEQ next_char
 
 	.fx_logowibble_load_addr
@@ -143,29 +157,52 @@ EQUB 0
 
 .fx_logowibble_table
 FOR n, 0, LOGOWIBBLE_table_size-1, 1
-EQUB 10 + 4 * SIN(2 * PI * n / LOGOWIBBLE_table_size)
+EQUB 10 + 3.9 * SIN(2 * PI * n / LOGOWIBBLE_table_size)
 NEXT
 
 .fx_logowibble_sprite_table_LO
+IF _LOGOWIBBLE_SPARSE_DATA
 EQUB LO(logo_data_00)
 EQUB LO(logo_data_10)
 EQUB LO(logo_data_01)
 EQUB LO(logo_data_11)
 EQUB LO(logo_data_02)
 EQUB LO(logo_data_12)
+ELSE
+EQUB LO(logo_data_00)
+EQUB LO(logo_data_10)
+EQUB LO(logo_data_00)
+EQUB LO(logo_data_10)
+EQUB LO(logo_data_00)
+EQUB LO(logo_data_10)
+ENDIF
 
 .fx_logowibble_sprite_table_HI
+IF _LOGOWIBBLE_SPARSE_DATA
 EQUB HI(logo_data_00)
 EQUB HI(logo_data_10)
 EQUB HI(logo_data_01)
 EQUB HI(logo_data_11)
 EQUB HI(logo_data_02)
 EQUB HI(logo_data_12)
+ELSE
+EQUB HI(logo_data_00)
+EQUB HI(logo_data_10)
+EQUB HI(logo_data_00)
+EQUB HI(logo_data_10)
+EQUB HI(logo_data_00)
+EQUB HI(logo_data_10)
+ENDIF
 
 .fx_logowibble_y_mult_table
 FOR n, 0, LOGOWIBBLE_sixel_height-1, 1
 EQUB (n DIV 3) * LOGOWIBBLE_char_width
 NEXT
+
+IF _LOGOWIBBLE_SPARSE_DATA = FALSE
+.fx_logowibble_row_mask
+EQUB 3, 3, 12, 12, 80, 80
+ENDIF
 
 \ ******************************************************************
 \ *	Sprite data
@@ -175,8 +212,8 @@ NEXT
 \\ Image size=60x18 pixels=60x18
 .logo
 \\ Data in ROW order
-EQUB 60, 6	;pixel width, char height
 .logo_data
+IF _LOGOWIBBLE_SPARSE_DATA
 .logo_data_00	; x_offset=0, y_row=0
 EQUB 3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1
 EQUB 1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
@@ -219,5 +256,20 @@ EQUB 64,64,0,80,80,0,16,64,0,64,0,0,16,64,0,16,64,0,16,0,16,64,0,16,0,16,0,0,64,
 EQUB 64,64,0,80,80,0,16,0,80,80,80,0,16,64,0,16,64,0,80,16,80,80,0,16,64,80,16,0,64,64
 EQUB 64,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,64,64
 EQUB 64,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80
-
+ELSE
+.logo_data_00	; x_offset=0, y_offset=0
+EQUB 55,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,51,53
+EQUB 53,53,96,112,48,96,32,32,32,32,32,96,32,32,96,32,112,32,32,32,32,32,32,32,32,32,32,32,53,53
+EQUB 53,53,106,112,58,104,40,61,36,60,36,106,44,52,104,40,61,110,44,104,44,52,104,44,104,44,32,32,53,53
+EQUB 53,53,106,112,58,106,32,101,112,115,61,106,32,53,106,32,53,106,112,106,115,49,106,32,114,123,36,32,53,53
+EQUB 53,53,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,53,53
+EQUB 117,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,113,53
+.logo_data_10	; x_offset=1, y_offset=0
+EQUB 106,99,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,107
+EQUB 106,106,32,112,112,32,48,32,32,32,32,32,48,32,32,48,96,48,32,32,32,32,32,32,32,32,32,32,106,106
+EQUB 106,106,32,117,112,37,52,110,44,104,44,32,61,108,32,52,110,44,61,36,60,108,32,60,36,60,36,32,106,106
+EQUB 106,106,32,117,112,37,53,42,112,114,123,36,53,106,32,53,106,32,117,48,119,115,32,53,96,115,61,32,106,106
+EQUB 106,106,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,106,106
+EQUB 106,114,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,122
+ENDIF
 .end_fx_logowibble
