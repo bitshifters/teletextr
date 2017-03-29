@@ -80,6 +80,7 @@ EQUB 0
 	LDA fx_logowibble_sprite_table_HI, X
 	ADC #0
 	STA fx_logowibble_data_addr + 2
+	\\ Also don't need to calc sprite address each time if using dense data - to be optimised
 
 	\\ X char position on screen
 	.fx_logowibble_x_pos
@@ -141,6 +142,9 @@ EQUB 0
 	INC fx_logowibble_load_addr + 2
 	INC fx_logowibble_write_addr + 2
 	BNE sixel_row_loop
+
+	\\ Could also move to next sprite data row if dense data
+	\\ Might also be able to keep sprite index in register if data small enough...
 
 	.return
 	LDX fx_logowibble_index
