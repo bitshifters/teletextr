@@ -136,6 +136,7 @@ INCLUDE "src/fx/music.asm"
 INCLUDE "src/fx/copybuffer.asm"
 
 INCLUDE "src/fx/noise.asm"
+INCLUDE "src/fx/logoanim.asm"
 
 
 ;----------------------------------------------------------------------------------------------------------
@@ -336,6 +337,7 @@ PRINT " fx_starfield size is", (end_fx_starfield-start_fx_starfield), "bytes"
 PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "bytes"
 PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "bytes"
 PRINT " fx_logowibble size is", (end_fx_logowibble-start_fx_logowibble), "bytes"
+PRINT " fx_logoanim size is", (end_fx_logoanim-start_fx_logoanim), "bytes"
 
 
 PRINT "------------------------------------------------------------"

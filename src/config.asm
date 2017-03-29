@@ -81,6 +81,12 @@ SCRIPT_SEGMENT_END
 ENDIF
 
 
+SCRIPT_CALL fx_logoanim_init
+
+SCRIPT_SEGMENT_START    30.0
+    SCRIPT_CALL fx_buffer_copy
+    SCRIPT_CALL fx_logoanim_update
+SCRIPT_SEGMENT_END
 
 
 ;-----------------------------------------------------------
