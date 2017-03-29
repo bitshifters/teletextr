@@ -48,6 +48,7 @@ EQUB 0
 
 	.sixel_row_loop
 
+	\\ Index into table for X lookup
 	TYA
 	ASL A
 	CLC
@@ -55,6 +56,7 @@ EQUB 0
 	AND #(LOGOWIBBLE_table_size-1)
 	TAX
 
+	\\ Get x position
 	LDA fx_logowibble_table, X			; X value for this sixel row
 	STA fx_logowibble_x_pos + 1
 	AND #&1
@@ -62,7 +64,6 @@ EQUB 0
 	TAX
 
 	\\ Sprite address = logo_data_XY + char_row
-
 	CLC
 	LDA fx_logowibble_sprite_table_LO, X
 	ADC fx_logowibble_y_mult_table, Y
@@ -84,18 +85,20 @@ EQUB 0
 
 	.fx_logowibble_plot_loop
 
+	.fx_logowibble_data_addr
+	LDA &2000, Y
+	BEQ next_char
+
 	.fx_logowibble_load_addr
-	LDA &7800, X
+	ORA &7800, X
 
 	\\ Could mask out bits here to avoid having 6x copies of the sprite data
-
-	.fx_logowibble_data_addr
-	ORA &2000, Y
 
 	.fx_logowibble_write_addr
 	STA &7800, X
 
 	\\ Next char
+	.next_char
 	INX
 	INY
 	CPY #LOGOWIBBLE_char_width
