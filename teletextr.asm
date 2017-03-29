@@ -136,7 +136,6 @@ INCLUDE "src/fx/music.asm"
 INCLUDE "src/fx/copybuffer.asm"
 
 INCLUDE "src/fx/noise.asm"
-INCLUDE "src/fx/logowibble.asm"
 
 
 ;----------------------------------------------------------------------------------------------------------
@@ -297,11 +296,13 @@ INCLUDE "src/fx/vectorballs.asm"
 FX_PLASMA_SLOT = 3
 INCLUDE "src/fx/plasma.asm"
 
-
-
 ;----------------------------------------------------------------------------------------------------------
 FX_TESTCARD_SLOT = 3
 INCLUDE "src/fx/testcard.asm"
+
+;----------------------------------------------------------------------------------------------------------
+FX_LOGOWIBBLE_SLOT = 3
+INCLUDE "src/fx/logowibble.asm"
 
 
 .bank3_end
@@ -334,6 +335,7 @@ PRINT " fx_particles size is", (end_fx_particles-start_fx_particles), "bytes"
 PRINT " fx_starfield size is", (end_fx_starfield-start_fx_starfield), "bytes"
 PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "bytes"
 PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "bytes"
+PRINT " fx_logowibble size is", (end_fx_logowibble-start_fx_logowibble), "bytes"
 
 
 PRINT "------------------------------------------------------------"

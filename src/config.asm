@@ -82,14 +82,6 @@ ENDIF
 
 
 
-SCRIPT_SEGMENT_START    20.0
-    SCRIPT_CALL fx_copybuffer_update
-    SCRIPT_CALL fx_logowibble_update
-    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
-SCRIPT_SEGMENT_END
-
-
-
 
 ;-----------------------------------------------------------
 ; Screen off/on
@@ -227,12 +219,10 @@ SCRIPT_CALL fx_clear
 ; KC: Agree - a simple & reusable intro to each fx, maybe 5x5 font?
 ;-----------------------------------------------------------
 
-; STARFIELD NEEDED!!! :)
-; Starfield provided! :D
-
 SCRIPT_SEGMENT_START    10.0
-    SCRIPT_CALL fx_buffer_copy              ; stars are self-erasing - optional!
+    SCRIPT_CALL fx_copybuffer_update              ; stars are self-erasing - optional!
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
+    SCRIPT_CALLSLOT fx_logowibble_update, FX_LOGOWIBBLE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
 

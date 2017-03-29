@@ -19,14 +19,12 @@ LOGOWIBBLE_table_size = 64
 \ *	Logo Wibble FX
 \ ******************************************************************
 
-\\ Drawing complete sprite
+\\ Drawing complete sprite at fixed vertical position
 \\ Each sixel line can have a separate X value
 \\ For each sixel line
 \\ Get x value
 \\ Switch data block even/odd
 \\ Start at x char, mask in all sprite data for that sixel line
-\\ Need function to mask in 30 bytes starting at screen address for given sixel line
-\\ Copy sprite plot routine and adapt it...
 
 .fx_logowibble_index
 EQUB 0
