@@ -7,15 +7,46 @@
 
 ALIGN 256
 
-IF CONTIGUOUS_TABLES
-.table_data SKIP 1536
-;table_data = &0E00
+PRECALC_TABLES = TRUE
 
-; specify contiguous tables
-    SQUARETABLE2_LSB = table_data
-    SQUARETABLE1_LSB = SQUARETABLE2_LSB+256
-    SQUARETABLE2_MSB = SQUARETABLE1_LSB+512
-    SQUARETABLE1_MSB = SQUARETABLE2_MSB+256
+IF CONTIGUOUS_TABLES
+
+
+
+
+	IF PRECALC_TABLES
+
+		.SQUARETABLE2_LSB
+		FOR i, 0, 255
+			n = 256-i
+			EQUB LO( (n*n) /4 )
+		NEXT
+		.SQUARETABLE1_LSB
+		FOR i, 0, 511
+			EQUB LO( (i*i) /4 )					
+		NEXT
+		.SQUARETABLE2_MSB
+		FOR i, 0, 255
+			n = 256-i
+			EQUB HI( (n*n) /4 )
+		NEXT
+		.SQUARETABLE1_MSB
+		FOR i, 0, 511
+			EQUB HI( (i*i) /4 )
+		NEXT
+
+	ELSE
+
+
+	.table_data SKIP 1536
+	;table_data = &0E00
+
+	; specify contiguous tables
+		SQUARETABLE2_LSB = table_data
+		SQUARETABLE1_LSB = SQUARETABLE2_LSB+256
+		SQUARETABLE2_MSB = SQUARETABLE1_LSB+512
+		SQUARETABLE1_MSB = SQUARETABLE2_MSB+256
+	ENDIF
 
 ELSE
 
@@ -54,6 +85,22 @@ ENDIF
 ; &0300-&04FF = table2 msb
 ; &0400-&05FF = table1 msb 
 ;----------------------------------------------------------------------------------------------------------
+
+IF PRECALC_TABLES
+.initialise_multiply
+{
+    ; set the msb of lmul0, lmul1, rmul0 and rmul1 just once
+    ;  for the entire lifecycle of the application
+    ;  - the lsb of these 16-bit addresses will be set as the multiplication terms
+    LDA#HI(SQUARETABLE1_LSB):STA lmul0+1:STA rmul0+1
+    LDA#HI(SQUARETABLE1_MSB):STA lmul1+1:STA rmul1+1	
+	rts
+}
+
+
+ELSE
+
+
 .initialise_multiply
 {
     ; set the msb of lmul0, lmul1, rmul0 and rmul1 just once
@@ -119,6 +166,9 @@ ENDIF
 
     rts
 }
+
+ENDIF
+
 
 ; SM: I wanted to use the same multiply tables as the 3D stuff for general multiply routines
 ; however I cannot fathom out how Nick built his multiply tables in 768 bytes rather than 1024

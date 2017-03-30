@@ -14,10 +14,12 @@ ENDIF
 .bank_file1a   EQUS "Bank1  $"
 .bank_file2a   EQUS "Bank2  $"
 .bank_file3a   EQUS "Bank3  $"
-
+.bank_file4a   EQUS "SBank0 $"
+.bank_file5a   EQUS "SBank1 $"
 
 .intro_text0 EQUS "Teletextr OS V1.0", 13, 10, 0
 .intro_text1 EQUS "Initializing Teletext system...", 13, 10, 0
+.master_text EQUS "This demo is compatible with BBC Master 128 Only. :(", 13, 10, 0
 
 .main
 {
@@ -26,7 +28,16 @@ ENDIF
 	\\ *FX 200,3 - clear memory on break as we use OS memory areas and can cause nasty effects
 	LDA #200
 	LDX #3
-	JSR osbyte			
+	JSR osbyte		
+
+
+    jsr shadow_check_master
+    beq is_master
+    MPRINT    master_text
+    rts
+.is_master
+
+
 
     MPRINT    intro_text0
     MPRINT    intro_text1
@@ -88,9 +99,8 @@ ENDIF
 
 
 	\\ load all banks
-IF 1
 
-
+    ; SWR 0
     lda #0
     jsr swr_select_slot
 
@@ -100,6 +110,7 @@ IF 1
     jsr disksys_load_file
     MPRINT loading_bank_text2
 
+    ; SWR 1
     lda #1
     jsr swr_select_slot
 
@@ -109,6 +120,7 @@ IF 1
     jsr disksys_load_file
     MPRINT loading_bank_text2
 
+    ; SWR 2
     lda #2
     jsr swr_select_slot
 
@@ -118,6 +130,7 @@ IF 1
     jsr disksys_load_file
     MPRINT loading_bank_text2
 
+    ; SWR 3
     lda #3
     jsr swr_select_slot
 
@@ -127,47 +140,25 @@ IF 1
     jsr disksys_load_file
     MPRINT loading_bank_text2
     
-ELSE
+    ; shadow bank 0
+    lda #SELECT_RAM_MAIN
+    jsr shadow_select_ram
 
-    lda #0
-    jsr swr_select_slot
-
-    lda #&80
-    ldx #LO(bank_file0)
-    ldy #HI(bank_file0)
-    jsr file_stream
+    lda #&30
+    ldx #LO(bank_file4a)
+    ldy #HI(bank_file4a)
+    jsr disksys_load_file
     MPRINT loading_bank_text2
 
-    lda #1
-    jsr swr_select_slot
+    ; shadow bank 1
+    lda #SELECT_RAM_SHADOW
+    jsr shadow_select_ram
 
-    lda #&80
-    ldx #LO(bank_file1)
-    ldy #HI(bank_file1)
-    jsr file_stream
+    lda #&30
+    ldx #LO(bank_file5a)
+    ldy #HI(bank_file5a)
+    jsr disksys_load_file
     MPRINT loading_bank_text2
-
-    lda #2
-    jsr swr_select_slot
-
-    lda #&80
-    ldx #LO(bank_file2)
-    ldy #HI(bank_file2)
-    jsr file_stream
-    MPRINT loading_bank_text2
-
-    lda #3
-    jsr swr_select_slot
-
-    lda #&80
-    ldx #LO(bank_file3)
-    ldy #HI(bank_file3)
-    jsr file_stream
-    MPRINT loading_bank_text2
-
-
-ENDIF
-
 
     ; runtime
     
@@ -182,7 +173,12 @@ ENDIF
 	CLI	
 
 
-
+    ; initialise shadow ram
+    ; CAN ONLY DO THIS ONCE CODE IS IN PLACE TO ENSURE MEMORY &3000-&7C00 does not contain executable code
+    jsr shadow_enable_hiram
+IF USE_SHADOW_RAM
+    jsr shadow_init_buffers
+ENDIF
 
 
 

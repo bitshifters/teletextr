@@ -63,16 +63,13 @@ ENDIF
 .fx_plasma_column
 {
     FOR n,0,SCREEN_H-1
-        sta &7800+n*SCREEN_W,X
+        sta MODE7_VRAM_SHADOW+n*SCREEN_W,X
     NEXT    
     rts
 }
 
-
-; call once before the animation routine
-.fx_plasma_init
+.fx_plasma_screen
 {
-    jsr fx_buffer_clear
 
 
 	lda #144+7  ; white graphics
@@ -95,7 +92,63 @@ ENDIF
 
 ;    lda #144+7  ; white block 
 ;    ldx #39
-;	jsr mode7_set_column_shadow_fast   
+;	jsr mode7_set_column_shadow_fast     
+
+
+
+ ;   lda fx_plasma_char
+ ;   ldx #2
+;	jsr mode7_set_column_shadow_fast    
+IF 0
+IF 0
+    FOR n,0,24,2
+;        lda #160+1+8+16
+        lda #160+1+64
+        sta MODE7_VRAM_SHADOW+2+n*40
+    NEXT
+    FOR n,1,24,2
+;        lda #160+2+4+64
+        lda #160+2+16
+        sta MODE7_VRAM_SHADOW+2+n*40
+    NEXT
+ELSE
+
+    FOR n,0,24,4
+        lda #160+1+64
+        sta MODE7_VRAM_SHADOW+2+n*40
+    NEXT
+    FOR n,1,24,4
+        lda #160+4
+        sta MODE7_VRAM_SHADOW+2+n*40
+    NEXT
+    FOR n,2,24,4
+        lda #160+2+16
+        sta MODE7_VRAM_SHADOW+2+n*40
+    NEXT
+    FOR n,3,24,4
+        lda #160+8
+        sta MODE7_VRAM_SHADOW+2+n*40
+    NEXT
+ENDIF
+
+
+
+ELSE
+
+
+
+    lda #255
+    ldx #2
+    jsr fx_plasma_column;    jsr mode7_set_column_shadow_fast    
+ENDIF  
+    rts
+}
+
+; call once before the animation routine
+.fx_plasma_init
+{
+    jsr fx_buffer_clear
+
 
 
     lda #0
@@ -118,58 +171,14 @@ ENDIF
 }
 
 
-
 .fx_plasma
 {
+
 ;    jsr fx_plasma_rand
 ;   rts
     jsr fx_mode7fx
 
- ;   lda fx_plasma_char
- ;   ldx #2
-;	jsr mode7_set_column_shadow_fast    
-IF 0
-IF 0
-    FOR n,0,24,2
-;        lda #160+1+8+16
-        lda #160+1+64
-        sta &7800+2+n*40
-    NEXT
-    FOR n,1,24,2
-;        lda #160+2+4+64
-        lda #160+2+16
-        sta &7800+2+n*40
-    NEXT
-ELSE
-
-    FOR n,0,24,4
-        lda #160+1+64
-        sta &7800+2+n*40
-    NEXT
-    FOR n,1,24,4
-        lda #160+4
-        sta &7800+2+n*40
-    NEXT
-    FOR n,2,24,4
-        lda #160+2+16
-        sta &7800+2+n*40
-    NEXT
-    FOR n,3,24,4
-        lda #160+8
-        sta &7800+2+n*40
-    NEXT
-ENDIF
-
-
-
-ELSE
-
-
-
-    lda #255
-    ldx #2
-    jsr fx_plasma_column;    jsr mode7_set_column_shadow_fast    
-ENDIF
+    jsr fx_plasma_screen
 
 
     lda pnt_tab+0

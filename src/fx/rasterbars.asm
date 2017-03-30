@@ -5,7 +5,7 @@
 
 .start_fx_rasterbars
 
-MODE7_shadow_addr = &7800
+MODE7_shadow_addr = MODE7_VRAM_SHADOW
 
 FX_RASTERBAR_TABLE_SIZE = 64
 FX_RASTER_BAR_GAP = 9

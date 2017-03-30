@@ -1,5 +1,7 @@
 \\ 6502 Graphics routines
 
+.mode7_graphics_start
+
 ; Considered some double buffer options where we render to a byte or bit buffer
 ; and unpack during the copy blit, it's certainly faster to plot pixels this way, but
 ; the overhead of unpack/copying is severe - nearly 4x the cycle count.
@@ -254,3 +256,4 @@ NEXT
 }
 
 
+.mode7_graphics_end

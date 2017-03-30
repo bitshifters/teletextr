@@ -3,7 +3,7 @@
 
 .start_fx_playgifs
 
-PLAYGIFS_shadow_addr = &7800+40
+PLAYGIFS_shadow_addr = MODE7_VRAM_SHADOW+40
 PLAYGIFS_num = 4
 PLAYGIFS_time = 25 * 8
 
