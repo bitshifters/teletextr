@@ -115,23 +115,6 @@ ENDIF
 
 
 ;-----------------------------------------------------------
-; some kind of "Bitshifters presents" sequence would be good here
-; KC: Agree - a simple & reusable intro to each fx, maybe 5x5 font?
-;-----------------------------------------------------------
-
-; STARFIELD NEEDED!!! :)
-; Starfield provided! :D
-
-SCRIPT_SEGMENT_START    10.0
-    SCRIPT_CALL fx_buffer_swap              ; stars are self-erasing - optional!
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
-SCRIPT_SEGMENT_END
-
-
-
-;-----------------------------------------------------------
 ; Screen off/on
 ;-----------------------------------------------------------
 BLANK_DISPLAY 2.0

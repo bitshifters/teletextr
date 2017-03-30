@@ -24,6 +24,15 @@
 ;   D=1,X=0 - Display from shadow memory, Draw to main memory (&3000-&7FFF)
 
 
+
+
+SELECT_RAM_MAIN = 0
+SELECT_RAM_SHADOW = 4
+
+
+
+
+
 ; check if host machine is a Master 128
 ; we do this by testing if memory address &C000 is writable
 ; returns z=0 if master 128
@@ -57,6 +66,29 @@
     ora #4    	; set X to 1
     and #255-1  ; set D to 0
     and #255-8  ; set Y to 0, so that the 8Kb Buffer can be used as RAM
+    sta &fe34
+    rts
+}
+
+; returns currently selected memory bank in A
+;  0=Normal RAM, 4=Shadow RAM
+.shadow_get_ram
+{
+    lda &fe34
+    and #4
+    rts
+}
+
+; Select memory bank as provided in A
+;  0=Normal RAM, 4=Shadow RAM
+; Caller is responsible for preserving/restoring state so that double buffering is not affected
+
+.shadow_select_ram
+{
+    sta &8f
+    lda &fe34
+    and #255-4
+    ora &8f
     sta &fe34
     rts
 }

@@ -1,5 +1,5 @@
 
-
+MUSIC_SHADOW = TRUE
 
 \\ Initialise music player - pass in VGM_stream_data address
 \\ parses header from stream
@@ -8,6 +8,20 @@
     jsr fx_music_stop
     lda #19:jsr osbyte
 
+IF MUSIC_SHADOW
+    jsr shadow_get_ram
+    pha
+    lda #MUSIC_EN_SLOT_S
+    sta fx_music_slot
+    jsr shadow_select_ram
+
+	LDX #LO(music_en_s)
+	LDY #HI(music_en_s)
+	JSR	vgm_init_stream
+
+    pla
+    jsr shadow_select_ram
+ELSE
     lda #MUSIC_EN_SLOT
     sta fx_music_slot
     jsr swr_select_slot
@@ -15,6 +29,7 @@
 	LDX #LO(music_en)
 	LDY #HI(music_en)
 	JSR	vgm_init_stream
+ENDIF
     rts
 }
 \\ Initialise music player - pass in VGM_stream_data address
@@ -24,6 +39,21 @@
     jsr fx_music_stop
     lda #19:jsr osbyte
 
+IF MUSIC_SHADOW
+    jsr shadow_get_ram
+    pha
+    lda #MUSIC_REG_SLOT_S
+    sta fx_music_slot
+    jsr shadow_select_ram
+
+	LDX #LO(music_reg_s)
+	LDY #HI(music_reg_s)
+	JSR	vgm_init_stream
+
+    pla
+    jsr shadow_select_ram
+ELSE
+
     lda #MUSIC_REG_SLOT
     sta fx_music_slot
     jsr swr_select_slot
@@ -31,6 +61,7 @@
 	LDX #LO(music_reg)
 	LDY #HI(music_reg)
 	JSR	vgm_init_stream
+ENDIF
     rts
 }
 
@@ -42,6 +73,20 @@
     jsr fx_music_stop
     lda #19:jsr osbyte
 
+IF MUSIC_SHADOW
+    jsr shadow_get_ram
+    pha
+    lda #MUSIC_EXCEPTION_SLOT_S
+    sta fx_music_slot
+    jsr shadow_select_ram
+
+	LDX #LO(music_exception_s)
+	LDY #HI(music_exception_s)
+	JSR	vgm_init_stream
+
+    pla
+    jsr shadow_select_ram
+ELSE
     lda #MUSIC_EXCEPTION_SLOT
     sta fx_music_slot
     jsr swr_select_slot
@@ -49,6 +94,7 @@
 	LDX #LO(music_exception)
 	LDY #HI(music_exception)
 	JSR	vgm_init_stream
+ENDIF
     rts
 }
 
@@ -76,24 +122,38 @@
     jsr teletext_update
     lda fx_music_on
     beq exit
-; SM: somethings up with SEI/CLI in here - causes the delta_time to go bonkers!
-;    SEI
+
+IF MUSIC_SHADOW
+    ; page in the music bank
+    jsr shadow_get_ram
+    pha
+    lda fx_music_slot
+    jsr shadow_select_ram
+
+	\\ Poll the music player
+	jsr poll_player
+    
+    ; restore previously paged ROM bank
+    pla
+    jsr shadow_select_ram
+
+ELSE
+
     lda &f4
     PHA
 
     ; page in the music bank
     lda fx_music_slot
     jsr swr_select_slot
-;    CLI
+
 
 	\\ Poll the music player
 	jsr poll_player
     
     ; restore previously paged ROM bank
-;    SEI
     PLA
     jsr swr_select_bank
-;    CLI
+ENDIF
 .exit
     rts    
 }

@@ -221,17 +221,19 @@ INCLUDE "src/fx/rotozoom2.asm"
 INCLUDE "src/fx/rotozoom3.asm"
 .end_fx_rotozoom
 
-;----------------------------------------------------------------------------------------------------------
-.music_en
-; hack demo to temporarily use small music track to free up 16Kb SWR bank, and put music in main RAM instead
-IF FALSE
-MUSIC_EN_SLOT = 0
-INCBIN "data/music_en.raw.exo" ; 16362 bytes
-ELSE
-MUSIC_EN_SLOT = 0
-INCBIN "data/music_reg.raw.exo"         ; 1548
-ENDIF
 
+;----------------------------------------------------------------------------------------------------------
+IF MUSIC_SHADOW == FALSE
+.music_en
+    ; hack demo to temporarily use small music track to free up 16Kb SWR bank, and put music in main RAM instead
+    IF FALSE
+        MUSIC_EN_SLOT = 0
+        INCBIN "data/music_en.raw.exo" ; 16362 bytes
+    ELSE
+        MUSIC_EN_SLOT = 0
+        INCBIN "data/music_reg.raw.exo"         ; 1548
+    ENDIF
+ENDIF
 
 
 
@@ -249,14 +251,16 @@ CLEAR &8000, &BFFF
 ORG &8000
 GUARD &BFFF
 .bank1_start
-MUSIC_REG_SLOT = 1
-.music_reg
-INCBIN "data/music_reg.raw.exo"         ; 1548
 
-MUSIC_EXCEPTION_SLOT = 1
-.music_exception
-INCBIN "data/music_exception.raw.exo"   ; 4297 
+IF MUSIC_SHADOW == FALSE
+    MUSIC_REG_SLOT = 1
+    .music_reg
+    INCBIN "data/music_reg.raw.exo"         ; 1548
 
+    MUSIC_EXCEPTION_SLOT = 1
+    .music_exception
+    INCBIN "data/music_exception.raw.exo"   ; 4297 
+ENDIF
 
 ;...
 
@@ -358,6 +362,53 @@ INCLUDE "src/fx/testcard.asm"
 SAVE "Bank3", bank3_start, bank3_end, &8000
 
 
+
+;----------------------------------------------------------------------------------------------------------
+; Shadow Bank 0 (20Kb) Main
+;----------------------------------------------------------------------------------------------------------
+
+CLEAR &3000, &7BFF
+ORG &3000
+GUARD &7BFF
+.shadow_bank0_start
+
+
+MUSIC_EN_SLOT_S = SELECT_RAM_MAIN
+.music_en_s
+INCBIN "data/music_en.raw.exo" ; 16362 bytes
+
+
+MUSIC_REG_SLOT_S = SELECT_RAM_MAIN
+.music_reg_s
+INCBIN "data/music_reg.raw.exo"         ; 1548
+
+
+
+.shadow_bank0_end
+SAVE "SBank0", shadow_bank0_start, shadow_bank0_end, &3000
+
+
+;----------------------------------------------------------------------------------------------------------
+; Shadow Bank 1 (20Kb)
+;----------------------------------------------------------------------------------------------------------
+
+CLEAR &3000, &7BFF
+ORG &3000
+GUARD &7BFF
+.shadow_bank1_start
+
+MUSIC_EXCEPTION_SLOT_S = SELECT_RAM_SHADOW
+.music_exception_s
+INCBIN "data/music_exception.raw.exo"   ; 4297 
+
+.shadow_bank1_end
+SAVE "SBank1", shadow_bank1_start, shadow_bank1_end, &3000
+
+
+; Another 8Kb bank for &C000-&DFFF ?
+; Another 4Kb bank for &8000-&8FFF ?
+
+
 ;----------------------------------------------------------------------------------------------------------
 ; Effect stats
 ;----------------------------------------------------------------------------------------------------------
@@ -403,8 +454,11 @@ PRINT "Bank0 from", ~bank0_start, "to", ~bank0_end, ", free mem is", 16384-(bank
 PRINT "Bank1 from", ~bank1_start, "to", ~bank1_end, ", free mem is", 16384-(bank1_end-bank1_start), "bytes"
 PRINT "Bank2 from", ~bank2_start, "to", ~bank2_end, ", free mem is", 16384-(bank2_end-bank2_start), "bytes"
 PRINT "Bank3 from", ~bank3_start, "to", ~bank3_end, ", free mem is", 16384-(bank3_end-bank3_start), "bytes"
-
-PRINT "Code space remaining", &7800-end, "bytes"
+PRINT ""
+PRINT "Shadow Bank0 from", ~shadow_bank0_start, "to", ~shadow_bank0_end, ", free mem is", 19456-(shadow_bank0_end-shadow_bank0_start), "bytes"
+PRINT "Shadow Bank1 from", ~shadow_bank1_start, "to", ~shadow_bank1_end, ", free mem is", 19456-(shadow_bank1_end-shadow_bank1_start), "bytes"
+PRINT ""
+PRINT "Code space remaining", &3000-end, "bytes"
 
 
 PUTFILE "data/pages/holdtest.txt.bin", "HOLD", &7C00
