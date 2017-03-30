@@ -61,7 +61,16 @@ INCLUDE "src/main.h.asm"
 \ *	Code
 \ ******************************************************************
 
-ORG &1100 ; could be &0E00 on a master, but disksys and filesys currently use &0e00-&10ff as scratch ram
+; Master 128 PAGE is &0E00 since MOS uses  memory is available from 
+ORG &0E00
+; 0E00 - &11FF is a 1Kb buffer 
+; used by disksys and filesys as scratch RAM
+; also used by 3d model system as scratch RAM
+; also used as an offscreen draw buffer
+SKIP 1024
+
+
+ORG &1200 ; setting the load address here means it can load & boot on a non-Master 128 (but will quickly exit if not a master).
 
 ; new guard position of &3000 which is where shadow ram begins
 ; we cannot put code into video ram address range if we are to use shadow ram
