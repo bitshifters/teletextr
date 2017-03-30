@@ -16,20 +16,21 @@ ELSE
 ENDIF
     rts
 }
-.fx_copybuffer_update
+.fx_buffer_swap
 {
 IF USE_SHADOW_RAM
     jsr shadow_swap_buffers
-    lda #32
-	jsr mode7_clear_screen_fast    
+;    lda #32
+;	jsr mode7_clear_screen_fast    
 ELSE
 	jsr mode7_copy_screen_fast
-    lda #32
-	jsr mode7_clear_shadow_fast
+;    lda #32
+;	jsr mode7_clear_shadow_fast
 ENDIF
     rts    
 }
 
+IF 0
 ; back buffer copy only, no clear
 .fx_buffer_copy
 {
@@ -39,11 +40,14 @@ ELSE
 ENDIF
     rts    
 }
+ENDIF
 
 ; clear back buffer
 .fx_buffer_clear
 {
 IF USE_SHADOW_RAM 
+    lda #32
+    jsr mode7_clear_screen_fast    
 ELSE
     lda #32
 	jsr mode7_clear_shadow_fast
@@ -51,6 +55,7 @@ ENDIF
     rts    
 }
 
+IF 0
 ; clear front buffer
 .fx_screen_clear
 {
@@ -58,17 +63,26 @@ ENDIF
 	jsr mode7_clear_screen_fast
     rts    
 }
+ENDIF
 
-; clear all buffers
+; clear all buffers by swapping screens & clearing as we go
 .fx_clear
 {
+    jsr fx_buffer_clear
+    jsr fx_buffer_swap
+    jsr fx_buffer_clear
+    jsr fx_buffer_swap
+    rts
+IF 0    
 IF USE_SHADOW_RAM
     rts
 ELSE
     jsr fx_screen_clear
     jmp fx_buffer_clear
 ENDIF
+ENDIF
 }
+
 
 ; SM: NEW Shadow RAM double buffering routines
 ; Draw buffer is ALWAYS &7C00

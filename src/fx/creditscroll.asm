@@ -8,7 +8,7 @@
 .start_fx_creditscroll
 
 \\ Change these to adjust window that is scrolled
-CREDITS_shadow_addr = &7800
+CREDITS_shadow_addr = MODE7_VRAM_SHADOW
 CREDITS_end_addr = CREDITS_shadow_addr + (MODE7_char_width * MODE7_char_height)
 CREDITS_first_char = 4
 CREDITS_last_char = MODE7_char_width

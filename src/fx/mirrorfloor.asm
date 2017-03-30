@@ -5,7 +5,7 @@
 
 .start_fx_mirrorfloor
 
-MIRROR_shadow_addr = &7800
+MIRROR_shadow_addr = MODE7_VRAM_SHADOW
 
 MIRROR_read_row = 21			; and the 8 rows above it
 MIRROR_write_row = 22			; and the 2 rows below it

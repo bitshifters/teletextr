@@ -7,7 +7,7 @@
 DEBUG = TRUE
 _ABUG = FALSE
 _HEADER = TRUE  ; teletext header is visible, so adjust line offsets +1 in effects
-USE_SHADOW_RAM = FALSE
+USE_SHADOW_RAM = TRUE
 
 
 

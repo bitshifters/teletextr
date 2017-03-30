@@ -30,7 +30,6 @@
 ;         z=1 if not 
 .shadow_check_master
 {
-    sei
     lda &c000
     tay
     eor #&ff
@@ -38,7 +37,6 @@
     sta &c000
     cpx &c000
     sty &c000
-    cli
     rts
 }
 
@@ -63,9 +61,46 @@
     rts
 }
 
+; set a single buffer display configuration such that the selected memory is the same as the current display memory
+; ie. let X=D
+.shadow_set_single_buffer
+{
+    lda &fe34    
+    and #1
+    asl a
+    asl a
+    sta &8f
+    lda &fe34
+    and #255-4
+    ora &8f
+    sta &fe34
+    rts
+}
+
+; set a double buffer display configuration such that the selected memory is the opposite of the current display memory
+; ie. let X=!D
+.shadow_set_double_buffer
+{
+    lda &fe34    
+    and #1
+    eor #1
+    asl a
+    asl a
+    sta &8f
+    lda &fe34
+    and #255-4
+    ora &8f
+    sta &fe34
+    rts
+}
+
+
 ; we swap the buffers by inverting bits 0 and 2
 ;  the previously selected main memory becomes display memory
 ;  and previously selected display memory becomes main memory
+
+; in single buffer mode, both display & main memory swap, but point to the same memory
+; in double buffer mode, both display & main memory swap, but point to the opposite memory 
 .shadow_swap_buffers
 {
     lda &fe34

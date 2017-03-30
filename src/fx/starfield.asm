@@ -4,9 +4,9 @@
 
 .start_fx_starfield
 
-STARFIELD_shadow_addr = &7800
+STARFIELD_shadow_addr = MODE7_VRAM_SHADOW
 
-STARFIELD_ERASE_STARS = TRUE				; FALSE if erasing screen anyway
+STARFIELD_ERASE_STARS = FALSE				; FALSE if erasing screen anyway
 
 STARFIELD_top_row = 1						; omit Ceefax header
 STARFIELD_left_column = 1					; needs to be 4 if req background colour
@@ -66,7 +66,8 @@ STARFIELD_start_addr = STARFIELD_shadow_addr + (STARFIELD_top_row * MODE7_char_w
 	IF STARFIELD_ERASE_STARS
 	STA stars_table_byte,X
 	ENDIF
-	CMP #32
+	; sm: screen is now cleared with zero, not 32
+	;CMP #32
 	BNE skip_write
 
 	\\ Plot our star
