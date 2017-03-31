@@ -1,8 +1,12 @@
 ; DFS/ADFS Disk op routines
 ; helpful for streaming, faster loading to SWR etc.
 ; http://chrisacorns.computinghistory.org.uk/docs/Acorn/Manuals/Acorn_DiscSystemUGI2.pdf
+; Our SWR loader is 60% faster than *SRLOAD
 
 DISKSYS_DEBUG = FALSE
+DISKSYS_CATALOG_ADDR = SCRATCH_RAM_ADDR
+DISKSYS_BUFFER_ADDR = DISKSYS_CATALOG_ADDR+512 ; &1000 ; must be page aligned
+DISKSYS_BUFFER_SIZE = 1 ; SECTORS TO READ, MUST BE ONE (for now)
 
 .osword_params
 .osword_params_drive
@@ -271,7 +275,7 @@ ENDIF
 ; A=memory address MSB (page aligned)
 ; X=filename address LSB
 ; Y=filename address MSB
-; clobbers memory &0e00 to &10ff
+; clobbers memory DISKSYS_BUFFER_ADDR to DISKSYS_BUFFER_ADDR+768
 .disksys_load_file
 {
     sta transfer_addr+2
@@ -283,9 +287,9 @@ ENDIF
 
     txa:pha:tya:pha
 
-    ; load 512 byte disk catalogue to &0E00-&0FFF
-    ldx #&00
-    ldy #&0e
+    ; load 512 byte disk catalogue to DISKSYS_CATALOG_ADDR to DISKSYS_CATALOG_ADDR+512
+    ldx #LO(DISKSYS_CATALOG_ADDR)
+    ldy #HI(DISKSYS_CATALOG_ADDR)
     jsr disksys_read_catalogue
 
     pla:tay:pla:tax
@@ -411,10 +415,10 @@ IF DISKSYS_DEBUG
     MPRINT txt_l1
 ENDIF
 
-    ; load a single sector to 256 byte memory buffer &1000
-    lda #1
-    ldx #0
-    ldy #&10
+    ; load a single sector to 256 byte memory buffer DISKSYS_BUFFER_ADDR
+    lda #DISKSYS_BUFFER_SIZE
+    ldx #LO(DISKSYS_BUFFER_ADDR)
+    ldy #HI(DISKSYS_BUFFER_ADDR)
     jsr disksys_read_sectors
 
     sei
@@ -426,7 +430,7 @@ ENDIF
     ; copy from the memory buffer to destination address
     ldx #0
 .transfer
-    lda &1000,x
+    lda DISKSYS_BUFFER_ADDR,x
 .transfer_addr
     sta &ff00,x         ; modified
     inx
