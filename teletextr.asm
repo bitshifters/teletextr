@@ -51,18 +51,17 @@ INCLUDE "src/main.h.asm"
 .zp_end
 
 
-;----------------------------------------------------------------------------------------------------------
-; Effect code headers
-;----------------------------------------------------------------------------------------------------------
-
 
 
 \ ******************************************************************
 \ *	Code
 \ ******************************************************************
 
+
 ; Master 128 PAGE is &0E00 since MOS uses  memory is available from 
 ORG &0E00
+SCRATCH_RAM_ADDR = *
+
 ; 0E00 - &11FF is a 1Kb buffer 
 ; used by disksys and filesys as scratch RAM
 ; also used by 3d model system as scratch RAM
