@@ -57,6 +57,10 @@ INCLUDE "src/main.h.asm"
 \ *	Code
 \ ******************************************************************
 
+ORG &0900
+
+
+
 
 ; Master 128 PAGE is &0E00 since MOS uses  memory is available from 
 ORG &0E00
@@ -128,8 +132,9 @@ INCLUDE "src/config.asm"
 \ ******************************************************************
 \ *	Code entry
 \ ******************************************************************
-
+INCLUDE "src/boot.asm"
 INCLUDE "src/main.asm"
+
 
 .end_lib
 
@@ -162,7 +167,7 @@ INCLUDE "src/fx/noise.asm"
 
 
 
-SAVE "Teletxr", start, end, main
+SAVE "Teletxr", start, end, boot
 
 
 \ ******************************************************************
