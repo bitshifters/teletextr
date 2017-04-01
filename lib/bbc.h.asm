@@ -11,6 +11,7 @@ osword = &FFF1
 osfind = &FFCE
 osgbpb = &FFD1
 osargs = &FFDA
+oscli = &FFF7
 EVENTV = &0220
 
 \\ Internal Key Number not INKEY!
