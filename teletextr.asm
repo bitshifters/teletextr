@@ -52,25 +52,63 @@ INCLUDE "src/main.h.asm"
 
 
 
-
-\ ******************************************************************
-\ *	Code
-\ ******************************************************************
-
-ORG &0900
-
-
-
-
-; Master 128 PAGE is &0E00 since MOS uses  memory is available from 
-ORG &0E00
-SCRATCH_RAM_ADDR = *
+; Master 128 PAGE is &0E00 since MOS uses other RAM buffers for DFS workspace
+SCRATCH_RAM_ADDR = &0E00
 
 ; 0E00 - &11FF is a 1Kb buffer 
 ; used by disksys and filesys as scratch RAM
 ; also used by 3d model system as scratch RAM
 ; also used as an offscreen draw buffer
-SKIP 1024
+
+
+
+\ ******************************************************************
+\ *	Boot Code
+\ ******************************************************************
+
+
+
+
+
+
+\ ******************************************************************
+\ *	Utilities code
+\ ******************************************************************
+
+ORG &0900
+GUARD &0CFF
+.utils_start
+INCLUDE "lib/swr.asm"
+INCLUDE "lib/print.asm"
+INCLUDE "lib/disksys.asm"
+;INCLUDE "lib/filesys.asm"
+INCLUDE "lib/shadowram.asm"
+; this lot fits in 1Kb with 2 bytes to spare
+.utils_end
+
+SAVE "System", utils_start, utils_end, 0
+
+\ ******************************************************************
+\ *	Bootstrap loader code
+\ ******************************************************************
+
+ORG &0400
+GUARD &07FF
+
+.boot_start
+INCLUDE "src/boot.asm"
+.boot_end
+
+
+SAVE "Teletxr", boot_start, boot_end, boot_entry
+
+
+
+
+
+\ ******************************************************************
+\ *	Main Code
+\ ******************************************************************
 
 
 ORG &1200 ; setting the load address here means it can load & boot on a non-Master 128 (but will quickly exit if not a master).
@@ -104,16 +142,13 @@ INCLUDE "lib/mode7_gif_anim.asm"
 
 
 
-INCLUDE "lib/shadowram.asm"
-INCLUDE "lib/print.asm"
 INCLUDE "lib/exomiser.asm"
 INCLUDE "lib/vgmplayer.h.asm"
 INCLUDE "lib/vgmplayer.asm"
-INCLUDE "lib/swr.asm"
-INCLUDE "lib/filesys.asm"
+
 INCLUDE "lib/irq.asm"
 INCLUDE "lib/vram.asm"
-INCLUDE "lib/disksys.asm"
+
 
 
 
@@ -132,7 +167,7 @@ INCLUDE "src/config.asm"
 \ ******************************************************************
 \ *	Code entry
 \ ******************************************************************
-INCLUDE "src/boot.asm"
+
 INCLUDE "src/main.asm"
 
 
@@ -167,7 +202,7 @@ INCLUDE "src/fx/noise.asm"
 
 
 
-SAVE "Teletxr", start, end, boot
+SAVE "Main", start, end, 0
 
 
 \ ******************************************************************

@@ -9,6 +9,11 @@ IF 0
 .myfile EQUS "Bank0  $"
 ENDIF
 
+
+.os_load_system   EQUS "LOAD System", 13
+.os_load_main     EQUS "LOAD Main", 13
+;.oscli_sbank0   EQUS "LOAD SBank0"
+
 ; disk loader uses hacky filename format (same as catalogue) 
 .bank_file0a   EQUS "Bank0  $"
 .bank_file1a   EQUS "Bank1  $"
@@ -16,21 +21,28 @@ ENDIF
 .bank_file3a   EQUS "Bank3  $"
 .bank_file4a   EQUS "SBank0 $"
 .bank_file5a   EQUS "SBank1 $"
+.bank_file6a   EQUS "Main   $"
 
 .intro_text0 EQUS "Teletextr OS V1.0", 13, 10, 0
 .intro_text1 EQUS "Initializing Teletext system...", 13, 10, 0
 .master_text EQUS "This demo is compatible with BBC Master 128 Only. :(", 13, 10, 0
+.error_text  EQUS "Guru meditation", 13, 10, 0
 
-.boot
+.boot_entry
 {
 \\ ***** System initialise ***** \\
 
 	\\ *FX 200,3 - clear memory on break as we use OS memory areas and can cause nasty effects
-	LDA #200
-	LDX #3
-	JSR osbyte		
+	lda #200
+	ldx #3
+	jsr osbyte		
 
+    ; install the system utils at &900
+    ldx #LO(os_load_system)
+    ldy #HI(os_load_system)
+    jsr oscli
 
+    ; check system compatibility
     jsr shadow_check_master
     beq is_master
     MPRINT    master_text
@@ -158,6 +170,12 @@ ENDIF
     ldx #LO(bank_file5a)
     ldy #HI(bank_file5a)
     jsr disksys_load_file
+    MPRINT loading_bank_text2
+
+    ; install main code
+    ldx #LO(os_load_main)
+    ldy #HI(os_load_main)
+    jsr oscli    
     MPRINT loading_bank_text2
 
     ; runtime
