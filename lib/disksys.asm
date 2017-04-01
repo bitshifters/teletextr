@@ -76,6 +76,7 @@ EQUB 0				; returned error value
     rts
 }
 
+IF 0
 .disksys_catalogue_addr     EQUW 0
 
 ;--------------------------------------------------------------
@@ -90,6 +91,7 @@ EQUB 0				; returned error value
     sty disksys_catalogue_addr+1
     rts
 }
+ENDIF
 
 ;--------------------------------------------------------------
 ; Fetch the 512 byte catalogue from the disk to memory
@@ -101,14 +103,14 @@ EQUB 0				; returned error value
 ; 512 bytes written to buffer in X/Y
 .disksys_read_catalogue
 {
-    jsr disksys_set_catalogue_addr
+ ;   jsr disksys_set_catalogue_addr
 
     ldx #0
     ldy #0
     jsr disksys_seek
     lda #2
-    ldx disksys_catalogue_addr+0
-    ldy disksys_catalogue_addr+1
+    ldx #LO(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+0
+    ldy #HI(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+1
     jsr disksys_read_sectors    
     rts
 }
@@ -125,9 +127,9 @@ IF 0
     txa
     pha
 
-    lda disksys_catalogue_addr+0
+    lda #LO(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+0
     sta addr+1
-    lda disksys_catalogue_addr+1
+    lda #HI(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+1
     sta addr+2
 
     txa
@@ -160,11 +162,11 @@ ENDIF
 ; X/Y preserved
 .disksys_get_numfiles
 {
-    lda disksys_catalogue_addr+0
+    lda #LO(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+0
     clc
     adc #5
     sta addr+1
-    lda disksys_catalogue_addr+1
+    lda #HI(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+1
     adc #1
     sta addr+2
 .addr
@@ -191,11 +193,11 @@ ENDIF
     stx comp_addr2+1
     sty comp_addr2+2
 
-    lda disksys_catalogue_addr+0
+    lda #LO(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+0
     clc
     adc #8
     sta comp_addr+1
-    lda disksys_catalogue_addr+1
+    lda #HI(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+1
     adc #0
     sta comp_addr+2
 
@@ -260,9 +262,9 @@ ENDIF
     asl a
     clc
     adc #8
-    adc disksys_catalogue_addr+0
+    adc #LO(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+0
     tax
-    lda disksys_catalogue_addr+1
+    lda #HI(DISKSYS_CATALOG_ADDR) ;disksys_catalogue_addr+1
     adc #1
     tay
     rts
