@@ -11,7 +11,7 @@
 ; then this function copies the buffer to temp memory
 ; before copying it back, de-interleaved
 ;----------------------------------------------------------------------------------------------------------
-TEMP_ADDR = &0E00
+TEMP_ADDR = SCRATCH_RAM_ADDR
 .fix_verts
 {
     sta npts

@@ -125,7 +125,7 @@ BLANK_DISPLAY 2.0
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_noise_update
+    SCRIPT_CALLSLOT fx_noise_update, FX_NOISE_SLOT
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 SCRIPT_CALL fx_clear

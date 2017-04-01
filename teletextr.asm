@@ -50,27 +50,60 @@ INCLUDE "src/main.h.asm"
 
 .zp_end
 
+; Master 128 PAGE is &0E00 since MOS uses other RAM buffers for DFS workspace
+SCRATCH_RAM_ADDR = &0E00
 
-;----------------------------------------------------------------------------------------------------------
-; Effect code headers
-;----------------------------------------------------------------------------------------------------------
-
-
-
-\ ******************************************************************
-\ *	Code
-\ ******************************************************************
-
-; Master 128 PAGE is &0E00 since MOS uses  memory is available from 
-ORG &0E00
 ; 0E00 - &11FF is a 1Kb buffer 
 ; used by disksys and filesys as scratch RAM
 ; also used by 3d model system as scratch RAM
 ; also used as an offscreen draw buffer
-SKIP 1024
+
+\ ******************************************************************
+\ *	Utility code - always memory resident
+\ ******************************************************************
+
+ORG &0900
+GUARD &0CFF
+.utils_start
+INCLUDE "lib/swr.asm"
+INCLUDE "lib/print.asm"     ; feels unnecessary, hardly used, and only for debugging mainly
+INCLUDE "lib/disksys.asm"
+;INCLUDE "lib/filesys.asm"  ; not needed anymore, as using disksys instead (faster)
+INCLUDE "lib/shadowram.asm"
+; this lot fits in 1Kb with 2 bytes to spare!
+.utils_end
+
+SAVE "System", utils_start, utils_end, 0
+
+\ ******************************************************************
+\ *	Bootstrap loader code
+\ ******************************************************************
+
+; Loaded at &0400 at boot time, overwritten later as used by exomiser
+ORG &0400
+GUARD &07FF
+
+.boot_start
+INCLUDE "src/boot.asm"
+.boot_end
 
 
-ORG &1200 ; setting the load address here means it can load & boot on a non-Master 128 (but will quickly exit if not a master).
+SAVE "Teletxr", boot_start, boot_end, boot_entry
+
+
+
+
+
+\ ******************************************************************
+\ *	Main Code
+\ ******************************************************************
+
+
+
+; &0E00-&11FF is SCRATCH_RAM_ADDR
+
+; main code entry
+ORG &1200
 
 ; new guard position of &3000 which is where shadow ram begins
 ; we cannot put code into video ram address range if we are to use shadow ram
@@ -78,17 +111,12 @@ GUARD &3000
 
 .start
 
-
-
-
 ;----------------------------------------------------------------------------------------------------------
 ; Common code
 ;----------------------------------------------------------------------------------------------------------
 ; Include common code used by effects here...
 .start_lib
 
-
-ALIGN 256
 WIREFRAME=TRUE
 MODE7=TRUE
 
@@ -98,29 +126,16 @@ INCLUDE "lib/mode7_plot_pixel.asm"
 INCLUDE "lib/mode7_sprites.asm"
 INCLUDE "lib/mode7_gif_anim.asm"
 
-
-
-
-INCLUDE "lib/shadowram.asm"
-INCLUDE "lib/print.asm"
 INCLUDE "lib/exomiser.asm"
 INCLUDE "lib/vgmplayer.h.asm"
 INCLUDE "lib/vgmplayer.asm"
-INCLUDE "lib/swr.asm"
-INCLUDE "lib/filesys.asm"
+
 INCLUDE "lib/irq.asm"
 INCLUDE "lib/vram.asm"
-INCLUDE "lib/disksys.asm"
-
-
-
-ALIGN 256
-
 
 ;----------------------------------------------------------------------------------------------------------
 ; demo config
 ;----------------------------------------------------------------------------------------------------------
-
 
 INCLUDE "src/script.asm"
 INCLUDE "src/config.asm"
@@ -131,6 +146,7 @@ INCLUDE "src/config.asm"
 \ ******************************************************************
 
 INCLUDE "src/main.asm"
+
 
 .end_lib
 
@@ -146,7 +162,7 @@ INCLUDE "src/main.asm"
 INCLUDE "src/fx/music.asm"
 INCLUDE "src/fx/copybuffer.asm"
 
-INCLUDE "src/fx/noise.asm"
+
 
 
 
@@ -163,7 +179,7 @@ INCLUDE "src/fx/noise.asm"
 
 
 
-SAVE "Teletxr", start, end, main
+SAVE "Main", start, end, 0
 
 
 \ ******************************************************************
@@ -295,6 +311,10 @@ INCLUDE "src/fx/dotscroller.asm"
 FX_TELETEXT_SLOT = 1
 INCLUDE "src/fx/teletext.asm"
 
+;----------------------------------------------------------------------------------------------------------
+; Noise effect
+FX_NOISE_SLOT = 1
+INCLUDE "src/fx/noise.asm"
 
 .bank1_end
 SAVE "Bank1", bank1_start, bank1_end, &8000
@@ -450,6 +470,7 @@ PRINT "ZeroPage from", ~zp_start, "to", ~zp_end, ", size is", (zp_end-zp_start),
 PRINT "Lib code from", ~start_lib, "to", ~end_lib, ", size is", (end_lib-start_lib), "bytes"
 PRINT " FX code from", ~start_fx_code, "to", ~end_fx_code, ", size is", (end_fx_code-start_fx_code), "bytes"
 PRINT "All code from", ~start, "to", ~end, ", size is", (end-start), "bytes"
+PRINT ""
 PRINT "Bank0 from", ~bank0_start, "to", ~bank0_end, ", free mem is", 16384-(bank0_end-bank0_start), "bytes"
 PRINT "Bank1 from", ~bank1_start, "to", ~bank1_end, ", free mem is", 16384-(bank1_end-bank1_start), "bytes"
 PRINT "Bank2 from", ~bank2_start, "to", ~bank2_end, ", free mem is", 16384-(bank2_end-bank2_start), "bytes"
@@ -458,9 +479,13 @@ PRINT ""
 PRINT "Shadow Bank0 from", ~shadow_bank0_start, "to", ~shadow_bank0_end, ", free mem is", 19456-(shadow_bank0_end-shadow_bank0_start), "bytes"
 PRINT "Shadow Bank1 from", ~shadow_bank1_start, "to", ~shadow_bank1_end, ", free mem is", 19456-(shadow_bank1_end-shadow_bank1_start), "bytes"
 PRINT ""
-PRINT "Code space remaining", &3000-end, "bytes"
+PRINT "Bootstrap code from", ~boot_start, "to", ~boot_end, ", free mem is", 1024-(boot_end-boot_start), "bytes"
+PRINT "Utility code from", ~utils_start, "to", ~utils_end, ", free mem is", 1024-(utils_end-utils_start), "bytes"
+PRINT ""
 
+PRINT "Main code space remaining", &3000-end, "bytes"
 
+IF 0
 PUTFILE "data/pages/holdtest.txt.bin", "HOLD", &7C00
 PUTFILE "data/pages/testpage.txt.bin", "TEST", &7C00
 PUTFILE "data/pages/Channl4","Channl4", &7C00
@@ -471,7 +496,7 @@ PUTFILE "data/pages/TVGuide","TVGuide", &7C00
 PUTFILE "data/pages/Yorks","Yorks", &7C00
 
 PUTBASIC "src/fx/6845.txt", "6845"
-
+ENDIF
 
 PRINT "Build successful."
 

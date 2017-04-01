@@ -1,5 +1,10 @@
-	
+; General file loading / streaming routines	
+
+
 FILESYS_DEBUG=FALSE
+FILESYS_BUFFER_ADDR = SCRATCH_RAM_ADDR ; must be page aligned
+FILESYS_BUFFER_SIZE = 1 ; PAGES TO READ, MUST BE ONE (for now)
+
 
 ;-------------------------------------------------------------------------
 ; Load a file
@@ -198,8 +203,7 @@ osargs_params=&9C ; 4-byte zero page address for OSARGS output
 ; Y=filename MSB
 ; A=load address MSB (256 byte buffer)
 
-FILESYS_BUFFER_ADDR = &0e00 ; must be page aligned
-FILESYS_BUFFER_SIZE = 1 ; MUST BE ONE (for now)
+
 
 .file_stream
 {
