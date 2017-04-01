@@ -499,7 +499,7 @@ PRINT "Shadow Bank1 from", ~shadow_bank1_start, "to", ~shadow_bank1_end, ", free
 PRINT ""
 PRINT "Code space remaining", &3000-end, "bytes"
 
-
+IF 0
 PUTFILE "data/pages/holdtest.txt.bin", "HOLD", &7C00
 PUTFILE "data/pages/testpage.txt.bin", "TEST", &7C00
 PUTFILE "data/pages/Channl4","Channl4", &7C00
@@ -510,7 +510,7 @@ PUTFILE "data/pages/TVGuide","TVGuide", &7C00
 PUTFILE "data/pages/Yorks","Yorks", &7C00
 
 PUTBASIC "src/fx/6845.txt", "6845"
-
+ENDIF
 
 PRINT "Build successful."
 
