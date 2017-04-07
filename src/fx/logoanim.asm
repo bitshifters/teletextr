@@ -126,14 +126,23 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 }
 
 \\ Something like set writeptr to top of column before entry
-\\ Draw Y rows of blocks and 10-Y rows of bytes A&X
+\\ Draw Y rows of solid sixels and 10-Y rows of bytes A&X
 .fx_logoanim_draw_col_top
 {
 	STA first_byte+1
+	STA middle_first+1
 	STX second_byte+1
 	STX second_solid+1
+	STX middle_second+1
 
-	STY solid_loop+1
+	LDA mode7_sprites_div3_table, Y
+	STA solid_loop+1
+
+	LDA mode7_sprites_mod3_table, Y
+	LSR A:TAX							; this table is shifted
+	LDA fx_logoanim_sixel_mask_top, X
+	STA middle_mask+1
+	STA middle_mask2+1
 
 	LDX #0
 	LDY #0
@@ -162,6 +171,38 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	BNE solid_loop
 	.done_solid_loop
 
+	\\ Middle bit!
+	CPX #10
+	BCS done_middle_bit
+
+	.middle_mask
+	LDA #&0
+	BEQ done_middle_bit			; no sixel mask needed
+
+	.middle_first
+	ORA #0
+	STA (writeptr), Y
+	
+	.middle_second
+	LDA #&0
+	BEQ skip_middle
+
+	.middle_mask2
+	ORA #&0
+	INY
+	STA (writeptr), Y
+	DEY
+	.skip_middle
+	INX
+
+	CLC
+	LDA writeptr
+	ADC #MODE7_char_width
+	STA writeptr
+	BCC done_middle_bit
+	INC writeptr+1
+	.done_middle_bit
+
 	.byte_loop
 	CPX #10
 	BCS done_byte_loop
@@ -188,16 +229,26 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	BNE byte_loop
 	.done_byte_loop
 
+	.return
 	RTS
 }
 
 .fx_logoanim_draw_col_bot
 {
 	STA first_byte+1
+	STA middle_first+1
 	STX second_byte+1
 	STX second_solid+1
+	STX middle_second+1
 
-	STY solid_loop+1
+	LDA mode7_sprites_div3_table, Y
+	STA solid_loop+1
+
+	LDA mode7_sprites_mod3_table, Y
+	LSR A:TAX							; this table is shifted
+	LDA fx_logoanim_sixel_mask_bot, X
+	STA middle_mask+1
+	STA middle_mask2+1
 
 	LDX #0
 	LDY #0
@@ -225,6 +276,38 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	DEC writeptr+1
 	BNE solid_loop
 	.done_solid_loop
+
+	\\ Middle bit!
+	CPX #10
+	BCS done_middle_bit
+
+	.middle_mask
+	LDA #&0
+	BEQ done_middle_bit			; no sixel mask needed
+
+	.middle_first
+	ORA #0
+	STA (writeptr), Y
+	
+	.middle_second
+	LDA #&0
+	BEQ skip_middle
+
+	.middle_mask2
+	ORA #&0
+	INY
+	STA (writeptr), Y
+	DEY
+	.skip_middle
+	INX
+
+	SEC
+	LDA writeptr
+	SBC #MODE7_char_width
+	STA writeptr
+	BCS done_middle_bit
+	DEC writeptr+1
+	.done_middle_bit
 
 	.byte_loop
 	CPX #10
@@ -267,8 +350,7 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	LDA #HI(LOGOANIM_shadow_addr + 2)
 	STA writeptr+1
 
-	LDX fx_logoanim_ypos + 0
-	LDY mode7_sprites_div3_table, X
+	LDY fx_logoanim_ypos + 0
 
 	LDA #&20
 	LDX #&6A
@@ -279,8 +361,7 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	LDA #HI(LOGOANIM_shadow_addr + 8)
 	STA writeptr+1
 
-	LDX fx_logoanim_ypos + 1
-	LDY mode7_sprites_div3_table, X
+	LDY fx_logoanim_ypos + 1
 
 	LDA #&20
 	LDX #&6A
@@ -291,8 +372,7 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	LDA #HI(LOGOANIM_shadow_addr + 14)
 	STA writeptr+1
 
-	LDX fx_logoanim_ypos + 2
-	LDY mode7_sprites_div3_table, X
+	LDY fx_logoanim_ypos + 2
 
 	LDA #&35
 	LDX #&20
@@ -303,8 +383,7 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	LDA #HI(LOGOANIM_shadow_addr + 24)
 	STA writeptr+1
 
-	LDX fx_logoanim_ypos + 3
-	LDY mode7_sprites_div3_table, X
+	LDY fx_logoanim_ypos + 3
 
 	LDA #&35
 	LDX #&20
@@ -315,8 +394,7 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	LDA #HI(LOGOANIM_shadow_addr + 5 + 24 * MODE7_char_width)
 	STA writeptr+1
 
-	LDX fx_logoanim_ypos + 4
-	LDY mode7_sprites_div3_table, X
+	LDY fx_logoanim_ypos + 4
 
 	LDA #&35
 	LDX #&20
@@ -327,8 +405,7 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	LDA #HI(LOGOANIM_shadow_addr + 17 + 24 * MODE7_char_width)
 	STA writeptr+1
 
-	LDX fx_logoanim_ypos + 5
-	LDY mode7_sprites_div3_table, X
+	LDY fx_logoanim_ypos + 5
 
 	LDA #&6A
 	LDX #&00
@@ -339,8 +416,7 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	LDA #HI(LOGOANIM_shadow_addr + 18 + 24 * MODE7_char_width)
 	STA writeptr+1
 
-	LDX fx_logoanim_ypos + 6
-	LDY mode7_sprites_div3_table, X
+	LDY fx_logoanim_ypos + 6
 
 	LDA #&20
 	LDX #&6A
@@ -351,8 +427,7 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	LDA #HI(LOGOANIM_shadow_addr + 20 + 24 * MODE7_char_width)
 	STA writeptr+1
 
-	LDX fx_logoanim_ypos + 7
-	LDY mode7_sprites_div3_table, X
+	LDY fx_logoanim_ypos + 7
 
 	LDA #&35
 	LDX #&20
@@ -363,8 +438,7 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	LDA #HI(LOGOANIM_shadow_addr + 31 + 24 * MODE7_char_width)
 	STA writeptr+1
 
-	LDX fx_logoanim_ypos + 8
-	LDY mode7_sprites_div3_table, X
+	LDY fx_logoanim_ypos + 8
 
 	LDA #&20
 	LDX #&6A
@@ -378,6 +452,11 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 \ *	Look up tables
 \ ******************************************************************
 
+.fx_logoanim_sixel_mask_top
+EQUB &0, 1+2, 1+2+4+8
+
+.fx_logoanim_sixel_mask_bot
+EQUB &0, 16+64, 16+64+4+8
 
 \ ******************************************************************
 \ *	Sprite data
