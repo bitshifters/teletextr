@@ -136,7 +136,6 @@ INCLUDE "src/fx/music.asm"
 INCLUDE "src/fx/copybuffer.asm"
 
 INCLUDE "src/fx/noise.asm"
-INCLUDE "src/fx/logoanim.asm"
 
 
 ;----------------------------------------------------------------------------------------------------------
@@ -224,6 +223,7 @@ INCLUDE "src/fx/starfield.asm"
 
 
 
+
 FX_ROTOZOOM_SLOT = 1
 .start_fx_rotozoom
 INCLUDE "src/fx/rotozoom.asm"
@@ -237,6 +237,10 @@ INCLUDE "src/fx/rotozoom3.asm"
 FX_DOTSCROLLER_SLOT = 1
 INCLUDE "src/fx/dotscroller.asm"
 
+;----------------------------------------------------------------------------------------------------------
+; Animated logo
+FX_LOGOANIM_SLOT = 1
+INCLUDE "src/fx/logoanim.asm"
 
 
 
