@@ -63,7 +63,7 @@ SCRATCH_RAM_ADDR = &0E00
 \ ******************************************************************
 
 ORG &0900
-GUARD &0CFF
+GUARD &0D00
 .utils_start
 INCLUDE "lib/swr.asm"
 INCLUDE "lib/print.asm"     ; feels unnecessary, hardly used, and only for debugging mainly
