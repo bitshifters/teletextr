@@ -63,6 +63,16 @@ MACRO BLANK_DISPLAY duration
     SCRIPT_CALL show_vram
 ENDMACRO
 
+MACRO DOTSCOLLER_SEGMENT duration, set_text_fn
+    SCRIPT_CALLSLOT set_text_fn, FX_DOTSCROLLER_SLOT
+    SCRIPT_SEGMENT_START duration
+        SCRIPT_CALL fx_buffer_swap  
+        SCRIPT_CALL fx_buffer_clear    
+        SCRIPT_CALLSLOT fx_dotscroller_update, FX_DOTSCROLLER_SLOT
+        SCRIPT_CALLSLOT fx_mirrorfloor_update, FX_MIRRORFLOOR_SLOT
+        SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+    SCRIPT_SEGMENT_END
+ENDMACRO
 
 ;------------------------------------------------------------------------
 ; Demo script begins
@@ -228,6 +238,7 @@ GIF_SEGMENT 4.0, PLAYGIFS_WEATHER
 
 ;-----------------------------------------------------------
 ; look like we're loading/configuring
+; KC: TODO - use Bitshifters animated logo
 ;-----------------------------------------------------------
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
@@ -255,12 +266,13 @@ SCRIPT_CALL fx_clear
 ;-----------------------------------------------------------
 ; some kind of "Bitshifters presents" sequence would be good here
 ; KC: Agree - a simple & reusable intro to each fx, maybe 5x5 font?
+; KC: TODO - put logo wibble here from branch - NEED BETTER LOGO
 ;-----------------------------------------------------------
 
 ; STARFIELD NEEDED!!! :)
 ; Starfield provided! :D
 
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap              ; stars are self-erasing - optional!
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
@@ -269,13 +281,14 @@ SCRIPT_SEGMENT_END
 
 
 
-IF 1
+IF 0
 ; SM: this effect is knacked for some reason, causes demo to hang, not sure why
 ; SM: think its fixed now. not sure what it was tho. suspicious about some filesys code overwriting pages &0e00-&10ff
 ;----------------------------------------------------------
 ; vector text effect
 ;-----------------------------------------------------------
 ; SM: I'd like to get a full vector font in so we can show any text string with it
+; KC: This doesn't work on my machine at the moment :(
 
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
 SCRIPT_SEGMENT_START    30.0
@@ -293,9 +306,10 @@ ENDIF
 
 
 
-IF 1
+IF 0
 ; SM: gonna make the linebox demo do something more - like animated boxes/fractals etc.
 ; KC: I get the line box starting in the middle of the screen when I run through?  Uninitialised start pos?
+; KC: removing for now as want to get the sequence tighter
 
 ; test segment
 SCRIPT_SEGMENT_START    5.0
@@ -316,6 +330,9 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
+
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_3d
 
 IF 1
 ;-----------------------------------------------------------
@@ -346,6 +363,9 @@ ENDIF
 ; Particles!
 ;-----------------------------------------------------------
 
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_part
+
 SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
 SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
 
@@ -375,6 +395,8 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
 
+; go through once to speed up - can always cut to again later
+IF 0
 SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
@@ -401,7 +423,7 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
-
+ENDIF
 
 GIF_SEGMENT 5.0, PLAYGIFS_BIRD
 
@@ -416,6 +438,9 @@ IF 1
 ; bit of mirror floor action going on too?
 
 
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_vb
+
 ; point cube effect
 SCRIPT_CALLSLOT fx_vectorballs_init, FX_VECTORBALLS_SLOT
 SCRIPT_CALLSLOT fx_vectorballs_set_small, FX_VECTORBALLS_SLOT
@@ -429,7 +454,7 @@ SCRIPT_SEGMENT_END
 
 
 SCRIPT_CALLSLOT fx_vectorballs_set_medium, FX_VECTORBALLS_SLOT
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear     
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
@@ -437,7 +462,7 @@ SCRIPT_SEGMENT_START    10.0
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT fx_vectorballs_set_large, FX_VECTORBALLS_SLOT
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
@@ -477,14 +502,17 @@ ENDIF
 GIF_SEGMENT 2.0, PLAYGIFS_BLUEBLOB
 
 
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_int
+
 RUN_EFFECT 5.0, fx_interference_update, FX_INTERFERENCE_SLOT
 
 GIF_SEGMENT 4.0, PLAYGIFS_DANCER
 
 SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
-RUN_EFFECT 5.0, fx_interference_update, FX_INTERFERENCE_SLOT
+RUN_EFFECT 4.0, fx_interference_update, FX_INTERFERENCE_SLOT
 
-GIF_SEGMENT 4.0, PLAYGIFS_DANCER
+GIF_SEGMENT 3.0, PLAYGIFS_DANCER
 RUN_EFFECT 2.0, fx_interference_update, FX_INTERFERENCE_SLOT
 GIF_SEGMENT 2.0, PLAYGIFS_DANCER
 RUN_EFFECT 1.0, fx_interference_update, FX_INTERFERENCE_SLOT
@@ -512,6 +540,7 @@ ENDIF
 ; Dot scroller
 ;-----------------------------------------------------------
 
+IF 0            ; skip this - use as an intro to each section
 SCRIPT_SEGMENT_START    20.0
     SCRIPT_CALL fx_buffer_swap  
     SCRIPT_CALL fx_buffer_clear    
@@ -519,7 +548,7 @@ SCRIPT_SEGMENT_START    20.0
     SCRIPT_CALLSLOT fx_mirrorfloor_update, FX_MIRRORFLOOR_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
-
+ENDIF
 
 
 
@@ -529,9 +558,13 @@ SCRIPT_SEGMENT_END
 ; plasma segment
 ;-----------------------------------------------------------
 ; SM: fairly happy with this, but I just want to add some animation params so its less uniform and more interesting
+
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_pl
+
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOT fx_plasma_init, FX_PLASMA_SLOT
-SCRIPT_SEGMENT_START    30.0
+SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_plasma, FX_PLASMA_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
@@ -543,23 +576,30 @@ SCRIPT_SEGMENT_END
 ;-----------------------------------------------------------
 ; this is the best effect, just need to animate it, possibly add some different textures
 
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_rot
+
 SCRIPT_CALL fx_clear
 
 ;SCRIPT_CALL shadow_set_single_buffer
 
-SCRIPT_SEGMENT_START    60.0
+SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_rotozoom3_animate, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_rotozoom3, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
 
+IF 0
 ; Might kill this one - technically interesting, but way too slow
+; KC: yes, too slow!  Next time!
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_rotozoom1, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT     
 SCRIPT_SEGMENT_END
+ENDIF
 
 IF 0
 ; was just a technical concept really - dump it
