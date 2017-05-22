@@ -14,9 +14,11 @@
 ; Here's some helpers to neaten things up a bit
 ;-----------------------------------------------
 
+total_duration = 0
 
 ; quick segment containing one double buffered effect
 MACRO RUN_EFFECT duration, routine, slot
+    total_duration = total_duration + duration
     SCRIPT_SEGMENT_START    duration
         SCRIPT_CALL fx_buffer_swap 
         SCRIPT_CALLSLOT routine, slot
@@ -27,6 +29,7 @@ ENDMACRO
 
 ; quick segment containing one double buffered effect, with a value
 MACRO RUN_EFFECTV duration, routine, slot, value
+    total_duration = total_duration + duration
     SCRIPT_SEGMENT_START    duration
         SCRIPT_CALL fx_buffer_swap 
     SCRIPT_CALL fx_buffer_clear        
@@ -37,6 +40,7 @@ ENDMACRO
 
 ; gif animation macro, just pass in duration and the id of the gif anim to play
 MACRO GIF_SEGMENT duration, gifid
+    total_duration = total_duration + duration
     SCRIPT_CALL fx_buffer_clear
     SCRIPT_CALL shadow_set_single_buffer
     SCRIPT_CALLSLOTV fx_playgifs_init, FX_PLAYGIFS_SLOT, gifid
@@ -56,6 +60,7 @@ ENDMACRO
 
 ; hide the screen for duration, then clear it and show again
 MACRO BLANK_DISPLAY duration
+    total_duration = total_duration + duration
     SCRIPT_SEGMENT_START    duration
         SCRIPT_CALL hide_vram
     SCRIPT_SEGMENT_END
@@ -64,6 +69,7 @@ MACRO BLANK_DISPLAY duration
 ENDMACRO
 
 MACRO DOTSCOLLER_SEGMENT duration, set_text_fn
+    total_duration = total_duration + duration
     SCRIPT_CALLSLOT set_text_fn, FX_DOTSCROLLER_SLOT
     SCRIPT_SEGMENT_START duration
         SCRIPT_CALL fx_buffer_swap  
@@ -80,6 +86,8 @@ ENDMACRO
 
 
 .demo_script_start
+
+PRINT "SCRIPT: START", total_duration, "s"
 
 ; initialise routines
 SCRIPT_CALL fx_copybuffer_init
