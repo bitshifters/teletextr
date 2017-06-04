@@ -5,7 +5,7 @@
 
 .start_fx_interference
 
-INTERFERENCE_shadow_addr = &7800 + 4	; currently writing 36x22 character screen
+INTERFERENCE_shadow_addr = MODE7_VRAM_SHADOW + 4	; currently writing 36x22 character screen
 
 
 INTERFERENCE_sprite_width = 54

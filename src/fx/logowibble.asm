@@ -6,7 +6,7 @@ _LOGOWIBBLE_SPARSE_DATA = FALSE			; uses 3x as much space for data
 
 .start_fx_logowibble
 
-LOGOWIBBLE_shadow_addr = &7800
+LOGOWIBBLE_shadow_addr = MODE7_VRAM_SHADOW
 
 LOGOWIBBLE_char_width = 30
 LOGOWIBBLE_char_height = 6
@@ -101,6 +101,8 @@ EQUB 0
 	ENDIF
 
 	BEQ next_char
+
+	ORA #32
 
 	.fx_logowibble_load_addr
 	ORA &7800, X

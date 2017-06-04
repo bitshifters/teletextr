@@ -145,6 +145,7 @@ ENDIF
 }
 
 
+; Call only ONCE per run.
 .fx_3dshape_init
 {
     ; initialise variables
@@ -162,7 +163,8 @@ ENDIF
 
 
     ; setup multiplication tables
-    jsr initialise_multiply
+; SDM: do this only once per run, now done in script.
+;    jsr initialise_multiply
 
 
     ; load first model

@@ -33,7 +33,7 @@
 
 .start_fx_logoanim
 
-LOGOANIM_shadow_addr = &7800
+LOGOANIM_shadow_addr = MODE7_VRAM_SHADOW
 
 LOGOANIM_draw_addr = LOGOANIM_shadow_addr + 10 * MODE7_char_width
 LOGOANIM_logo_rows = 5

@@ -5,7 +5,7 @@
 
 .start_fx_particles
 
-MODE7_particles_addr = &7800
+MODE7_particles_addr = MODE7_VRAM_SHADOW
 
 PARTICLES_max = 128
 _PARTICLES_ENABLE_BANG = FALSE
@@ -631,7 +631,8 @@ EQUB 0
 			sta plot_hi						;[3]
 
 			lda (plot_lo),y
-			cmp #32
+			; sm: buffer now cleared to 0, not 32
+			;cmp #32
 			bne skipcol
 
 			lda plot_tmp
