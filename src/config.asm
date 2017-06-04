@@ -277,7 +277,7 @@ SCRIPT_SEGMENT_END
 ENDIF
 
 
-IF 0
+IF 1
 ; SM: this effect is knacked for some reason, causes demo to hang, not sure why
 ; SM: think its fixed now. not sure what it was tho. suspicious about some filesys code overwriting pages &0e00-&10ff
 ;----------------------------------------------------------
