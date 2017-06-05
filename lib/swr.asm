@@ -16,27 +16,34 @@
     ; scan for roms
     ldx #15
 .rom_loop
+;   stx &f4     ; should really set this but have interupts disabled so OS shouldn't find out
     stx &fe30   ; select rom bank
-    lda &8000   ; read byte
-    tay         ; save
-    eor #&FF    ; invert, so that we are know we are writing a different value 
-    sta &8000   ; write byte
+    ldy #0      ; assume rom
+    lda &8008   ; read byte
+    eor #&AA    ; invert, so that we are know we are writing a different value 
+    sta &8008   ; write byte
+    cmp &8008   ; check that byte was written by comparing what we wrote with what we read back
+    bne no_ram
+;    eor #&AA
+;    sta &8008  ; shoud realy poke it back but don't care as we're going to obliterate bank
+    iny         ; is ram
+    .no_ram
     tya
-    sec
-    sbc &8000   ; check that byte was written by comparing what we wrote with what we read back
     sta swr_rom_banks,x ; 0 if ram, non-zero if rom
     dex
     bpl rom_loop
 
     ; reset swr_ram_banks array
-    lda #255
-    sta swr_ram_banks+0
-    sta swr_ram_banks+1
-    sta swr_ram_banks+2
-    sta swr_ram_banks+3
+;    lda #255
+;   X already contains 255 as above loop terminates when x < 0
+    stx swr_ram_banks+0
+    stx swr_ram_banks+1
+    stx swr_ram_banks+2
+    stx swr_ram_banks+3
 
     ; put available ram bank id's into swr_ram_banks
-    ldx #0
+;    ldx #0
+    inx         ; save a byte as X = 255
     ldy #0
 .ram_loop
     lda swr_rom_banks,x
@@ -82,8 +89,8 @@
     lda swr_ram_banks,X
     bmi bad_socket
     sei
-    sta &fe30
     sta &f4
+    sta &fe30
     sta swr_slot_selected
     cli
 .bad_socket
@@ -94,8 +101,8 @@
 .swr_select_bank
 {
     sei
-    sta &fe30
     sta &f4
+    sta &fe30
     cli
     rts
 }

@@ -131,7 +131,6 @@ SCRIPT_SEGMENT_END
 ENDIF
 
 
-
 ;-----------------------------------------------------------
 ; Screen off/on
 ;-----------------------------------------------------------
@@ -277,13 +276,21 @@ SCRIPT_CALL fx_clear
 ; KC: TODO - put logo wibble here from branch - NEED BETTER LOGO
 ;-----------------------------------------------------------
 
-; STARFIELD NEEDED!!! :)
-; Starfield provided! :D
+SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
+SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL shadow_set_double_buffer
 
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap              ; stars are self-erasing - optional!
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
+    SCRIPT_CALLSLOT fx_logowibble_update, FX_LOGOWIBBLE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
 
@@ -306,8 +313,6 @@ SCRIPT_SEGMENT_START    30.0
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
-
-
 ENDIF
 
 

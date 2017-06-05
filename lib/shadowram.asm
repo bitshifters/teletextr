@@ -50,6 +50,7 @@ SELECT_RAM_SHADOW = 4
 }
 
 ; clear bit 4 of ACCCON, so that the 8Kb Buffer at &C000 can be used as spare RAM instead of MOS VDU buffer
+; NB. not VDU buffer but VDU code.  When selected as RAM this is used by the Filing System - OK to steal if not loading files!
 .shadow_enable_hiram
 {
     lda &fe34
