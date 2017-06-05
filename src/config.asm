@@ -266,7 +266,6 @@ SCRIPT_SEGMENT_END
 
 SCRIPT_CALL shadow_set_double_buffer
 
-IF 1
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap              ; stars are self-erasing - optional!
     SCRIPT_CALL fx_buffer_clear    
@@ -274,7 +273,6 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_logowibble_update, FX_LOGOWIBBLE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
-ENDIF
 
 
 IF 1

@@ -35,7 +35,8 @@
     and #7
     bne do3d
 
-    jsr fx_teletext_showpages
+; ARGH! CAN'T DO THIS AS FX_TELETEXT IN DIFFERENT SWRAM BANK!
+;    jsr fx_teletext_showpages
     rts
 
 .do3d
