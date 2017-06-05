@@ -689,7 +689,7 @@ SKIP PARTICLES_max
 \\ Apart from sin/cos table - could be reused from another fx?
 .fx_particles_table
 FOR n,0,&13F,1
-EQUB 127 * SIN(2 * PI * n / 255)
+EQUB 127 * SIN(2 * PI * n / 255)	; 255 or 256?
 NEXT
 
 fx_particles_table_cos = fx_particles_table + 64
