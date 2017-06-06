@@ -222,7 +222,7 @@ SCRIPT_CALL fx_music_start
 ; GIF SEGUE - Weather breaking
 ;-----------------------------------------------------------
 
-GIF_SEGMENT 4.0, PLAYGIFS_WEATHER
+GIF_SEGMENT 5.0, PLAYGIFS_WEATHER
 
 ;-----------------------------------------------------------
 ; some kind of "Bitshifters presents" sequence would be good here
@@ -344,7 +344,7 @@ ENDIF
 
 IF 1
 ; dot scroll an intro message
-DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_rot
+DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_rot
 
 SCRIPT_CALL fx_clear
 
@@ -360,7 +360,7 @@ ENDIF
 ; GIF SEGUE - Bird
 ;-----------------------------------------------------------
 
-GIF_SEGMENT 5.0, PLAYGIFS_BIRD
+GIF_SEGMENT 4.0, PLAYGIFS_BIRD
 
 ;-----------------------------------------------------------
 ; Particles!
@@ -368,7 +368,7 @@ GIF_SEGMENT 5.0, PLAYGIFS_BIRD
 
 IF 1
 ; dot scroll an intro message
-DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_part
+DOTSCOLLER_SEGMENT      6.0, fx_dotscroller_set_text_part
 
 SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
 SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
