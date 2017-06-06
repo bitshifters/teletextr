@@ -150,6 +150,62 @@ ENDIF
 \ *	Dotscroller Scroll FX
 \ ******************************************************************
 
+.fx_dotscroller_set_text
+{
+	STX fx_dotscroller_ptr
+	STY fx_dotscroller_ptr+1
+
+	LDA 0
+	STA fx_dotscroller_char_idx
+	STA fx_dotscroller_col_idx
+
+	RTS
+}
+
+MACRO FX_DOTSCROLLER_SET_FN text_string
+{
+	LDX #LO(text_addr):LDY #HI(text_addr):JMP fx_dotscroller_set_text
+	.text_addr EQUS text_string, 0			; sadly MACROs don't like text parameters :(
+}
+ENDMACRO
+
+.fx_dotscroller_set_text_3d
+{
+	LDX #LO(text_addr):LDY #HI(text_addr):JMP fx_dotscroller_set_text
+	.text_addr EQUS "        HOW ABOUT SOME 3D SHAPES?        ", 0
+}
+
+.fx_dotscroller_set_text_vb
+{
+	LDX #LO(text_addr):LDY #HI(text_addr):JMP fx_dotscroller_set_text
+	.text_addr EQUS "        VECTORBALLS IN TELETEXT?!        ", 0
+}
+
+.fx_dotscroller_set_text_part
+{
+	LDX #LO(text_addr):LDY #HI(text_addr):JMP fx_dotscroller_set_text
+	.text_addr EQUS "        PARTICLES ON A BEEB? SURE!        ", 0
+}
+
+.fx_dotscroller_set_text_int
+{
+	LDX #LO(text_addr):LDY #HI(text_addr):JMP fx_dotscroller_set_text
+	.text_addr EQUS "        OLD SCHOOL INTERFERENCE FTW!        ", 0
+}
+
+.fx_dotscroller_set_text_rot
+{
+	LDX #LO(text_addr):LDY #HI(text_addr):JMP fx_dotscroller_set_text
+	.text_addr EQUS "        ROTOZOOM!!...        ", 0
+}
+
+.fx_dotscroller_set_text_pl
+{
+	LDX #LO(text_addr):LDY #HI(text_addr):JMP fx_dotscroller_set_text
+	.text_addr EQUS "        GOTTA HAVE SOME PLASMA        ", 0
+}
+
+
 \\ NB. Can only have 255 characters max at the moment
 .fx_dotscroller_msg
 EQUS "HELLO WORLD! THIS IS A DOT SCROLLER WHICH IS SOMEWHAT UNREADABLE BUT BETTER IN UPPERCASE!... 0123456789    "
@@ -220,7 +276,7 @@ ENDIF
 
 	.char_idx
 	LDY #0
-	LDA fx_dotscroller_msg, Y
+	LDA (fx_dotscroller_ptr), Y
 	BNE not_zero
 	STA char_idx + 1
 	BEQ char_idx
@@ -278,7 +334,7 @@ ENDIF
 	\\ Next char next time
 	LDX #0
 	INY
-	LDA fx_dotscroller_msg, Y
+	LDA (fx_dotscroller_ptr), Y
 	BNE same_char
 	LDY #0 
 
