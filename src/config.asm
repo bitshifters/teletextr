@@ -225,23 +225,6 @@ SCRIPT_CALL fx_music_start
 GIF_SEGMENT 4.0, PLAYGIFS_WEATHER
 
 ;-----------------------------------------------------------
-; look like we're loading/configuring
-; KC: TODO - use Bitshifters animated logo
-;-----------------------------------------------------------
-
-IF 1
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
-    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
-SCRIPT_SEGMENT_END
-ENDIF
-
-SCRIPT_CALL fx_clear
-
-;-----------------------------------------------------------
 ; some kind of "Bitshifters presents" sequence would be good here
 ; KC: Agree - a simple & reusable intro to each fx, maybe 5x5 font?
 ; KC: TODO - put logo wibble here from branch - NEED BETTER LOGO
@@ -260,7 +243,24 @@ SCRIPT_CALL shadow_set_double_buffer
 ENDIF
 
 ;-----------------------------------------------------------
-; Wibbling logo - need much better sprite though
+; look like we're loading/configuring
+; KC: TODO - use Bitshifters animated logo
+;-----------------------------------------------------------
+
+IF 1
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+ENDIF
+
+SCRIPT_CALL fx_clear
+
+;-----------------------------------------------------------
+; Wibbling logo - NEED MUCH BETTER SPRITE!  TELETEXTR LOGO?
 ;-----------------------------------------------------------
 
 IF 1
@@ -478,17 +478,53 @@ IF 1
 DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_3d
 
 SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_CALLSLOT fx_3dshape_toggle_culling, FX_3DSHAPE_SLOT      ; start with backfaces visible
+SCRIPT_SEGMENT_START    4.5
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
     SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+SCRIPT_CALLSLOT fx_3dshape_toggle_culling, FX_3DSHAPE_SLOT      ; remove backfaces
+
+SCRIPT_SEGMENT_START    4.5
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+
+SCRIPT_SEGMENT_START    4.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+
+SCRIPT_SEGMENT_START    4.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT        ; this is too garish
+    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+
+SCRIPT_SEGMENT_START    4.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT        ; this is too garish
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    

@@ -68,7 +68,7 @@ ENDIF
     ; check for "C" pressed to toggle backface culling
     LDA#&81:LDX#&AD:LDY#&FF:JSR &FFF4
     TYA:BEQ noc:LDA cullingdb:BNE noc
-    LDA culling:EOR #255:STA culling:LDA#1
+    JSR fx_3dshape_toggle_culling:LDA#1
     .noc STA cullingdb
 
 IF WIREFRAME==FALSE
@@ -144,6 +144,12 @@ ENDIF
     rts    
 }
 
+
+.fx_3dshape_toggle_culling
+{
+    LDA culling:EOR #255:STA culling
+    RTS
+}
 
 ; Call only ONCE per run.
 .fx_3dshape_init
