@@ -208,15 +208,90 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL fx_music_stop
 
 SCRIPT_CALL sfx_noise_on
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    2.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_colournoise_update
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
+SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
+SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+SCRIPT_SEGMENT_START    0.1
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
+SCRIPT_SEGMENT_END
+SCRIPT_CALL shadow_set_double_buffer
+
+SCRIPT_CALL sfx_noise_on
+SCRIPT_SEGMENT_START    1.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_colournoise_update
+;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+SCRIPT_CALL sfx_noise_off
+
+SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
+SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
+SCRIPT_SEGMENT_END
+SCRIPT_CALL shadow_set_double_buffer
+
+SCRIPT_CALL sfx_noise_on
+SCRIPT_SEGMENT_START    0.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_colournoise_update
+;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+SCRIPT_CALL sfx_noise_off
+
+SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
+SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
+SCRIPT_SEGMENT_END
+SCRIPT_CALL shadow_set_double_buffer
+
+SCRIPT_CALL sfx_noise_on
+SCRIPT_SEGMENT_START    0.1
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_colournoise_update
+;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+SCRIPT_CALL sfx_noise_off
+
+SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
+SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+SCRIPT_SEGMENT_START    2.0
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
+SCRIPT_SEGMENT_END
+SCRIPT_CALL shadow_set_double_buffer
+
+;-----------------------------------------------------------
+; START DEMO SECTION
+;-----------------------------------------------------------
+
+BLANK_DISPLAY 1.0
+
+SCRIPT_CALL fx_clear
+SCRIPT_SEGMENT_START    1.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; but should have changed from CEEFAX to BITFAX?
+SCRIPT_SEGMENT_END
+
 SCRIPT_CALL fx_music_init_en ; en
 SCRIPT_CALL fx_music_start
+
+SCRIPT_SEGMENT_START    1.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; but should have changed from CEEFAX to BITFAX?
+SCRIPT_SEGMENT_END
 
 ;-----------------------------------------------------------
 ; GIF SEGUE - Weather breaking
@@ -230,15 +305,13 @@ GIF_SEGMENT 5.0, PLAYGIFS_WEATHER
 ; KC: TODO - put logo wibble here from branch - NEED BETTER LOGO
 ;-----------------------------------------------------------
 
-IF 1
+IF 0
 SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
 SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
-
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
 ;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
 SCRIPT_SEGMENT_END
-
 SCRIPT_CALL shadow_set_double_buffer
 ENDIF
 
