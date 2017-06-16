@@ -93,4 +93,17 @@ ENDIF
     rts    
 }
 
+
+
+.fx_testcard_dot
+{
+	lda #144+7
+	jsr mode7_set_graphics_shadow_fast
+
+    LDA #32+16
+    STA MODE7_VRAM_SHADOW + (((MODE7_char_height-1)/2) * MODE7_char_width) + (MODE7_char_width/2) - 1
+    RTS
+}
+
+
 .end_fx_testcard
