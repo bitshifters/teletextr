@@ -297,7 +297,8 @@ SCRIPT_SEGMENT_END
 ; GIF SEGUE - Weather breaking
 ;-----------------------------------------------------------
 
-GIF_SEGMENT 5.0, PLAYGIFS_WEATHER
+GIF_SEGMENT 5.2, PLAYGIFS_WEATHER
+; would be cute to add "Weather forecast for Budleigh Salterton..."
 
 ;-----------------------------------------------------------
 ; some kind of "Bitshifters presents" sequence would be good here
