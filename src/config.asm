@@ -215,29 +215,32 @@ SCRIPT_SEGMENT_START    2.0
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
-SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
 SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
 SCRIPT_SEGMENT_START    0.1
+    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
-;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
 SCRIPT_SEGMENT_END
-SCRIPT_CALL shadow_set_double_buffer
 
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    1.5
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_colournoise_update
-;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
-SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
 SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
 SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
-;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
 SCRIPT_SEGMENT_END
-SCRIPT_CALL shadow_set_double_buffer
 
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    0.5
@@ -247,13 +250,15 @@ SCRIPT_SEGMENT_START    0.5
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
-SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
 SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
 SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
-;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
 SCRIPT_SEGMENT_END
-SCRIPT_CALL shadow_set_double_buffer
 
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    0.1
@@ -263,13 +268,16 @@ SCRIPT_SEGMENT_START    0.1
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
-SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
 SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
 SCRIPT_SEGMENT_START    2.0
+    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
-;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
 SCRIPT_SEGMENT_END
-SCRIPT_CALL shadow_set_double_buffer
+
 
 ;-----------------------------------------------------------
 ; START DEMO SECTION
@@ -297,7 +305,7 @@ SCRIPT_SEGMENT_END
 ; GIF SEGUE - Weather breaking
 ;-----------------------------------------------------------
 
-GIF_SEGMENT 5.2, PLAYGIFS_WEATHER
+GIF_SEGMENT 5.5, PLAYGIFS_WEATHER
 ; would be cute to add "Weather forecast for Budleigh Salterton..."
 
 ;-----------------------------------------------------------
