@@ -283,7 +283,7 @@ EQUB PARTICLES_SPURT_speed
 	TYA
 	AND #&3
 	CLC
-	ADC #145
+	ADC #146
 	STA fx_particles_state, X
 
 	\\ Set X&Y pos
@@ -357,7 +357,7 @@ EQUB 0
 	STA fx_particles_drip_col
 
 	\\ Turn this into teletext code
-	ADC #145
+	ADC #147
 	STA fx_particles_state, X
 
 	\\ Set X&Y pos fraction
