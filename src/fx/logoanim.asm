@@ -88,26 +88,9 @@ EQUB -1, -1, -1, -1, -1, -1, -1, -1, -1
 	STA LOGOANIM_draw_addr, X
 
 	\\ Annoyingly blank right edge for symmetry
-	LDA #LO(LOGOANIM_shadow_addr+39)
-	STA writeptr
-	LDA #HI(LOGOANIM_shadow_addr+39)
-	STA writeptr+1
-
-	\\ Choose loop for code size over speed
-	LDY #0
-	LDX #25
-	.blank_loop
 	LDA #32
-	STA (writeptr), Y
-	DEX
-	BEQ return
-	CLC
-	LDA writeptr
-	ADC #MODE7_char_width
-	STA writeptr
-	BCC blank_loop
-	INC writeptr+1
-	BNE blank_loop
+	LDX #39
+	JSR mode7_set_column_shadow_fast
 
 	.return
 	RTS
