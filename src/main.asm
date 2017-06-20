@@ -1,6 +1,6 @@
-_ENABLE_IRQ_VSYNC = TRUE
+_ENABLE_IRQ_VSYNC = FALSE				; enable to trigger out internal "vsync" on timer 1 at a set point through the frame
 
-TIMER_latch = 20000-2		; 20ms = 1x vsync :)
+TIMER_latch = 20000-2					; 20ms = 1x vsync :)
 TIMER_start = (TIMER_latch * 0.9)		; some % down the frame is our vsync point
 
 
