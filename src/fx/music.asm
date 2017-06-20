@@ -165,9 +165,9 @@ ENDIF
 
 .teletext_header
 ;"0123456789012345678901234567890123456789"
-EQUS "P100   ",130,"CEEFAX "
+EQUS " P100  ",130,"CEEFAX "
 .page
-EQUS "100  Fri 19 Jan ",131,"20:49/1"
+EQUS "100  Sat 24 Jun ",131,"20:49/1"
 .second EQUS "0"
 .counter EQUB 0
 

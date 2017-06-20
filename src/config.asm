@@ -39,10 +39,10 @@ ENDMACRO
 MACRO GIF_SEGMENT duration, gifid
     SCRIPT_CALL fx_buffer_clear
     SCRIPT_CALL shadow_set_single_buffer
-    SCRIPT_CALLSLOTV fx_playgifs_init, FX_PLAYGIFS_SLOT, gifid
+    SCRIPT_CALLSLOTV fx_playgifs_init, gifid, FX_PLAYGIFS_SLOT
 
     SCRIPT_SEGMENT_START duration
-        SCRIPT_CALLSLOTV fx_playgifs_playanim, FX_PLAYGIFS_SLOT, gifid
+        SCRIPT_CALLSLOTV fx_playgifs_playanim, gifid, FX_PLAYGIFS_SLOT
         SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
     SCRIPT_SEGMENT_END
 
@@ -215,29 +215,32 @@ SCRIPT_SEGMENT_START    2.0
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
-SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
-SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
 SCRIPT_SEGMENT_START    0.1
+    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
-;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
 SCRIPT_SEGMENT_END
-SCRIPT_CALL shadow_set_double_buffer
 
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    1.5
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_colournoise_update
-;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
-SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
-SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
 SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
-;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
 SCRIPT_SEGMENT_END
-SCRIPT_CALL shadow_set_double_buffer
 
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    0.5
@@ -247,13 +250,15 @@ SCRIPT_SEGMENT_START    0.5
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
-SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
-SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
 SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
-;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
 SCRIPT_SEGMENT_END
-SCRIPT_CALL shadow_set_double_buffer
 
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    0.1
@@ -263,13 +268,16 @@ SCRIPT_SEGMENT_START    0.1
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
-SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
-SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
 SCRIPT_SEGMENT_START    2.0
+    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
-;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
 SCRIPT_SEGMENT_END
-SCRIPT_CALL shadow_set_double_buffer
+
 
 ;-----------------------------------------------------------
 ; START DEMO SECTION
@@ -297,7 +305,8 @@ SCRIPT_SEGMENT_END
 ; GIF SEGUE - Weather breaking
 ;-----------------------------------------------------------
 
-GIF_SEGMENT 5.0, PLAYGIFS_WEATHER
+GIF_SEGMENT 5.5, PLAYGIFS_WEATHER
+; would be cute to add "Weather forecast for Budleigh Salterton..."
 
 ;-----------------------------------------------------------
 ; some kind of "Bitshifters presents" sequence would be good here
@@ -392,12 +401,31 @@ IF 1
 ; dot scroll an intro message
 DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_int
 
-RUN_EFFECT 5.0, fx_interference_update, FX_INTERFERENCE_SLOT
+SCRIPT_CALL fx_clear
+SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+3, FX_GREENSCREEN_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_bg, 144+1, FX_GREENSCREEN_SLOT
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
 
 GIF_SEGMENT 4.0, PLAYGIFS_DANCER
 
 SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
-RUN_EFFECT 5.0, fx_interference_update, FX_INTERFERENCE_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+5, FX_GREENSCREEN_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_bg, 144+4, FX_GREENSCREEN_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+; reset green screen
+SCRIPT_CALLSLOT fx_greenscreen_set_default, FX_GREENSCREEN_SLOT
 ENDIF
 
 IF 0        ; don't think this works at this point in the sequence
@@ -646,11 +674,6 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL shadow_set_double_buffer
 
 SCRIPT_CALL fx_music_stop
-; clear the screen on finish
-SCRIPT_CALL fx_buffer_swap
-SCRIPT_CALL fx_buffer_clear
-SCRIPT_CALL fx_buffer_swap
-SCRIPT_CALL fx_buffer_clear
 
 ;----------------------------------------------------------- 
 ; Finish - show testcard
@@ -663,9 +686,19 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_testcard, FX_TESTCARD_SLOT
 SCRIPT_SEGMENT_END
 
+; Turn off TV - Screen needs to clear to a single dot in the centre!!
 SCRIPT_CALL fx_music_stop
+SCRIPT_CALL fx_clear
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap  
+SCRIPT_CALLSLOT fx_testcard_dot, FX_TESTCARD_SLOT
+SCRIPT_SEGMENT_END
 
-; Screen needs to clear to a single dot in the centre!!
+; clear the screen on finish
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
 
 .segment_end
 
@@ -835,7 +868,7 @@ ENDIF
 
 ; Need to get to the action within 60s and keep the overall length tight - less is more!
 ; Strength is that we can switch rapidly between fx so keep it snappy - we're not hiding any loading!
-; Go from least to most impressive - probably start 2D and end 3D ("brining Teletext to a new dimension")
+; Go from least to most impressive - probably start 2D and end 3D ("bringing Teletext to a new dimension")
 
 ; 6. FX polish:
 ;    a. Nice colour setups for Interference

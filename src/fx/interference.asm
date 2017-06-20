@@ -5,14 +5,14 @@
 
 .start_fx_interference
 
-INTERFERENCE_shadow_addr = MODE7_VRAM_SHADOW + 4	; currently writing 36x22 character screen
+INTERFERENCE_shadow_addr = MODE7_VRAM_SHADOW + MODE7_char_width + 3	; currently writing 36x22 character screen
 
 
 INTERFERENCE_sprite_width = 54
 INTERFERENCE_sprite_height = 33
 
-INTERFERENCE_screen_width = 36
-INTERFERENCE_screen_height = 22
+INTERFERENCE_screen_width = 37
+INTERFERENCE_screen_height = 24
 
 INTERFERENCE_max_x = (INTERFERENCE_sprite_width - INTERFERENCE_screen_width) * 2	; in pixels
 INTERFERENCE_max_y = (INTERFERENCE_sprite_height - INTERFERENCE_screen_height) * 3	; in pixels
@@ -258,9 +258,9 @@ EQUB 0
 
 .fx_interference_update
 {
-	lda #144+7
-    ldx #0
-	jsr mode7_set_column_shadow_fast
+;	lda #144+7
+;   ldx #0
+;	jsr mode7_set_column_shadow_fast
 
 
 
