@@ -239,7 +239,8 @@ EQUB 0
 
 	\\ Derive colour
 	TYA
-	AND #&3
+	AND #&7
+	LSR A
 	CLC
 	ADC #145
 	STA fx_particles_state, X
@@ -257,6 +258,7 @@ EQUB 0
 	\\ Must have Y here
 	JSR fx_particles_set_vel2_Y
 
+	INY			; assumes 256 entries in spin table
 	INY			; assumes 256 entries in spin table
 	TYA:CLC:ADC #&40
 	STA fx_particles_spin_idx
