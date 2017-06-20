@@ -20,6 +20,8 @@ CREDITS_last_char = MODE7_char_width
 
 \\ Scrolls entire screen up by one pixel adding new pixels from array
 
+\\ Scrolls entire screen up by one pixel adding new pixels from array
+FAST_SCROLL = TRUE
 .fx_creditscroll_scroll_up
 {
 	\\ Start by updating the top line
@@ -37,38 +39,89 @@ CREDITS_last_char = MODE7_char_width
 	\\ For each character row
 	.y_loop
 
+
+
+
+
+IF FAST_SCROLL
+	lda writeptr+0
+	sta readaddr+1
+	sta writeaddr2+1
+
+	lda writeptr+1
+	sta readaddr+2
+	sta writeaddr2+2
+
+	lda readptr+0
+	sta writeaddr1+1
+
+	lda readptr+1
+	sta writeaddr1+2
+ENDIF
+
+
+
+IF FAST_SCROLL
 	\\ First char in row
 	LDY #CREDITS_first_char
-	.x_loop
+.x_loop
 
+.readaddr
+	LDX &ffff, Y			; [4*]
+	LDA glyph_shift_table_1-32,X	; [4*]
+	STA top_bits+1			; [4]
+.writeaddr1
+	LDX &ffff, Y			; [4*]
+	LDA glyph_shift_table_2-32,X	; [4*]
+	.top_bits
+	ORA #0					; [2]
+	\\ Write the byte back to the screen
+.writeaddr2
+	STA &ffff, Y		; [4*]
+	\\ Full width
+	.skip
+	INY						; [2]
+	CPY #CREDITS_last_char	; [2]
+	BCC x_loop				; [2*]
+
+; 32 cycles
+ELSE
+	\\ First char in row
+	LDY #CREDITS_first_char
+.x_loop
 	\\ Get top pixels from row below
-	LDA (readptr), Y
-	AND #&3
-	STA top_bits + 1
+	LDA (readptr), Y		; [5*]
+	TAX						; [2]
+	AND #&3					; [2]
+	STA top_bits + 1		; [4]
 
 	\\ Get bottom pixels from current row
-	LDA (writeptr), Y
-	AND #&FC
+	LDA (writeptr), Y		; [5*]
+	AND #&FC				; [2]
 
 	\\ Merge them together
 	.top_bits
-	ORA #0
+	ORA #0					; [2]
 
 	\\ Always add 32
-	ORA #32
+	ORA #32					; [2]
 
 	\\ Rotate the pixels to scroll up
-	TAX
-	LDA fx_creditscroll_rotate, X
+	TAX						; [2]
+	LDA fx_creditscroll_rotate, X	; [4*]
 
 	\\ Write the byte back to the screen
-	STA (writeptr), Y
+	STA (writeptr), Y		; [5*]
 
 	\\ Full width
 	.skip
-	INY
-	CPY #CREDITS_last_char
-	BCC x_loop
+	INY						; [2]
+	CPY #CREDITS_last_char	; [2]
+	BCC x_loop				; [2*]
+	; 41 cycles per char
+
+ENDIF
+
 
 	\\ Move down a row
 
@@ -366,9 +419,9 @@ EQUB 0
 \ *	Credit Font FX
 \ ******************************************************************
 
-.fx_creditscroll_rotate
+.fx_creditscroll_rotate_table
 {
-	FOR n, 0, 255, 1
+	FOR n, 32, 127, 1	; teletext codes range from 32-127
 	a = n AND 1
 	b = n AND 2
 	c = n AND 4
@@ -389,6 +442,41 @@ EQUB 0
 	ENDIF
 	NEXT
 }
+
+fx_creditscroll_rotate = fx_creditscroll_rotate_table-32
+
+IF FAST_SCROLL
+; table to shift 3x2 teletext graphic up by 1 pixel row 
+.glyph_shift_table_1
+{
+	FOR n, 32, 127, 1	; teletext codes range from 32-127
+		a = n AND 1
+		b = (n AND 2)/2
+		c = (n AND 4)/4
+		d = (n AND 8)/8
+		e = (n AND 16)/16
+		f = (n AND 64)/64
+
+		EQUB 32 + (c*1) + (d*2) + (e*4) + (f*8)
+		;PRINT n
+	NEXT
+}
+; table to translate top 2 teletext pixels to bottom 2
+.glyph_shift_table_2
+{
+	FOR n, 32, 127, 1	; teletext codes range from 32-127
+		a = n AND 1
+		b = (n AND 2)/2
+		c = (n AND 4)/4
+		d = (n AND 8)/8
+		e = (n AND 16)/16
+		f = (n AND 64)/64
+
+		EQUB (a*16) + (b*64)
+	NEXT
+}
+ENDIF
+
 
 \\ Spare character row which will get added to bottom of scroll
 \\ Update fn so only top two pixels (1+2) get added to bottom of scroll
