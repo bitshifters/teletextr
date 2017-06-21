@@ -58,10 +58,13 @@ ENDIF
     .loop
 	IF _ENABLE_IRQ_VSYNC
 	LDA &fe34
-	BEQ is_double_buffered
-	CMP #5
-	BEQ is_double_buffered
+	AND #&5
+	BEQ is_single_buffered
+	CMP #&5
+	BNE is_double_buffered
+
 	\\ Is single buffered - wait for timer 1 sync instead of vsync
+	.is_single_buffered
 	LDA vsync_count
 	.wait_for_vsync
 	CMP vsync_count
