@@ -416,6 +416,122 @@ EQUB 0
 
 
 \ ******************************************************************
+\ *	Individual chars
+\ ******************************************************************
+
+; char in A, at writeptr
+.fx_creditscroll_plot_char
+{
+	TAX
+	LDY #0
+
+	LDA mode7_font_data, X
+	STA (writeptr), Y
+
+	INY
+	LDA mode7_font_data+1, X
+	STA (writeptr), Y
+
+	INY
+	LDA mode7_font_data+2, X
+	STA (writeptr), Y
+
+	LDY #MODE7_char_width
+
+	LDA mode7_font_data_second_row, X
+	STA (writeptr), Y
+
+	INY
+	LDA mode7_font_data_second_row+1, X
+	STA (writeptr), Y
+
+	INY
+	LDA mode7_font_data_second_row+2, X
+	STA (writeptr), Y
+	
+	RTS
+}
+
+; from readptr, at (X,Y)
+.fx_creditscroll_write_string
+{
+	CLC
+	TXA
+	ADC mode7_sprites_row_addr_LO, Y
+	STA writeptr
+	LDA #HI(MODE7_VRAM_SHADOW)
+	ADC mode7_sprites_row_addr_HI, Y
+	STA writeptr+1
+
+	LDY #0
+	.loop
+	LDA (readptr), Y
+	BEQ done_loop
+	STY loop_idx+1
+
+	JSR fx_creditscroll_plot_char
+
+	CLC
+	LDA writeptr
+	ADC #3
+	STA writeptr
+	LDA writeptr+1
+	ADC #0
+	STA writeptr+1
+
+	.loop_idx
+	LDY #0
+	INY
+	BNE loop
+	.done_loop
+
+	RTS
+}
+
+; address of data in X,Y
+.fx_creditscroll_write_screen
+{
+	STX fx_creditscroll_ptr
+	STY fx_creditscroll_ptr+1
+
+	.loop
+	LDY #0
+	LDA (fx_creditscroll_ptr), Y
+	CMP #&FF
+	BEQ done_loop
+	TAX
+	INY
+	LDA (fx_creditscroll_ptr), Y
+	INY
+	STA y_pos+1
+
+	TYA
+	CLC
+	ADC fx_creditscroll_ptr
+	STA readptr
+	LDA fx_creditscroll_ptr+1
+	STA readptr+1
+
+	.y_pos
+	LDY #0
+	JSR fx_creditscroll_write_string
+
+	; y is updated
+	INY
+	TYA
+	CLC
+	ADC readptr
+	STA fx_creditscroll_ptr
+	LDA readptr+1
+	ADC #0
+	STA fx_creditscroll_ptr+1
+	JMP loop
+
+	.done_loop
+	RTS
+}
+
+\ ******************************************************************
 \ *	Credit Font FX
 \ ******************************************************************
 
@@ -602,6 +718,24 @@ EQUS 4," ",0
 EQUS 4," ",0
 EQUS 4," ",0
 EQUS &FF
+
+.fx_creditscroll_screen
+EQUS 3,4,"BITSHIFTERS", 0
+EQUS 4,7,"PRESENTS", 0
+EQUS 5,10,"TELETEXTR", 0
+EQUS &FF
+
+.fx_creditscroll_write_text_bs
+{
+	LDA #LO(text_addr):STA readptr:LDA #HI(text_addr):STA readptr+1
+	LDX #4:LDY#4:JMP fx_creditscroll_write_string
+	.text_addr EQUS "BITSHIFTERS", 0
+}
+
+.fx_creditscroll_write_screen_bs
+{
+	LDX #LO(fx_creditscroll_screen):LDY #HI(fx_creditscroll_screen):JMP fx_creditscroll_write_screen
+}
 
 RESET_MAPCHAR
 
