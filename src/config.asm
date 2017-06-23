@@ -295,7 +295,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL fx_music_init_en ; en
 SCRIPT_CALL fx_music_start
 
-SCRIPT_SEGMENT_START    1.0
+SCRIPT_SEGMENT_START    0.8
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; but should have changed from CEEFAX to BITFAX?
@@ -305,7 +305,7 @@ SCRIPT_SEGMENT_END
 ; GIF SEGUE - Weather breaking
 ;-----------------------------------------------------------
 
-GIF_SEGMENT 5.5, PLAYGIFS_WEATHER
+GIF_SEGMENT 6.3, PLAYGIFS_WEATHER
 ; would be cute to add "Weather forecast for Budleigh Salterton..."
 
 ;-----------------------------------------------------------
@@ -335,6 +335,7 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_clear        
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_creditscroll_write_screen_bs, FX_CREDITSCROLL_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 ENDIF
@@ -481,6 +482,8 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
 
+SCRIPT_CALLSLOT fx_particles_bang, FX_PARTICLES_SLOT
+SCRIPT_CALLSLOT fx_particles_bang, FX_PARTICLES_SLOT
 SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
@@ -490,6 +493,8 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
 
+SCRIPT_CALLSLOT fx_particles_bang, FX_PARTICLES_SLOT
+SCRIPT_CALLSLOT fx_particles_bang, FX_PARTICLES_SLOT
 SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
 
 SCRIPT_SEGMENT_START    5.0
@@ -614,19 +619,21 @@ SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
 SCRIPT_SEGMENT_START    4.5
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT        ; this is too garish
-    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+;    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT        ; this is too garish
+;    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
 
-SCRIPT_SEGMENT_START    4.5
+SCRIPT_SEGMENT_START    7.5
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT        ; this is too garish
-    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+;    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT        ; this is too garish
+;    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END

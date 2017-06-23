@@ -1,7 +1,7 @@
-_ENABLE_IRQ_VSYNC = FALSE				; enable to trigger out internal "vsync" on timer 1 at a set point through the frame
+_ENABLE_IRQ_VSYNC = TRUE				; enable to trigger out internal "vsync" on timer 1 at a set point through the frame
 
 TIMER_latch = 20000-2					; 20ms = 1x vsync :)
-TIMER_start = (TIMER_latch * 0.9)		; some % down the frame is our vsync point
+TIMER_start = (TIMER_latch /2)		; some % down the frame is our vsync point
 
 
 .main
@@ -57,15 +57,27 @@ ENDIF
 
     .loop
 	IF _ENABLE_IRQ_VSYNC
+	LDA &fe34
+	AND #&5
+	BEQ is_single_buffered
+	CMP #&5
+	BNE is_double_buffered
+
+	\\ Is single buffered - wait for timer 1 sync instead of vsync
+	.is_single_buffered
 	LDA vsync_count
 	.wait_for_vsync
 	CMP vsync_count
 	BEQ wait_for_vsync
-	ELSE
-    lda #19:jsr osbyte
+	BNE do_update
+
+	.is_double_buffered
 	ENDIF
 
+    lda #19:jsr osbyte
+
 	; get delta time since last update
+	.do_update
 	ldx	vsync_count
 	lda #0
 	sta vsync_count
