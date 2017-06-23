@@ -338,6 +338,7 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_textscreen_type_presents, FX_CREDITSCROLL_SLOT
+;    SCRIPT_CALLSLOTV fx_teletext_drawpage, 5, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 ENDIF
