@@ -120,6 +120,7 @@ ELSE
     ldx delta_time
 .delta_loop
         jsr fx_vectortext_animate
+        jsr fx_vectortext_animate
     dex
     BNE delta_loop    
 ENDIF
@@ -199,6 +200,12 @@ ENDIF
 .fx_vectortext_model
 
 
+
+
+
+IF 0
+; ABUG model
+
 VTEXT_NPTS = 35
 
 VTEXT_NLINES = 28
@@ -208,6 +215,7 @@ VTEXT_SCALE = 50
 
 MD_HEADER VTEXT_NPTS,VTEXT_NLINES,VTEXT_NSURFS,VTEXT_MAXVIS
 
+
 MACRO VT_POINT  x,y
     scale=3.5
     xo=-27.0
@@ -216,6 +224,9 @@ MACRO VT_POINT  x,y
     MD_POINT (x+xo)*scale,(y+yo)*scale,0.0,1.0
 ENDMACRO
 
+MACRO VT_LINE a,b,offset
+    EQUB a+offset,b+offset
+ENDMACRO
 
 .fx_vectortext_model_verts
 ; A (0-6)
@@ -261,9 +272,7 @@ VT_POINT 47,0
 VT_POINT 55,0
 VT_POINT 55,10
 
-MACRO VT_LINE a,b,offset
-    EQUB a+offset,b+offset
-ENDMACRO
+
 
 .fx_vectortext_linearray
 ; A
@@ -303,7 +312,103 @@ VT_LINE 0,1,32
 VT_LINE 1,2,32
  
  
+ELSE
 
+
+; NOVA model
+
+VTEXT_NPTS = 21
+
+VTEXT_NLINES = 15
+VTEXT_NSURFS = 0
+VTEXT_MAXVIS = 0
+VTEXT_SCALE = 50
+
+MD_HEADER VTEXT_NPTS,VTEXT_NLINES,VTEXT_NSURFS,VTEXT_MAXVIS
+
+
+
+
+MACRO VT_POINT  x,y
+    scale=4.5
+    xo=-35.0/2.0
+    yo=-7.0/2.0
+    zo=0.0
+    MD_POINT (x+xo)*scale,(y+yo)*scale,0.0,1.0
+ENDMACRO
+
+MACRO VT_LINE a,b,offset
+    EQUB a+offset,b+offset
+ENDMACRO
+
+.fx_vectortext_model_verts
+; n (0-3)
+VT_POINT 0,0
+VT_POINT 0,6
+VT_POINT 6,0
+VT_POINT 6,6
+
+; O (4-7)
+VT_POINT 8,0
+VT_POINT 8,6
+VT_POINT 14,0
+VT_POINT 14,6
+
+; V (8-10)
+VT_POINT 16,0
+VT_POINT 22,6
+VT_POINT 22,0
+
+; A (11-15)
+VT_POINT 24,0
+VT_POINT 24,6
+VT_POINT 30,6
+VT_POINT 24,4
+VT_POINT 28,4
+
+; 1 (16-17)
+VT_POINT 32,0
+VT_POINT 32,6
+
+; 7 (18-20)
+VT_POINT 34,0
+VT_POINT 40,0
+VT_POINT 34,6
+
+
+
+
+.fx_vectortext_linearray
+; N
+VT_LINE 0,1,0
+VT_LINE 0,3,0
+VT_LINE 2,3,0
+
+; O
+VT_LINE 4,5,0
+VT_LINE 5,7,0
+VT_LINE 7,6,0
+VT_LINE 6,4,0
+
+; V
+VT_LINE 8,9,0
+VT_LINE 10,9,0
+
+; A
+VT_LINE 11,12,0
+VT_LINE 11,13,0
+VT_LINE 14,15,0
+
+
+; 1
+VT_LINE 16,17,0
+; 7
+VT_LINE 18,19,0
+VT_LINE 19,20,0
+
+
+
+ENDIF
 
 
 .end_fx_vectortext

@@ -525,10 +525,10 @@ ENDIF
 ; SM: think its fixed now. not sure what it was tho. suspicious about some filesys code overwriting pages &0e00-&10ff
 ; SM: I'd like to get a full vector font in so we can show any text string with it
 ; KC: This doesn't work on my machine at the moment :(
-
-IF 0
+; Seems ok now
+IF 1
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    12.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT    
