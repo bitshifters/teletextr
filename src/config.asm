@@ -330,12 +330,15 @@ ENDIF
 ;-----------------------------------------------------------
 
 IF 1
+SCRIPT_CALLSLOTV fx_textscreen_reset_type_delay, 4, FX_CREDITSCROLL_SLOT
+
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
-    SCRIPT_CALLSLOT fx_creditscroll_write_screen_bs, FX_CREDITSCROLL_SLOT
+    SCRIPT_CALLSLOT fx_textscreen_type_presents, FX_CREDITSCROLL_SLOT
+;    SCRIPT_CALLSLOTV fx_teletext_drawpage, 5, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 ENDIF

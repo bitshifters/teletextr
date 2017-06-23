@@ -416,11 +416,11 @@ EQUB 0
 
 
 \ ******************************************************************
-\ *	Individual chars
+\ *	Individual chars + typing
 \ ******************************************************************
 
 ; char in A, at writeptr
-.fx_creditscroll_plot_char
+.fx_textscreen_plot_char
 {
 	TAX
 	LDY #0
@@ -452,8 +452,19 @@ EQUB 0
 	RTS
 }
 
-; from readptr, at (X,Y)
-.fx_creditscroll_write_string
+.fx_textscreen_char_count
+EQUB 0
+
+.fx_textscreen_max_chars
+EQUB 0
+
+.fx_textscreen_type_delay
+EQUB 0
+
+.fx_textscreen_type_timer
+EQUB 0
+
+.fx_textscreen_plot_string
 {
 	CLC
 	TXA
@@ -469,7 +480,14 @@ EQUB 0
 	BEQ done_loop
 	STY loop_idx+1
 
-	JSR fx_creditscroll_plot_char
+	JSR fx_textscreen_plot_char
+
+	\\ Terminate after X chars
+	LDX fx_textscreen_char_count
+	INX
+	STX fx_textscreen_char_count
+	CPX fx_textscreen_max_chars
+	BCS done_loop
 
 	CLC
 	LDA writeptr
@@ -488,11 +506,35 @@ EQUB 0
 	RTS
 }
 
+.fx_textscreen_type_update
+{
+	INC fx_textscreen_type_timer
+	LDA fx_textscreen_type_timer
+	CMP fx_textscreen_type_delay
+	BCC no_inc
+
+	INC fx_textscreen_max_chars
+	LDA #0
+	STA fx_textscreen_type_timer
+
+	.no_inc
+	JMP fx_textscreen_plot_to_max
+}
+
 ; address of data in X,Y
-.fx_creditscroll_write_screen
+.fx_textscreen_plot_all
+{
+	LDA #&FF
+	STA fx_textscreen_max_chars
+}
+\\ Fall through
+.fx_textscreen_plot_to_max
 {
 	STX fx_creditscroll_ptr
 	STY fx_creditscroll_ptr+1
+
+	LDA #0
+	STA fx_textscreen_char_count
 
 	.loop
 	LDY #0
@@ -514,7 +556,11 @@ EQUB 0
 
 	.y_pos
 	LDY #0
-	JSR fx_creditscroll_write_string
+	JSR fx_textscreen_plot_string
+
+	LDX fx_textscreen_char_count
+	CPX fx_textscreen_max_chars
+	BCS done_loop
 
 	; y is updated
 	INY
@@ -528,6 +574,19 @@ EQUB 0
 	JMP loop
 
 	.done_loop
+	RTS
+}
+
+.fx_textscreen_reset_type_delay
+{
+	STA fx_textscreen_type_delay
+
+	LDA #1
+	STA fx_textscreen_max_chars
+
+	LDA #0
+	STA fx_textscreen_type_timer
+
 	RTS
 }
 
@@ -719,22 +778,22 @@ EQUS 4," ",0
 EQUS 4," ",0
 EQUS &FF
 
-.fx_creditscroll_screen
+.fx_textscreen_presents
 EQUS 3,4,"BITSHIFTERS", 0
 EQUS 4,7,"PRESENTS", 0
 EQUS 5,10,"TELETEXTR", 0
 EQUS &FF
 
-.fx_creditscroll_write_text_bs
+.fx_textscreen_plot_bs
 {
 	LDA #LO(text_addr):STA readptr:LDA #HI(text_addr):STA readptr+1
-	LDX #4:LDY#4:JMP fx_creditscroll_write_string
+	LDX #4:LDY#4:JMP fx_textscreen_plot_string
 	.text_addr EQUS "BITSHIFTERS", 0
 }
 
-.fx_creditscroll_write_screen_bs
+.fx_textscreen_type_presents
 {
-	LDX #LO(fx_creditscroll_screen):LDY #HI(fx_creditscroll_screen):JMP fx_creditscroll_write_screen
+	LDX #LO(fx_textscreen_presents):LDY #HI(fx_textscreen_presents):JMP fx_textscreen_type_update
 }
 
 RESET_MAPCHAR
