@@ -13,6 +13,8 @@ INCBIN "data/pages/heman.txt.bin"
 INCBIN "data/pages/heisenburg.txt.bin"
 .teletext_page5
 INCBIN "data/pages/teletextr2.txt.bin"
+.teletext_page6
+INCBIN "data/pages/nova.txt.bin"
 
 
 
@@ -24,6 +26,7 @@ INCBIN "data/pages/teletextr2.txt.bin"
     EQUW teletext_page3
     EQUW teletext_page4
     EQUW teletext_page5
+    EQUW teletext_page6
 
 
 
