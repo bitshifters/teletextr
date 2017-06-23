@@ -330,6 +330,7 @@ ENDIF
 ;-----------------------------------------------------------
 
 IF 1
+
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        

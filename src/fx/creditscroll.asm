@@ -458,6 +458,12 @@ EQUB 0
 .fx_creditscroll_max
 EQUB 0
 
+.fx_creditscroll_delay
+EQUB 0
+
+.fx_creditscroll_timer
+EQUB 0
+
 .fx_creditscroll_write_string
 {
 	CLC
@@ -500,15 +506,30 @@ EQUB 0
 	RTS
 }
 
+.fx_creditscroll_write_delay
+{
+	INC fx_creditscroll_timer
+	LDA fx_creditscroll_timer
+	CMP fx_creditscroll_delay
+	BCC no_inc
+
+	INC fx_creditscroll_max
+	LDA #0
+	STA fx_creditscroll_timer
+
+	.no_inc
+	JMP fx_creditscroll_write_count
+}
+
 ; address of data in X,Y
 .fx_creditscroll_write_screen
 {
 	LDA #&FF
+	STA fx_creditscroll_max
 }
 \\ Fall through
 .fx_creditscroll_write_count
 {
-	STA fx_creditscroll_max
 	STX fx_creditscroll_ptr
 	STY fx_creditscroll_ptr+1
 
@@ -553,6 +574,19 @@ EQUB 0
 	JMP loop
 
 	.done_loop
+	RTS
+}
+
+.fx_creditscroll_reset_write_delay
+{
+	STA fx_creditscroll_delay
+
+	LDA #1
+	STA fx_creditscroll_max
+
+	LDA #0
+	STA fx_creditscroll_timer
+
 	RTS
 }
 
@@ -759,7 +793,7 @@ EQUS &FF
 
 .fx_creditscroll_write_screen_bs
 {
-	LDX #LO(fx_creditscroll_screen):LDY #HI(fx_creditscroll_screen):JMP fx_creditscroll_write_screen
+	LDX #LO(fx_creditscroll_screen):LDY #HI(fx_creditscroll_screen):JMP fx_creditscroll_write_delay
 }
 
 RESET_MAPCHAR
