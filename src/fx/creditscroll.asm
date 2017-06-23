@@ -452,7 +452,12 @@ EQUB 0
 	RTS
 }
 
-; from readptr, at (X,Y)
+.fx_creditscroll_count
+EQUB 0
+
+.fx_creditscroll_max
+EQUB 0
+
 .fx_creditscroll_write_string
 {
 	CLC
@@ -470,6 +475,13 @@ EQUB 0
 	STY loop_idx+1
 
 	JSR fx_creditscroll_plot_char
+
+	\\ Terminate after X chars
+	LDX fx_creditscroll_count
+	INX
+	STX fx_creditscroll_count
+	CPX fx_creditscroll_max
+	BCS done_loop
 
 	CLC
 	LDA writeptr
@@ -491,8 +503,17 @@ EQUB 0
 ; address of data in X,Y
 .fx_creditscroll_write_screen
 {
+	LDA #&FF
+}
+\\ Fall through
+.fx_creditscroll_write_count
+{
+	STA fx_creditscroll_max
 	STX fx_creditscroll_ptr
 	STY fx_creditscroll_ptr+1
+
+	LDA #0
+	STA fx_creditscroll_count
 
 	.loop
 	LDY #0
@@ -515,6 +536,10 @@ EQUB 0
 	.y_pos
 	LDY #0
 	JSR fx_creditscroll_write_string
+
+	LDX fx_creditscroll_count
+	CPX fx_creditscroll_max
+	BCS done_loop
 
 	; y is updated
 	INY
