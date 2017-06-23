@@ -159,8 +159,12 @@ ENDIF
 
 
     ; prepare model data for runtime
+    lda shape_initialised
+    bne done
     JSR initialise_models
-
+    lda #255
+    sta shape_initialised
+.done
 
     ; setup multiplication tables
 ; SDM: do this only once per run, now done in script.
@@ -178,6 +182,7 @@ ENDIF
 
 
     rts
+.shape_initialised EQUB 0
 }
 
 .linedraw
