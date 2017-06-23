@@ -46,10 +46,8 @@ ENDIF
 .fx_buffer_clear
 {
 IF USE_SHADOW_RAM 
-    lda #32
     jsr mode7_clear_screen_fast    
 ELSE
-    lda #32
 	jsr mode7_clear_shadow_fast
 ENDIF
     rts    
