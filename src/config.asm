@@ -330,6 +330,7 @@ ENDIF
 ;-----------------------------------------------------------
 
 IF 1
+SCRIPT_CALLSLOTV fx_creditscroll_reset_write_delay, 4, FX_CREDITSCROLL_SLOT
 
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
