@@ -112,6 +112,10 @@ ENDIF
 
 	\\ load all SWR banks
 
+    ; PARTY MODE - LOAD CATALOG ONCE ONLY
+    jsr disksys_fetch_catalogue
+
+
     ; SWR 0
     MPRINT loading_bank_text  
     lda #0
