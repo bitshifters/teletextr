@@ -652,12 +652,153 @@ SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
 
-SCRIPT_SEGMENT_START    7.5
+
+;-----------------------------------------------------------
+; Crescendo - cut between everything really fast!
+;-----------------------------------------------------------
+
+;  Noise
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_noise_update, FX_NOISE_SLOT
+SCRIPT_SEGMENT_END
+
+; Testcard
+SCRIPT_CALL fx_clear
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_testcard, FX_TESTCARD_SLOT
+SCRIPT_SEGMENT_END
+
+; Heisenberg
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, 4, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+; Colour noise
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_colournoise_update
+;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+; Animated logo
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_END
+
+GIF_SEGMENT 0.2, PLAYGIFS_WEATHER
+
+; Logo anim
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_logowibble_update, FX_LOGOWIBBLE_SLOT
+    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
+SCRIPT_SEGMENT_END
+
+; Teletextr
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, 5, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+; Nova
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, 6, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+; Plasma
+SCRIPT_CALL fx_clear
+SCRIPT_CALLSLOT fx_plasma_init, FX_PLASMA_SLOT
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_plasma, FX_PLASMA_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+GIF_SEGMENT 0.2, PLAYGIFS_BLUEBLOB
+
+; Interference
+SCRIPT_CALL fx_clear
+SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+6, FX_GREENSCREEN_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_bg, 144+2, FX_GREENSCREEN_SLOT
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+GIF_SEGMENT 0.2, PLAYGIFS_DANCER
+
+; Rotozoom
+SCRIPT_CALL fx_clear
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_rotozoom3_animate, FX_ROTOZOOM_SLOT
+    SCRIPT_CALLSLOT fx_rotozoom3, FX_ROTOZOOM_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+
+GIF_SEGMENT 0.2, PLAYGIFS_BIRD
+
+; Particles
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+; Vector text
+SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
+SCRIPT_SEGMENT_END
+
+; point cube effect
+SCRIPT_CALLSLOT fx_vectorballs_init, FX_VECTORBALLS_SLOT
+SCRIPT_CALLSLOT fx_vectorballs_set_small, FX_VECTORBALLS_SLOT
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+; 3D shape
+SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+3, FX_GREENSCREEN_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_bg, 144+4, FX_GREENSCREEN_SLOT
+
+SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
-;    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT        ; this is too garish
-;    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
