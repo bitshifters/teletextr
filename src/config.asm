@@ -605,6 +605,7 @@ SCRIPT_SEGMENT_START    3.5
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
+    SCRIPT_CALLSLOT fx_greenscreen_update_hue, FX_GREENSCREEN_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
 
@@ -613,6 +614,7 @@ SCRIPT_SEGMENT_START    3.5
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear     
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
+    SCRIPT_CALLSLOT fx_greenscreen_update_hue, FX_GREENSCREEN_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
@@ -621,6 +623,7 @@ SCRIPT_SEGMENT_START    3.5
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
+    SCRIPT_CALLSLOT fx_greenscreen_update_hue, FX_GREENSCREEN_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 ENDIF

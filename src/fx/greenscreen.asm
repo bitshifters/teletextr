@@ -47,3 +47,58 @@ EQUB 0
 	LDA #144+2: STA fx_greenscreen_fg
 	RTS	
 }
+
+.fx_greenscreen_bright_ramp
+{
+	EQUB 144+4,144+4,144+4,144+4
+	EQUB 144+1,144+1,144+1
+	EQUB 144+5,144+5,144+5
+	EQUB 144+2,144+2,144+2
+	EQUB 144+6,144+6,144+6
+	EQUB 144+3,144+3,144+3
+	EQUB 144+7,144+7,144+7,144+7,144+7
+}
+
+.fx_greenscreen_hue_ramp
+{
+	EQUB 144+1,144+1,144+1,144+1
+	EQUB 144+3,144+3,144+3
+	EQUB 144+2,144+2,144+2
+	EQUB 144+6,144+6,144+6
+	EQUB 144+4,144+4,144+4
+	EQUB 144+5,144+5,144+5
+	EQUB 144+1,144+1,144+1,144+1,144+1
+}
+
+.fx_greenscreen_update_ramp
+{
+	LDY #0
+
+	FOR n,1,24,1
+	LDA (readptr), Y
+	INY
+	STA MODE7_VRAM_SHADOW + n*40
+	LDA #MODE7_separated
+	STA MODE7_VRAM_SHADOW + n*40 + 1
+	NEXT
+
+	RTS
+}
+
+.fx_greenscreen_update_bright
+{
+	LDA #LO(fx_greenscreen_bright_ramp)
+	STA readptr
+	LDA #HI(fx_greenscreen_bright_ramp)
+	STA readptr+1
+	JMP fx_greenscreen_update_ramp
+}
+
+.fx_greenscreen_update_hue
+{
+	LDA #LO(fx_greenscreen_hue_ramp)
+	STA readptr
+	LDA #HI(fx_greenscreen_hue_ramp)
+	STA readptr+1
+	JMP fx_greenscreen_update_ramp
+}
