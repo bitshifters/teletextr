@@ -139,14 +139,14 @@ ENDIF
 ; Screen off/on
 ;-----------------------------------------------------------
 
-BLANK_DISPLAY 2.0
+BLANK_DISPLAY 1.0
 
 ;-----------------------------------------------------------
 ; Tuning in....
 ;-----------------------------------------------------------
 
 SCRIPT_CALL sfx_noise_on
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_noise_update, FX_NOISE_SLOT
 SCRIPT_SEGMENT_END
@@ -157,7 +157,7 @@ SCRIPT_CALL fx_clear
 ; scrolling bars
 ;-----------------------------------------------------------
 
-SCRIPT_SEGMENT_START    2.0
+SCRIPT_SEGMENT_START    1.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear
     SCRIPT_CALLSLOT fx_copperbars_update, FX_COPPERBARS_SLOT
@@ -169,7 +169,7 @@ SCRIPT_SEGMENT_END
 
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOT fx_testcard_init, FX_TESTCARD_SLOT
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    2.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_testcard, FX_TESTCARD_SLOT
 SCRIPT_SEGMENT_END
@@ -188,20 +188,20 @@ BLANK_DISPLAY 2.0
 SCRIPT_CALL fx_music_init_reg  ; reg
 SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_clear
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_teletext_showtestcard, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_teletext_showpages, FX_TELETEXT_SLOT

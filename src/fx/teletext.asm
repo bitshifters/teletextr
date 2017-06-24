@@ -23,14 +23,17 @@ INCBIN "data/pages/classic_telesoft.txt.bin"
 INCBIN "data/pages/classic_weather.txt.bin"
 
 .teletext_page6
-INCBIN "data/pages/heisenburg.txt.bin"
-PAGE_HEISENBURG = 6
+INCBIN "data/pages/edittf.txt.bin"
+PAGE_EDITTF = 6
+
 .teletext_page7
 INCBIN "data/pages/heman.txt.bin"
 PAGE_HEMAN = 7
+
 .teletext_page8
-INCBIN "data/pages/edittf.txt.bin"
-PAGE_EDITTF = 8
+INCBIN "data/pages/heisenburg.txt.bin"
+PAGE_HEISENBURG = 8
+
 
 
 .teletext_page9
@@ -180,9 +183,16 @@ PAGE_SIMON = 13
 
 .fx_teletext_showpages
 {
+    inc localpage2
+    lda localpage2
+    cmp #64
+    bne nonewpage
+    lda #0
+    sta localpage2
     inc localpage
+.nonewpage
+
     lda localpage
-    lsr a:lsr a:lsr a:lsr a:lsr a
     and #7      ; now cycles through 8 'classic' teletext pages
     clc
     adc #1
@@ -191,6 +201,7 @@ PAGE_SIMON = 13
     rts
 
 .localpage EQUB 0
+.localpage2 EQUB 0
 }
 
 .end_fx_teletext
