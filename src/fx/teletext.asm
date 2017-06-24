@@ -5,6 +5,7 @@
 .teletext_page0
 INCBIN "data/pages/testpage.txt.bin"
 PAGE_TEST = 0
+
 .teletext_page1
 INCBIN "data/pages/edittf.txt.bin"
 PAGE_EDITTF = 1
@@ -17,27 +18,41 @@ PAGE_HEMAN = 3
 .teletext_page4
 INCBIN "data/pages/heisenburg.txt.bin"
 PAGE_HEISENBURG = 4
-
-
-
 .teletext_page5
-INCBIN "data/pages/teletextr2.txt.bin"
-PAGE_TELETEXTR = 5
-.teletext_page6
-INCBIN "data/pages/nova.txt.bin"
-PAGE_NOVA = 6
-.teletext_page7
-INCBIN "data/pages/horsenburger.txt.bin"
-PAGE_HORSENBURGER = 7
-.teletext_page8
-INCBIN "data/pages/kieran.txt.bin"
-PAGE_KIERAN = 8
-.teletext_page9
-INCBIN "data/pages/simon.txt.bin"
-PAGE_SIMON = 9
-.teletext_page10
 INCBIN "data/pages/yorks.bin"
-PAGE_YORKS = 10
+PAGE_YORKS2 = 5
+.teletext_page6
+INCBIN "data/pages/tvguide.bin"
+PAGE_YORKS3 = 6
+.teletext_page7
+INCBIN "data/pages/owl.bin"
+PAGE_YORKS4 = 7
+.teletext_page8
+INCBIN "data/pages/channl4.bin"
+PAGE_YORKS5 = 8
+
+
+.teletext_page9
+INCBIN "data/pages/teletextr2.txt.bin"
+PAGE_TELETEXTR = 9
+
+.teletext_page10
+INCBIN "data/pages/nova.txt.bin"
+PAGE_NOVA = 10
+
+.teletext_page11
+INCBIN "data/pages/horsenburger.txt.bin"
+PAGE_HORSENBURGER = 11
+
+.teletext_page12
+INCBIN "data/pages/kieran.txt.bin"
+PAGE_KIERAN = 12
+
+.teletext_page13
+INCBIN "data/pages/simon.txt.bin"
+PAGE_SIMON = 13
+
+
 
 
 
@@ -54,6 +69,9 @@ PAGE_YORKS = 10
     EQUW teletext_page8
     EQUW teletext_page9
     EQUW teletext_page10
+    EQUW teletext_page11
+    EQUW teletext_page12
+    EQUW teletext_page13
 
 
 
@@ -160,7 +178,7 @@ PAGE_YORKS = 10
 .fx_teletext_showpages
 {
     lda page+1
-    and #3
+    and #7      ; now cycles through 8 'classic' teletext pages
     clc
     adc #1
     jsr fx_teletext_drawpage

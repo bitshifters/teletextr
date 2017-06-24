@@ -210,7 +210,8 @@ SCRIPT_CALL fx_music_stop
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    2.0
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_colournoise_update
+    SCRIPT_CALLSLOT fx_colournoise_update, FX_NOISE_SLOT
+    ;SCRIPT_CALL fx_colournoise_update
 ;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
@@ -228,7 +229,8 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    1.5
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_colournoise_update
+;    SCRIPT_CALL fx_colournoise_update
+    SCRIPT_CALLSLOT fx_colournoise_update, FX_NOISE_SLOT
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
@@ -245,7 +247,9 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    0.5
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_colournoise_update
+    SCRIPT_CALLSLOT fx_colournoise_update, FX_NOISE_SLOT
+
+;    SCRIPT_CALL fx_colournoise_update
 ;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
@@ -263,7 +267,8 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    0.1
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_colournoise_update
+    SCRIPT_CALLSLOT fx_colournoise_update, FX_NOISE_SLOT
+;    SCRIPT_CALL fx_colournoise_update
 ;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
