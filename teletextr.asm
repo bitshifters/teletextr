@@ -260,6 +260,11 @@ FX_BACKGROUND_SLOT = 0
 INCLUDE "src/fx/background.asm"
 
 
+;----------------------------------------------------------------------------------------------------------
+; Animated logo
+FX_LOGOANIM_SLOT = 0
+INCLUDE "src/fx/logoanim.asm"
+
 .bank0_end
 SAVE "Bank0", bank0_start, bank0_end, &8000
 
@@ -289,20 +294,6 @@ ENDIF
 ; common overlay effects
 ;----------------------------------------------------------------------------------------------------------
 
-FX_MIRRORFLOOR_SLOT = 1
-INCLUDE "src/fx/mirrorfloor.asm"
-
-
-
-FX_GREENSCREEN_SLOT = 1
-INCLUDE "src/fx/greenscreen.asm"
-FX_COPPERBARS_SLOT = 1
-INCLUDE "src/fx/copperbars.asm"
-
-FX_RASTERBARS_SLOT = 1
-INCLUDE "src/fx/rasterbars.asm"
-FX_STARFIELD_SLOT = 1
-INCLUDE "src/fx/starfield.asm"
 
 
 
@@ -311,20 +302,17 @@ INCLUDE "src/fx/starfield.asm"
 FX_DOTSCROLLER_SLOT = 1
 INCLUDE "src/fx/dotscroller.asm"
 
-;----------------------------------------------------------------------------------------------------------
-; Animated logo
-FX_LOGOANIM_SLOT = 1
-INCLUDE "src/fx/logoanim.asm"
+
+
+
+
 
 ;----------------------------------------------------------------------------------------------------------
 ; Teletext effect
 FX_TELETEXT_SLOT = 1
 INCLUDE "src/fx/teletext.asm"
 
-;----------------------------------------------------------------------------------------------------------
-; Noise effect
-FX_NOISE_SLOT = 1
-INCLUDE "src/fx/noise.asm"
+
 
 .bank1_end
 SAVE "Bank1", bank1_start, bank1_end, &8000
@@ -357,6 +345,22 @@ INCLUDE "src/fx/creditscroll.asm"
 
 
 
+FX_GREENSCREEN_SLOT = 2
+INCLUDE "src/fx/greenscreen.asm"
+FX_COPPERBARS_SLOT = 2
+INCLUDE "src/fx/copperbars.asm"
+
+
+
+FX_MIRRORFLOOR_SLOT = 2
+INCLUDE "src/fx/mirrorfloor.asm"
+
+
+;----------------------------------------------------------------------------------------------------------
+; Noise effect
+FX_NOISE_SLOT = 2
+INCLUDE "src/fx/noise.asm"
+
 .bank2_end
 SAVE "Bank2", bank2_start, bank2_end, &8000
 ;----------------------------------------------------------------------------------------------------------
@@ -388,6 +392,16 @@ INCLUDE "src/fx/testcard.asm"
 ;----------------------------------------------------------------------------------------------------------
 FX_LOGOWIBBLE_SLOT = 3
 INCLUDE "src/fx/logowibble.asm"
+
+
+FX_RASTERBARS_SLOT = 3
+INCLUDE "src/fx/rasterbars.asm"
+
+
+
+FX_STARFIELD_SLOT = 3
+INCLUDE "src/fx/starfield.asm"
+
 
 
 .bank3_end

@@ -367,6 +367,6 @@ EQUB &6A, &6A, &20, &20, &20, &00, &6A, &20, &6A
 \ ******************************************************************
 
 .fx_logoanim_data
-INCBIN "data/pages/bslogo.txt.bin"			; actually just 5x rows
+INCBIN "data/pages/bslogo/bslogo.txt.bin"			; actually just 5x rows
 
 .end_fx_logoanim

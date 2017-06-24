@@ -139,14 +139,14 @@ ENDIF
 ; Screen off/on
 ;-----------------------------------------------------------
 
-BLANK_DISPLAY 2.0
+BLANK_DISPLAY 1.0
 
 ;-----------------------------------------------------------
 ; Tuning in....
 ;-----------------------------------------------------------
 
 SCRIPT_CALL sfx_noise_on
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_noise_update, FX_NOISE_SLOT
 SCRIPT_SEGMENT_END
@@ -157,7 +157,7 @@ SCRIPT_CALL fx_clear
 ; scrolling bars
 ;-----------------------------------------------------------
 
-SCRIPT_SEGMENT_START    2.0
+SCRIPT_SEGMENT_START    1.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear
     SCRIPT_CALLSLOT fx_copperbars_update, FX_COPPERBARS_SLOT
@@ -169,7 +169,7 @@ SCRIPT_SEGMENT_END
 
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOT fx_testcard_init, FX_TESTCARD_SLOT
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    2.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_testcard, FX_TESTCARD_SLOT
 SCRIPT_SEGMENT_END
@@ -188,20 +188,20 @@ BLANK_DISPLAY 2.0
 SCRIPT_CALL fx_music_init_reg  ; reg
 SCRIPT_CALL fx_music_start
 SCRIPT_CALL fx_clear
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_teletext_showtestcard, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_teletext_showpages, FX_TELETEXT_SLOT
@@ -219,7 +219,8 @@ SCRIPT_CALL fx_music_stop
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    2.0
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_colournoise_update
+    SCRIPT_CALLSLOT fx_colournoise_update, FX_NOISE_SLOT
+    ;SCRIPT_CALL fx_colournoise_update
 ;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
@@ -237,7 +238,8 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    1.5
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_colournoise_update
+;    SCRIPT_CALL fx_colournoise_update
+    SCRIPT_CALLSLOT fx_colournoise_update, FX_NOISE_SLOT
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 
@@ -254,7 +256,9 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    0.5
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_colournoise_update
+    SCRIPT_CALLSLOT fx_colournoise_update, FX_NOISE_SLOT
+
+;    SCRIPT_CALL fx_colournoise_update
 ;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
@@ -272,7 +276,8 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    0.1
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_colournoise_update
+    SCRIPT_CALLSLOT fx_colournoise_update, FX_NOISE_SLOT
+;    SCRIPT_CALL fx_colournoise_update
 ;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
@@ -352,7 +357,7 @@ IF 1
 SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOTV fx_teletext_drawpage, 5, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_TELETEXTR, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 ENDIF
@@ -383,10 +388,12 @@ IF 1
 SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOTV fx_teletext_drawpage, 6, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_NOVA, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 ENDIF
+
+
 
 
 SCRIPT_CALL fx_clear
@@ -705,14 +712,14 @@ SCRIPT_SEGMENT_END
 SCRIPT_SEGMENT_START    0.2
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOTV fx_teletext_drawpage, 4, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_HEISENBURG, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
 ; Colour noise
 SCRIPT_SEGMENT_START    0.2
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_colournoise_update
+    SCRIPT_CALLSLOT fx_colournoise_update, FX_NOISE_SLOT
 ;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
@@ -742,7 +749,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_SEGMENT_START    0.2
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOTV fx_teletext_drawpage, 5, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_TELETEXTR, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
@@ -750,7 +757,7 @@ SCRIPT_SEGMENT_END
 SCRIPT_SEGMENT_START    0.2
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOTV fx_teletext_drawpage, 6, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_NOVA, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
@@ -865,9 +872,54 @@ SCRIPT_CALL fx_buffer_clear
 SCRIPT_CALL fx_music_init_exception ; exception
 SCRIPT_CALL fx_music_start
 
+; The music is 34.5 seconds long
+
+
+; credits intro
+SCRIPT_CALLSLOTV fx_textscreen_reset_type_delay, 2, FX_CREDITSCROLL_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+3, FX_GREENSCREEN_SLOT
+SCRIPT_SEGMENT_START    2.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_textscreen_type_credits, FX_CREDITSCROLL_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
+SCRIPT_SEGMENT_END
+
+;-----------------------------------------------------------
+; image credits
+;-----------------------------------------------------------
+SCRIPT_SEGMENT_START    1.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_HORSENBURGER, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+SCRIPT_SEGMENT_START    1.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_KIERAN, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+SCRIPT_SEGMENT_START    1.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_SIMON, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+; clear the screen on finish
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+
+
 SCRIPT_CALL shadow_set_single_buffer
 
-SCRIPT_SEGMENT_START    34.5
+SCRIPT_SEGMENT_START    34.5-7.0
 ;    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_creditscroll_update, FX_CREDITSCROLL_SLOT 
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT

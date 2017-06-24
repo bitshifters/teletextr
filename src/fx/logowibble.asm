@@ -249,9 +249,9 @@ EQUB 3, 3, 12, 12, 80, 80
 .logo_data
 .logo_data_00	; x_offset=0, y_offset=0
 ;INCBIN "data/pages/logo_left.txt.bin"
-INCBIN "data/pages/bslogo_white_left.txt.bin"			; actually just 5x rows
+INCBIN "data/pages/bslogo/bslogo_white_left.txt.bin"			; actually just 5x rows
 
 .logo_data_10	; x_offset=1, y_offset=0
 ;INCBIN "data/pages/logo_right.txt.bin"
-INCBIN "data/pages/bslogo_white_right.txt.bin"			; actually just 5x rows
+INCBIN "data/pages/bslogo/bslogo_white_right.txt.bin"			; actually just 5x rows
 .end_fx_logowibble

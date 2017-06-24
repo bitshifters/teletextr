@@ -1,20 +1,62 @@
 .start_fx_teletext
 
+
 .teletext_data  
 .teletext_page0
 INCBIN "data/pages/testpage.txt.bin"
+PAGE_TEST = 0
+
 .teletext_page1
-INCBIN "data/pages/edittf.txt.bin"
+INCBIN "data/pages/classic_ceefax.txt.bin"
+
 .teletext_page2
-INCBIN "data/pages/ceefax.txt.bin"
+INCBIN "data/pages/classic_oracle.txt.bin"
+
 .teletext_page3
-INCBIN "data/pages/heman.txt.bin"
+INCBIN "data/pages/classic_millenium.txt.bin"
+
 .teletext_page4
-INCBIN "data/pages/heisenburg.txt.bin"
+INCBIN "data/pages/classic_telesoft.txt.bin"
+
+
 .teletext_page5
-INCBIN "data/pages/teletextr2.txt.bin"
+INCBIN "data/pages/classic_weather.txt.bin"
+
 .teletext_page6
+INCBIN "data/pages/edittf.txt.bin"
+PAGE_EDITTF = 6
+
+.teletext_page7
+INCBIN "data/pages/heman.txt.bin"
+PAGE_HEMAN = 7
+
+.teletext_page8
+INCBIN "data/pages/heisenburg.txt.bin"
+PAGE_HEISENBURG = 8
+
+
+
+.teletext_page9
+INCBIN "data/pages/teletextr2.txt.bin"
+PAGE_TELETEXTR = 9
+
+.teletext_page10
 INCBIN "data/pages/nova.txt.bin"
+PAGE_NOVA = 10
+
+.teletext_page11
+INCBIN "data/pages/horsenburger.txt.bin"
+PAGE_HORSENBURGER = 11
+
+.teletext_page12
+INCBIN "data/pages/kieran.txt.bin"
+PAGE_KIERAN = 12
+
+.teletext_page13
+INCBIN "data/pages/simon.txt.bin"
+PAGE_SIMON = 13
+
+
 
 
 
@@ -27,6 +69,13 @@ INCBIN "data/pages/nova.txt.bin"
     EQUW teletext_page4
     EQUW teletext_page5
     EQUW teletext_page6
+    EQUW teletext_page7
+    EQUW teletext_page8
+    EQUW teletext_page9
+    EQUW teletext_page10
+    EQUW teletext_page11
+    EQUW teletext_page12
+    EQUW teletext_page13
 
 
 
@@ -130,15 +179,29 @@ INCBIN "data/pages/nova.txt.bin"
     rts
 }
 
+
+
 .fx_teletext_showpages
 {
-    lda page+1
-    and #3
+    inc localpage2
+    lda localpage2
+    cmp #64
+    bne nonewpage
+    lda #0
+    sta localpage2
+    inc localpage
+.nonewpage
+
+    lda localpage
+    and #7      ; now cycles through 8 'classic' teletext pages
     clc
     adc #1
     jsr fx_teletext_drawpage
 
     rts
+
+.localpage EQUB 0
+.localpage2 EQUB 0
 }
 
 .end_fx_teletext
