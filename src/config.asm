@@ -343,7 +343,7 @@ IF 1
 SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOTV fx_teletext_drawpage, 5, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_TELETEXTR, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 ENDIF
@@ -372,10 +372,20 @@ IF 1
 SCRIPT_SEGMENT_START    3.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOTV fx_teletext_drawpage, 6, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_NOVA, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 ENDIF
+
+;-----------------------------------------------------------
+; ruff credits
+;-----------------------------------------------------------
+SCRIPT_SEGMENT_START    1.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_HORSENBURGER, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
 
 
 SCRIPT_CALL fx_clear

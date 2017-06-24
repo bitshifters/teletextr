@@ -1,20 +1,43 @@
 .start_fx_teletext
 
+
 .teletext_data  
 .teletext_page0
 INCBIN "data/pages/testpage.txt.bin"
+PAGE_TEST = 0
 .teletext_page1
 INCBIN "data/pages/edittf.txt.bin"
+PAGE_EDITTF = 1
 .teletext_page2
 INCBIN "data/pages/ceefax.txt.bin"
+PAGE_CEEFAX = 2
 .teletext_page3
 INCBIN "data/pages/heman.txt.bin"
+PAGE_HEMAN = 3
 .teletext_page4
 INCBIN "data/pages/heisenburg.txt.bin"
+PAGE_HEISENBURG = 4
+
+
+
 .teletext_page5
 INCBIN "data/pages/teletextr2.txt.bin"
+PAGE_TELETEXTR = 5
 .teletext_page6
 INCBIN "data/pages/nova.txt.bin"
+PAGE_NOVA = 6
+.teletext_page7
+INCBIN "data/pages/horsenburger.txt.bin"
+PAGE_HORSENBURGER = 7
+.teletext_page8
+INCBIN "data/pages/kieran.txt.bin"
+PAGE_KIERAN = 8
+.teletext_page9
+INCBIN "data/pages/simon.txt.bin"
+PAGE_SIMON = 9
+.teletext_page10
+INCBIN "data/pages/yorks.bin"
+PAGE_YORKS = 10
 
 
 
@@ -27,6 +50,10 @@ INCBIN "data/pages/nova.txt.bin"
     EQUW teletext_page4
     EQUW teletext_page5
     EQUW teletext_page6
+    EQUW teletext_page7
+    EQUW teletext_page8
+    EQUW teletext_page9
+    EQUW teletext_page10
 
 
 
