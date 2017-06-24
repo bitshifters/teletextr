@@ -119,7 +119,7 @@ ENDIF
 ; called by vsync handler
 .fx_music_irq
 {
-    bra exit
+;    bra exit
     jsr teletext_update
     lda fx_music_on
     beq exit
