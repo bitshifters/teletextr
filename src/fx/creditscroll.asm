@@ -820,6 +820,19 @@ EQUS &FF
 	EQUS &FF
 }
 
+
+.fx_textscreen_type_credits
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 4,6,"TELETEXTR",0
+	EQUS 4,8, "DEMO", 0
+	EQUS 17,11,"MADNESS", 0
+	EQUS 8,14, "CREATED", 0
+	EQUS 5,16, "BY", 0
+	EQUS &FF
+}
+
 RESET_MAPCHAR
 
 .mode7_font_data				; we use 16/25 lines of this screen

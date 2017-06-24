@@ -377,15 +377,7 @@ SCRIPT_SEGMENT_START    3.0
 SCRIPT_SEGMENT_END
 ENDIF
 
-;-----------------------------------------------------------
-; ruff credits
-;-----------------------------------------------------------
-SCRIPT_SEGMENT_START    1.5
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_HORSENBURGER, FX_TELETEXT_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
-SCRIPT_SEGMENT_END
+
 
 
 SCRIPT_CALL fx_clear
@@ -703,9 +695,54 @@ SCRIPT_CALL fx_buffer_clear
 SCRIPT_CALL fx_music_init_exception ; exception
 SCRIPT_CALL fx_music_start
 
+; The music is 34.5 seconds long
+
+
+; credits intro
+SCRIPT_CALLSLOTV fx_textscreen_reset_type_delay, 2, FX_CREDITSCROLL_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+3, FX_GREENSCREEN_SLOT
+SCRIPT_SEGMENT_START    2.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_textscreen_type_credits, FX_CREDITSCROLL_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
+SCRIPT_SEGMENT_END
+
+;-----------------------------------------------------------
+; image credits
+;-----------------------------------------------------------
+SCRIPT_SEGMENT_START    1.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_HORSENBURGER, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+SCRIPT_SEGMENT_START    1.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_KIERAN, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+SCRIPT_SEGMENT_START    1.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, PAGE_SIMON, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+; clear the screen on finish
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+
+
 SCRIPT_CALL shadow_set_single_buffer
 
-SCRIPT_SEGMENT_START    34.5
+SCRIPT_SEGMENT_START    34.5-7.0
 ;    SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_creditscroll_update, FX_CREDITSCROLL_SLOT 
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
