@@ -3,6 +3,9 @@
 \\ Code module
 \ ******************************************************************
 
+_ENABLE_AUDIO = TRUE				; enables output to sound chip (disable for silent testing/demo loop)
+
+
 VGM_PLAYER_ORG = *
 
 ORG &0380
@@ -296,6 +299,9 @@ EQUB &01, &02, &04, &08, &10, &20, &40, &80
 .psg_strobe
 {
 	sei					; **SELF-MODIFIED CODE**
+
+IF _ENABLE_AUDIO
+
 	ldy #255
 	sty $fe43
 	
@@ -310,6 +316,9 @@ EQUB &01, &02, &04, &08, &10, &20, &40, &80
 	nop
 	lda #$08
 	sta $fe40
+
+ENDIF ; _ENABLE_AUDIO
+
 	cli					; **SELF-MODIFIED CODE**
 	RTS
 }
