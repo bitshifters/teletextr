@@ -7,7 +7,7 @@
 LOGOWIBBLE_shadow_addr = MODE7_VRAM_SHADOW
 
 LOGOWIBBLE_char_width = 40
-LOGOWIBBLE_char_height = 10
+LOGOWIBBLE_char_height = 5
 LOGOWIBBLE_sixel_height = (LOGOWIBBLE_char_height * 3)
 
 LOGOWIBBLE_x_position = 1
@@ -248,7 +248,10 @@ EQUB 3, 3, 12, 12, 80, 80
 \\ Data in ROW order
 .logo_data
 .logo_data_00	; x_offset=0, y_offset=0
-INCBIN "data/pages/logo_left.txt.bin"
+;INCBIN "data/pages/logo_left.txt.bin"
+INCBIN "data/pages/bslogo_white_left.txt.bin"			; actually just 5x rows
+
 .logo_data_10	; x_offset=1, y_offset=0
-INCBIN "data/pages/logo_right.txt.bin"
+;INCBIN "data/pages/logo_right.txt.bin"
+INCBIN "data/pages/bslogo_white_right.txt.bin"			; actually just 5x rows
 .end_fx_logowibble
