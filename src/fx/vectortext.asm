@@ -28,22 +28,10 @@
 
 .fx_vectortext_update
 {
-	;lda #144+5
-
-
     lda page+0
-    and #7
-    bne do3d
-
-; ARGH! CAN'T DO THIS AS FX_TELETEXT IN DIFFERENT SWRAM BANK!
-;    jsr fx_teletext_showpages
-    rts
-
-.do3d
-
-
+    and #3
     clc
-    adc #144
+    adc #145
 
     ldx #0
 	jsr mode7_set_column_shadow_fast

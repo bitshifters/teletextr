@@ -323,8 +323,17 @@ ENDIF ; _ENABLE_AUDIO
 	RTS
 }
 
+IF _ENABLE_AUDIO
+
 PSG_STROBE_SEI_INSN = psg_strobe
 PSG_STROBE_CLI_INSN = psg_strobe + 25
+
+ELSE
+
+PSG_STROBE_SEI_INSN = psg_strobe
+PSG_STROBE_CLI_INSN = psg_strobe + 1
+
+ENDIF
 
 .psg_decode
 {
