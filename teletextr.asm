@@ -305,14 +305,18 @@ INCLUDE "src/fx/dotscroller.asm"
 
 
 
-
+FX_MIRRORFLOOR_SLOT = 1
+INCLUDE "src/fx/mirrorfloor.asm"
 
 ;----------------------------------------------------------------------------------------------------------
 ; Teletext effect
 FX_TELETEXT_SLOT = 1
 INCLUDE "src/fx/teletext.asm"
 
-
+;----------------------------------------------------------------------------------------------------------
+; Noise effect
+FX_NOISE_SLOT = 1
+INCLUDE "src/fx/noise.asm"
 
 .bank1_end
 SAVE "Bank1", bank1_start, bank1_end, &8000
@@ -352,14 +356,10 @@ INCLUDE "src/fx/copperbars.asm"
 
 
 
-FX_MIRRORFLOOR_SLOT = 2
-INCLUDE "src/fx/mirrorfloor.asm"
 
 
-;----------------------------------------------------------------------------------------------------------
-; Noise effect
-FX_NOISE_SLOT = 2
-INCLUDE "src/fx/noise.asm"
+
+
 
 .bank2_end
 SAVE "Bank2", bank2_start, bank2_end, &8000
