@@ -778,22 +778,46 @@ EQUS 4," ",0
 EQUS 4," ",0
 EQUS &FF
 
-.fx_textscreen_presents
-EQUS 3,4,"BITSHIFTERS", 0
-EQUS 4,7,"PRESENTS", 0
-EQUS 5,10,"TELETEXTR", 0
-EQUS &FF
-
-.fx_textscreen_plot_bs
-{
-	LDA #LO(text_addr):STA readptr:LDA #HI(text_addr):STA readptr+1
-	LDX #4:LDY#4:JMP fx_textscreen_plot_string
-	.text_addr EQUS "BITSHIFTERS", 0
-}
+\\ How to do a single string
+;.fx_textscreen_plot_bs
+;{
+;	LDA #LO(text_addr):STA readptr:LDA #HI(text_addr):STA readptr+1
+;	LDX #4:LDY#4:JMP fx_textscreen_plot_string
+;	.text_addr EQUS "BITSHIFTERS", 0
+;}
 
 .fx_textscreen_type_presents
 {
-	LDX #LO(fx_textscreen_presents):LDY #HI(fx_textscreen_presents):JMP fx_textscreen_type_update
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 3,14,"PRESENTS...", 0
+	EQUS &FF
+}
+
+.fx_textscreen_type_weather
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 4,6,"WEATHER",0
+	EQUS 4,8, "FORECAST", 0
+	EQUS 17,11,"FOR", 0
+	EQUS 8,14, "BUDLEIGH", 0
+	EQUS 5,16, "SALTERTON", 0
+	EQUS &FF
+}
+
+.fx_textscreen_type_oldschool
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 4,6,"OUR",0
+	EQUS 4,8, "TELETEXT", 0
+	EQUS 17,10,"TRIBUTE", 0
+	EQUS 2,13,"TO", 0
+	EQUS 2,16, "OLD SCHOOL", 0
+	EQUS 10,19, "CREATED",0
+	EQUS 20,21, "FOR...", 0
+	EQUS &FF
 }
 
 RESET_MAPCHAR
