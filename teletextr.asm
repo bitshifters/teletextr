@@ -265,6 +265,14 @@ INCLUDE "src/fx/background.asm"
 FX_LOGOANIM_SLOT = 0
 INCLUDE "src/fx/logoanim.asm"
 
+
+
+FX_GREENSCREEN_SLOT = 0
+INCLUDE "src/fx/greenscreen.asm"
+
+FX_COPPERBARS_SLOT = 0
+INCLUDE "src/fx/copperbars.asm"
+
 .bank0_end
 SAVE "Bank0", bank0_start, bank0_end, &8000
 
@@ -349,13 +357,6 @@ INCLUDE "src/fx/creditscroll.asm"
 
 
 
-FX_GREENSCREEN_SLOT = 2
-INCLUDE "src/fx/greenscreen.asm"
-FX_COPPERBARS_SLOT = 2
-INCLUDE "src/fx/copperbars.asm"
-
-
-
 
 
 
@@ -401,6 +402,10 @@ INCLUDE "src/fx/rasterbars.asm"
 
 FX_STARFIELD_SLOT = 3
 INCLUDE "src/fx/starfield.asm"
+
+
+
+
 
 
 

@@ -10,7 +10,7 @@
 \\ Change these to adjust window that is scrolled
 CREDITS_shadow_addr = MODE7_VRAM_SHADOW
 CREDITS_end_addr = CREDITS_shadow_addr + (MODE7_char_width * MODE7_char_height)
-CREDITS_first_char = 4
+CREDITS_first_char = 1
 CREDITS_last_char = MODE7_char_width
 
 
@@ -753,29 +753,156 @@ SET_TELETEXT_FONT_CHAR_MAP
 \\ New font is 3 chars wide = max 13 letters per line from 1
 
 .fx_creditscroll_text
-EQUS 4,"ABCDEFGHIJKL",0
-EQUS 4,"MNOPQRSTUVWX",0
-EQUS 4,"YZ0123456789",0
-EQUS 4,"?!.",0
-EQUS 4," ",0
-EQUS 4,"Bitshifters",0
-EQUS 5,"Presents",0
-EQUS 6,"Teletextr",0
-EQUS 4," ",0
-EQUS 4,"A new demo",0
-EQUS 5,"By Henley",0
-EQUS 6,"and Kieran..",0
-EQUS 4," ",0
-EQUS 4,"BBC rulez!",0
-EQUS 5,"Etc.",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
-EQUS 4," ",0
+
+
+
+
+; centering offsets
+; 1=19 2=17 3=16 4=14 5=13 6=11 7=10 8=8 9=7 a=5 b=4 c=2 d=1
+
+;       123456789abcd
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  7,"TELETEXTR",0
+EQUS  8,"Teletext",0
+EQUS  14,"DEMO",0
+EQUS  17,"OF",0
+EQUS  8,"TELETEXT",0
+EQUS  14,"NESS",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+EQUS 19,"A",0
+EQUS  4,"Bitshifters",0
+EQUS  5,"Production",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+; Specs creds
+EQUS  14,"SPECS",0
+EQUS  1,"",0
+EQUS  5,"BBC MASTER",0
+EQUS  7,"2MHZ 6502",0
+EQUS  7,"128KB RAM",0
+EQUS  10,"SAA5050",0
+EQUS  8,"TELETEXT",0
+EQUS  14,"CHIP",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+; Code creds
+EQUS 10,"Code By",0
+EQUS  1,"",0
+EQUS  5,"Kieran and",0
+EQUS 10,"simon.m",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+; Music creds
+EQUS  5,"VGM Choons",0
+EQUS  1,"",0
+EQUS  7,"Exception",0
+EQUS  17,"by",0
+EQUS  8,"jrlepage",0
+EQUS  1,"",0
+EQUS  11,"Reggie",0
+EQUS  17,"by",0
+EQUS  8,"SVETLANA",0
+EQUS  1,"",0
+EQUS  10,"en vard",0
+EQUS  5,"fyra javel",0
+EQUS  17,"by",0
+EQUS  7,"AbbeAbyss",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+
+; Art creds
+EQUS 11,"Art by",0
+EQUS  1,"",0
+EQUS  2,"Horsenburger",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+; Release creds
+EQUS  4,"Released at",0
+EQUS  1,"",0
+EQUS  7,"Nova 2017",0
+EQUS  13,"Devon",0
+EQUS  4,"24 Jun 2017",0
+EQUS  1," ",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+; Thanks
+
+
+EQUS  4,"Bitshifters",0
+EQUS  7,"Thanks...",0
+EQUS  1,"",0
+EQUS  2,"Nick Jameson",0
+EQUS  2,"Horsenburger",0
+EQUS  11,"Rawles",0
+EQUS 10,"Edit.tf",0
+EQUS 11,"jsbeeb",0
+EQUS 10,"BeebAsm",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+; Greets
+EQUS  2,"Greetz to...",0
+EQUS  1,"",0
+EQUS  1,"Raquel Meyers",0
+EQUS  1,"Steve Horsley",0
+EQUS  2,"Simon Rawles",0
+EQUS 10,"Rich TW",0
+EQUS  2,"Matt Godbolt",0
+EQUS  4,"Puppeh.CRTC",0
+EQUS  7,"rc55.CRTC",0
+EQUS  1,"Inverse Phase",0
+EQUS  14,"crtc",0
+EQUS  11,"DESiRE",0
+EQUS  10,"Ate Bit",0
+EQUS  2,"Stardot Crew",0
+EQUS  1,"Teletext Crew",0
+EQUS  1,"",0
+
+EQUS  4,"Everyone at",0
+EQUS  5,"the party!",0
+
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+
+IF 1
+EQUS  2,"Thanks for",0
+EQUS  7,"Watching!",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+EQUS  1,"",0
+ENDIF
+
+
 EQUS &FF
 
 \\ How to do a single string

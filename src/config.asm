@@ -122,8 +122,24 @@ SCRIPT_SEGMENT_END
 ENDIF
 
 
+; test credits sequence
+IF 0
+; clear the screen on finish
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
 
 
+SCRIPT_CALL shadow_set_single_buffer
+
+SCRIPT_SEGMENT_START    34.5-7.0
+;    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_creditscroll_update, FX_CREDITSCROLL_SLOT 
+    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
+;    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+SCRIPT_SEGMENT_END
+ENDIF
 
 
 
