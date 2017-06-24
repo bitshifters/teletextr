@@ -531,8 +531,12 @@ SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
 SCRIPT_SEGMENT_START    12.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT    
+;    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT    
+
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
+;    SCRIPT_CALLSLOT fx_background_update, FX_BACKGROUND_SLOT
+
+
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
 ENDIF
