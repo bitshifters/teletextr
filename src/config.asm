@@ -74,7 +74,16 @@ MACRO DOTSCOLLER_SEGMENT duration, set_text_fn
     SCRIPT_SEGMENT_END
 ENDMACRO
 
-
+MACRO TEXTTYPE_SEGMENT duration, delay, text_fn
+    SCRIPT_CALLSLOTV fx_textscreen_reset_type_delay, delay, FX_CREDITSCROLL_SLOT
+    SCRIPT_SEGMENT_START    duration
+        SCRIPT_CALL fx_buffer_swap              ; stars are self-erasing - optional!
+        SCRIPT_CALL fx_buffer_clear    
+        SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
+        SCRIPT_CALLSLOT text_fn, FX_CREDITSCROLL_SLOT
+        SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
+    SCRIPT_SEGMENT_END
+ENDMACRO
 
 ;------------------------------------------------------------------------
 ; DEMOS START
@@ -360,6 +369,8 @@ SCRIPT_SEGMENT_START    4.0
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
     SCRIPT_CALLSLOT fx_textscreen_type_oldschool, FX_CREDITSCROLL_SLOT
+    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
 ENDIF
@@ -397,7 +408,8 @@ SCRIPT_CALL fx_clear
 
 ; dot scroll an intro message
 IF 1
-DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_pl
+;DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_pl
+TEXTTYPE_SEGMENT        5.0, 3, fx_textscreen_type_plasma
 
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOT fx_plasma_init, FX_PLASMA_SLOT
@@ -422,7 +434,8 @@ GIF_SEGMENT 2.0, PLAYGIFS_BLUEBLOB
 
 IF 1
 ; dot scroll an intro message
-DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_int
+;DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_int
+TEXTTYPE_SEGMENT        4.0, 3, fx_textscreen_type_interference
 
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+3, FX_GREENSCREEN_SLOT
@@ -469,7 +482,8 @@ ENDIF
 
 IF 1
 ; dot scroll an intro message
-DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_rot
+;DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_rot
+TEXTTYPE_SEGMENT        4.0, 3, fx_textscreen_type_rotozoom
 
 SCRIPT_CALL fx_clear
 
@@ -493,7 +507,8 @@ GIF_SEGMENT 3.5, PLAYGIFS_BIRD
 
 IF 1
 ; dot scroll an intro message
-DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_part
+;DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_part
+TEXTTYPE_SEGMENT        4.0, 3, fx_textscreen_type_particles
 
 SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
 SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
@@ -547,8 +562,10 @@ ENDIF
 ; KC: This doesn't work on my machine at the moment :(
 ; Seems ok now - KC - I concur!
 IF 1
+TEXTTYPE_SEGMENT        2.0, 3, fx_textscreen_type_vectortext
+
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
-SCRIPT_SEGMENT_START    6.0
+SCRIPT_SEGMENT_START    4.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
 ;    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT    
@@ -568,7 +585,8 @@ ENDIF
 
 IF 1
 ; dot scroll an intro message
-DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_vb
+;DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_vb
+TEXTTYPE_SEGMENT        5.0, 3, fx_textscreen_type_vectorballs
 
 ; point cube effect
 SCRIPT_CALLSLOT fx_vectorballs_init, FX_VECTORBALLS_SLOT
@@ -605,7 +623,8 @@ ENDIF
 
 IF 1
 ; dot scroll an intro message
-DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_3d
+;DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_3d
+TEXTTYPE_SEGMENT        5.0, 3, fx_textscreen_type_3dshapes
 
 SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
 SCRIPT_CALLSLOT fx_3dshape_toggle_culling, FX_3DSHAPE_SLOT      ; start with backfaces visible

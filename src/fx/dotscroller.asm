@@ -10,7 +10,7 @@
 
 _DOTSCROLL_SMOOTH = FALSE			; don't like this effect
 _DOTSCROLL_BALL = FALSE				; not compatible with _SMOOTH!
-_DOTSCROLL_ANGLE = TRUE				; otherwise half circle
+_DOTSCROLL_ANGLE = FALSE				; otherwise half circle
 
 \\ Definitions
 DOTSCROLL_shadow_addr = &7800

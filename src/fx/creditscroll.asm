@@ -820,6 +820,88 @@ EQUS &FF
 	EQUS &FF
 }
 
+.fx_textscreen_type_plasma
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 4,6,"LETS START",0
+	EQUS 4,9, "WITH", 0
+	EQUS 17,12,"SOME", 0
+	EQUS 8,15, "PLASMA...", 0
+	EQUS &FF
+}
+
+.fx_textscreen_type_interference
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 14,6,"RUN",0
+	EQUS 24,9, "THE", 0
+	EQUS 3,12,"INTERFERENCE", 0
+	EQUS &FF
+}
+
+.fx_textscreen_type_rotozoom
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 5,9,"ROTOZOOM..",0
+	EQUS &FF
+}
+
+.fx_textscreen_type_particles
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 4,6,"PARTICLE",0
+	EQUS 8,9, "SYSTEM", 0
+	EQUS 12,12,"ENGAGE!", 0
+	EQUS &FF
+}
+
+.fx_textscreen_type_vectortext
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 4,6,"TIME TO",0
+	EQUS 5,9, "CALL", 0
+	EQUS 5,12,"BRESENHAM", 0
+	EQUS &FF
+}
+
+.fx_textscreen_type_vectorballs
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 4,6,"SPRITES",0
+	EQUS 5,9,"PLUS",0
+	EQUS 5,12,"VECTORS", 0
+	EQUS 4,15,"EQUALS...", 0
+	EQUS &FF
+}
+
+.fx_textscreen_type_3dshapes
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 4,6,"BRINGING",0
+	EQUS 5,9, "TELETEXT", 0
+	EQUS 5,12,"TO THE 3RD", 0
+	EQUS 4,15,"DIMENSION!", 0
+	EQUS &FF
+}
+
+.fx_textscreen_type_dotscroller
+{
+	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
+	.textscreen_data
+	EQUS 4,6,"SCROLLER",0
+	EQUS 5,9, "THAT IS", 0
+	EQUS 5,12,"IMPOSSIBLE", 0
+	EQUS 4,15,"TO READ", 0
+	EQUS &FF
+}
+
 RESET_MAPCHAR
 
 .mode7_font_data				; we use 16/25 lines of this screen
