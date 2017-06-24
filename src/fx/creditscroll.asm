@@ -810,13 +810,13 @@ EQUS &FF
 {
 	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
 	.textscreen_data
-	EQUS 4,6,"OUR",0
-	EQUS 4,8, "TELETEXT", 0
-	EQUS 17,10,"TRIBUTE", 0
-	EQUS 2,13,"TO", 0
-	EQUS 2,16, "OLD SCHOOL", 0
-	EQUS 10,19, "CREATED",0
-	EQUS 20,21, "FOR...", 0
+	EQUS 7,5,"OUR",0
+	EQUS 4,7, "TELETEXT", 0
+	EQUS 17,9,"TRIBUTE", 0
+	EQUS 8,12,"TO", 0
+	EQUS 4,15, "OLD SCHOOL", 0
+	EQUS 10,18, "CREATED",0
+	EQUS 20,20, "FOR...", 0
 	EQUS &FF
 }
 
@@ -835,9 +835,9 @@ EQUS &FF
 {
 	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
 	.textscreen_data
-	EQUS 14,6,"RUN",0
+	EQUS 14,6, "RUN",0
 	EQUS 24,9, "THE", 0
-	EQUS 3,12,"INTERFERENCE", 0
+	EQUS 2,12, "INTERFERENCE", 0
 	EQUS &FF
 }
 
@@ -853,9 +853,9 @@ EQUS &FF
 {
 	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
 	.textscreen_data
-	EQUS 4,6,"PARTICLE",0
-	EQUS 8,9, "SYSTEM", 0
-	EQUS 12,12,"ENGAGE!", 0
+	EQUS 4,6,  "PARTICLE",0
+	EQUS 8,9,  "SYSTEM", 0
+	EQUS 12,12,"ENGAGED!", 0
 	EQUS &FF
 }
 
@@ -863,9 +863,9 @@ EQUS &FF
 {
 	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
 	.textscreen_data
-	EQUS 4,6,"TIME TO",0
-	EQUS 5,9, "CALL", 0
-	EQUS 5,12,"BRESENHAM", 0
+	EQUS 6,6, "TIME TO",0
+	EQUS 5,9, "CALL IN", 0
+	EQUS 4,12,"BRESENHAM", 0
 	EQUS &FF
 }
 
@@ -873,8 +873,8 @@ EQUS &FF
 {
 	LDX #LO(textscreen_data):LDY #HI(textscreen_data):JMP fx_textscreen_type_update
 	.textscreen_data
-	EQUS 4,6,"SPRITES",0
-	EQUS 5,9,"PLUS",0
+	EQUS 4,6, "SPRITES",0
+	EQUS 5,9, "PLUS",0
 	EQUS 5,12,"VECTORS", 0
 	EQUS 4,15,"EQUALS...", 0
 	EQUS &FF
@@ -898,7 +898,7 @@ EQUS &FF
 	EQUS 4,6,"SCROLLER",0
 	EQUS 5,9, "THAT IS", 0
 	EQUS 5,12,"IMPOSSIBLE", 0
-	EQUS 4,15,"TO READ", 0
+	EQUS 4,15,"TO READ..", 0
 	EQUS &FF
 }
 

@@ -169,6 +169,7 @@ MACRO FX_DOTSCROLLER_SET_FN text_string
 }
 ENDMACRO
 
+IF 0
 .fx_dotscroller_set_text_3d
 {
 	LDX #LO(text_addr):LDY #HI(text_addr):JMP fx_dotscroller_set_text
@@ -205,11 +206,17 @@ ENDMACRO
 	.text_addr EQUS "        GOTTA HAVE SOME PLASMA        ", 0
 }
 
-
 \\ NB. Can only have 255 characters max at the moment
 .fx_dotscroller_msg
 EQUS "HELLO WORLD! THIS IS A DOT SCROLLER WHICH IS SOMEWHAT UNREADABLE BUT BETTER IN UPPERCASE!... 0123456789    "
 EQUB 0
+ENDIF
+
+.fx_dotscroller_set_text_hello
+{
+	LDX #LO(text_addr):LDY #HI(text_addr):JMP fx_dotscroller_set_text
+	.text_addr EQUS "    HELLO TO EVERYONE AT THE PARTY!!   ", 0
+}
 
 .fx_dotscroller_char_idx
 EQUB 0
@@ -520,7 +527,7 @@ ELSE	; half circle
 	angle = PI/4 + (12*PI/8) * c / DOTSCROLL_num_columns
 	ELSE
 	inner = 10
-	outer = 30
+	outer = 35
 	angle = PI/2 + 1 * PI * c / DOTSCROLL_num_columns
 	ENDIF
 
