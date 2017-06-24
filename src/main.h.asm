@@ -4,3 +4,6 @@
 
 .readptr            SKIP 2  ; generic read pointer that is available to any module
 .writeptr           SKIP 2  ; generic write pointer that is available to any module
+
+.fx_dotscroller_ptr     SKIP 2  ; super-lazy, should be in own module header
+.fx_creditscroll_ptr    SKIP 2  ; super-lazy, should be in own module header

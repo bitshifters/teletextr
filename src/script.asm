@@ -83,7 +83,7 @@ ENDMACRO
 
 
 ; Call a routine in a given slot with a value parameter
-MACRO SCRIPT_CALLSLOTV   effect_addr, swr_slot, value
+MACRO SCRIPT_CALLSLOTV   effect_addr, value, swr_slot
     SCRIPT_SLOT swr_slot
     SCRIPT_CALLV effect_addr, value
 ENDMACRO

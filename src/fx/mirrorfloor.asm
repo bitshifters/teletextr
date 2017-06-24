@@ -43,6 +43,8 @@ MIRROR_write_row2_addr = (MIRROR_shadow_addr + ((MIRROR_write_row+2) * MODE7_cha
 
 .fx_mirrorfloor_update
 {
+	JSR fx_mirrorfloor_set_blue
+
 	LDX #MIRROR_start_column
 	.loop0
 	LDA MIRROR_read_row0_addr,X
@@ -128,6 +130,27 @@ MIRROR_write_row2_addr = (MIRROR_shadow_addr + ((MIRROR_write_row+2) * MODE7_cha
 	BCC loop2
 
 	.return
+	RTS
+}
+
+.fx_mirrorfloor_set_blue
+{
+	LDA #144+4
+	FOR y,MIRROR_write_row,MODE7_char_height-1,1
+	STA MIRROR_shadow_addr + (y * MODE7_char_width) + 0
+	NEXT
+	LDA #MODE7_new_bg
+	FOR y,MIRROR_write_row,MODE7_char_height-1,1
+	STA MIRROR_shadow_addr + (y * MODE7_char_width) + 1
+	NEXT
+	LDA #144+7
+	FOR y,MIRROR_write_row,MODE7_char_height-1,1
+	STA MIRROR_shadow_addr + (y * MODE7_char_width) + 2
+	NEXT
+	LDA #MODE7_separated
+	FOR y,MIRROR_write_row,MODE7_char_height-1,1
+	STA MIRROR_shadow_addr + (y * MODE7_char_width) + 3
+	NEXT
 	RTS
 }
 

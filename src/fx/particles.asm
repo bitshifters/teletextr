@@ -8,7 +8,7 @@
 MODE7_particles_addr = MODE7_VRAM_SHADOW
 
 PARTICLES_max = 128
-_PARTICLES_ENABLE_BANG = FALSE
+_PARTICLES_ENABLE_BANG = TRUE
 _PARTICLES_ENABLE_SPIN = TRUE
 _PARTICLES_ENABLE_SPURT = TRUE
 _PARTICLES_ENABLE_DRIP = TRUE
@@ -239,7 +239,8 @@ EQUB 0
 
 	\\ Derive colour
 	TYA
-	AND #&3
+	AND #&7
+	LSR A
 	CLC
 	ADC #145
 	STA fx_particles_state, X
@@ -257,6 +258,7 @@ EQUB 0
 	\\ Must have Y here
 	JSR fx_particles_set_vel2_Y
 
+	INY			; assumes 256 entries in spin table
 	INY			; assumes 256 entries in spin table
 	TYA:CLC:ADC #&40
 	STA fx_particles_spin_idx
@@ -449,7 +451,7 @@ IF _PARTICLES_ENABLE_COLOUR = FALSE
 	jsr mode7_set_column_shadow_fast
 ENDIF
 
-IF _PARTICLES_ENABLE_BANG
+IF 0		;_PARTICLES_ENABLE_BANG
 	LDA #121
 	LDX #0
 	JSR osbyte
@@ -689,7 +691,7 @@ SKIP PARTICLES_max
 \\ Apart from sin/cos table - could be reused from another fx?
 .fx_particles_table
 FOR n,0,&13F,1
-EQUB 127 * SIN(2 * PI * n / 255)
+EQUB 127 * SIN(2 * PI * n / 255)	; 255 or 256?
 NEXT
 
 fx_particles_table_cos = fx_particles_table + 64

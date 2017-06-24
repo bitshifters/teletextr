@@ -20,6 +20,8 @@ CREDITS_last_char = MODE7_char_width
 
 \\ Scrolls entire screen up by one pixel adding new pixels from array
 
+\\ Scrolls entire screen up by one pixel adding new pixels from array
+FAST_SCROLL = TRUE
 .fx_creditscroll_scroll_up
 {
 	\\ Start by updating the top line
@@ -37,38 +39,89 @@ CREDITS_last_char = MODE7_char_width
 	\\ For each character row
 	.y_loop
 
+
+
+
+
+IF FAST_SCROLL
+	lda writeptr+0
+	sta readaddr+1
+	sta writeaddr2+1
+
+	lda writeptr+1
+	sta readaddr+2
+	sta writeaddr2+2
+
+	lda readptr+0
+	sta writeaddr1+1
+
+	lda readptr+1
+	sta writeaddr1+2
+ENDIF
+
+
+
+IF FAST_SCROLL
 	\\ First char in row
 	LDY #CREDITS_first_char
-	.x_loop
+.x_loop
 
+.readaddr
+	LDX &ffff, Y			; [4*]
+	LDA glyph_shift_table_1-32,X	; [4*]
+	STA top_bits+1			; [4]
+.writeaddr1
+	LDX &ffff, Y			; [4*]
+	LDA glyph_shift_table_2-32,X	; [4*]
+	.top_bits
+	ORA #0					; [2]
+	\\ Write the byte back to the screen
+.writeaddr2
+	STA &ffff, Y		; [4*]
+	\\ Full width
+	.skip
+	INY						; [2]
+	CPY #CREDITS_last_char	; [2]
+	BCC x_loop				; [2*]
+
+; 32 cycles
+ELSE
+	\\ First char in row
+	LDY #CREDITS_first_char
+.x_loop
 	\\ Get top pixels from row below
-	LDA (readptr), Y
-	AND #&3
-	STA top_bits + 1
+	LDA (readptr), Y		; [5*]
+	TAX						; [2]
+	AND #&3					; [2]
+	STA top_bits + 1		; [4]
 
 	\\ Get bottom pixels from current row
-	LDA (writeptr), Y
-	AND #&FC
+	LDA (writeptr), Y		; [5*]
+	AND #&FC				; [2]
 
 	\\ Merge them together
 	.top_bits
-	ORA #0
+	ORA #0					; [2]
 
 	\\ Always add 32
-	ORA #32
+	ORA #32					; [2]
 
 	\\ Rotate the pixels to scroll up
-	TAX
-	LDA fx_creditscroll_rotate, X
+	TAX						; [2]
+	LDA fx_creditscroll_rotate, X	; [4*]
 
 	\\ Write the byte back to the screen
-	STA (writeptr), Y
+	STA (writeptr), Y		; [5*]
 
 	\\ Full width
 	.skip
-	INY
-	CPY #CREDITS_last_char
-	BCC x_loop
+	INY						; [2]
+	CPY #CREDITS_last_char	; [2]
+	BCC x_loop				; [2*]
+	; 41 cycles per char
+
+ENDIF
+
 
 	\\ Move down a row
 
@@ -363,12 +416,187 @@ EQUB 0
 
 
 \ ******************************************************************
+\ *	Individual chars + typing
+\ ******************************************************************
+
+; char in A, at writeptr
+.fx_textscreen_plot_char
+{
+	TAX
+	LDY #0
+
+	LDA mode7_font_data, X
+	STA (writeptr), Y
+
+	INY
+	LDA mode7_font_data+1, X
+	STA (writeptr), Y
+
+	INY
+	LDA mode7_font_data+2, X
+	STA (writeptr), Y
+
+	LDY #MODE7_char_width
+
+	LDA mode7_font_data_second_row, X
+	STA (writeptr), Y
+
+	INY
+	LDA mode7_font_data_second_row+1, X
+	STA (writeptr), Y
+
+	INY
+	LDA mode7_font_data_second_row+2, X
+	STA (writeptr), Y
+	
+	RTS
+}
+
+.fx_textscreen_char_count
+EQUB 0
+
+.fx_textscreen_max_chars
+EQUB 0
+
+.fx_textscreen_type_delay
+EQUB 0
+
+.fx_textscreen_type_timer
+EQUB 0
+
+.fx_textscreen_plot_string
+{
+	CLC
+	TXA
+	ADC mode7_sprites_row_addr_LO, Y
+	STA writeptr
+	LDA #HI(MODE7_VRAM_SHADOW)
+	ADC mode7_sprites_row_addr_HI, Y
+	STA writeptr+1
+
+	LDY #0
+	.loop
+	LDA (readptr), Y
+	BEQ done_loop
+	STY loop_idx+1
+
+	JSR fx_textscreen_plot_char
+
+	\\ Terminate after X chars
+	LDX fx_textscreen_char_count
+	INX
+	STX fx_textscreen_char_count
+	CPX fx_textscreen_max_chars
+	BCS done_loop
+
+	CLC
+	LDA writeptr
+	ADC #3
+	STA writeptr
+	LDA writeptr+1
+	ADC #0
+	STA writeptr+1
+
+	.loop_idx
+	LDY #0
+	INY
+	BNE loop
+	.done_loop
+
+	RTS
+}
+
+.fx_textscreen_type_update
+{
+	INC fx_textscreen_type_timer
+	LDA fx_textscreen_type_timer
+	CMP fx_textscreen_type_delay
+	BCC no_inc
+
+	INC fx_textscreen_max_chars
+	LDA #0
+	STA fx_textscreen_type_timer
+
+	.no_inc
+	JMP fx_textscreen_plot_to_max
+}
+
+; address of data in X,Y
+.fx_textscreen_plot_all
+{
+	LDA #&FF
+	STA fx_textscreen_max_chars
+}
+\\ Fall through
+.fx_textscreen_plot_to_max
+{
+	STX fx_creditscroll_ptr
+	STY fx_creditscroll_ptr+1
+
+	LDA #0
+	STA fx_textscreen_char_count
+
+	.loop
+	LDY #0
+	LDA (fx_creditscroll_ptr), Y
+	CMP #&FF
+	BEQ done_loop
+	TAX
+	INY
+	LDA (fx_creditscroll_ptr), Y
+	INY
+	STA y_pos+1
+
+	TYA
+	CLC
+	ADC fx_creditscroll_ptr
+	STA readptr
+	LDA fx_creditscroll_ptr+1
+	STA readptr+1
+
+	.y_pos
+	LDY #0
+	JSR fx_textscreen_plot_string
+
+	LDX fx_textscreen_char_count
+	CPX fx_textscreen_max_chars
+	BCS done_loop
+
+	; y is updated
+	INY
+	TYA
+	CLC
+	ADC readptr
+	STA fx_creditscroll_ptr
+	LDA readptr+1
+	ADC #0
+	STA fx_creditscroll_ptr+1
+	JMP loop
+
+	.done_loop
+	RTS
+}
+
+.fx_textscreen_reset_type_delay
+{
+	STA fx_textscreen_type_delay
+
+	LDA #1
+	STA fx_textscreen_max_chars
+
+	LDA #0
+	STA fx_textscreen_type_timer
+
+	RTS
+}
+
+\ ******************************************************************
 \ *	Credit Font FX
 \ ******************************************************************
 
-.fx_creditscroll_rotate
+.fx_creditscroll_rotate_table
 {
-	FOR n, 0, 255, 1
+	FOR n, 32, 127, 1	; teletext codes range from 32-127
 	a = n AND 1
 	b = n AND 2
 	c = n AND 4
@@ -389,6 +617,41 @@ EQUB 0
 	ENDIF
 	NEXT
 }
+
+fx_creditscroll_rotate = fx_creditscroll_rotate_table-32
+
+IF FAST_SCROLL
+; table to shift 3x2 teletext graphic up by 1 pixel row 
+.glyph_shift_table_1
+{
+	FOR n, 32, 127, 1	; teletext codes range from 32-127
+		a = n AND 1
+		b = (n AND 2)/2
+		c = (n AND 4)/4
+		d = (n AND 8)/8
+		e = (n AND 16)/16
+		f = (n AND 64)/64
+
+		EQUB 32 + (c*1) + (d*2) + (e*4) + (f*8)
+		;PRINT n
+	NEXT
+}
+; table to translate top 2 teletext pixels to bottom 2
+.glyph_shift_table_2
+{
+	FOR n, 32, 127, 1	; teletext codes range from 32-127
+		a = n AND 1
+		b = (n AND 2)/2
+		c = (n AND 4)/4
+		d = (n AND 8)/8
+		e = (n AND 16)/16
+		f = (n AND 64)/64
+
+		EQUB (a*16) + (b*64)
+	NEXT
+}
+ENDIF
+
 
 \\ Spare character row which will get added to bottom of scroll
 \\ Update fn so only top two pixels (1+2) get added to bottom of scroll
@@ -514,6 +777,24 @@ EQUS 4," ",0
 EQUS 4," ",0
 EQUS 4," ",0
 EQUS &FF
+
+.fx_textscreen_presents
+EQUS 3,4,"BITSHIFTERS", 0
+EQUS 4,7,"PRESENTS", 0
+EQUS 5,10,"TELETEXTR", 0
+EQUS &FF
+
+.fx_textscreen_plot_bs
+{
+	LDA #LO(text_addr):STA readptr:LDA #HI(text_addr):STA readptr+1
+	LDX #4:LDY#4:JMP fx_textscreen_plot_string
+	.text_addr EQUS "BITSHIFTERS", 0
+}
+
+.fx_textscreen_type_presents
+{
+	LDX #LO(fx_textscreen_presents):LDY #HI(fx_textscreen_presents):JMP fx_textscreen_type_update
+}
 
 RESET_MAPCHAR
 

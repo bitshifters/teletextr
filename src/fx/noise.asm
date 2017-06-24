@@ -47,7 +47,6 @@
 .xloop
 
 
-
     jsr random
     and #1+2+4+8+16+64
     clc
@@ -109,19 +108,24 @@
 
     ldy #25
 .yloop
-    ldx #3
+    ldx #1
     tya:pha
 .xloop
 
 
-
+.no_zero
     jsr random
     and #7
+    beq no_zero
     tay
     lda colour_table,y
 .store
     sta &ffff,x
     inx
+    cpx #2
+    bne hold_hack
+    inx
+    .hold_hack
     cpx #39
     bne xloop
 

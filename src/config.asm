@@ -39,10 +39,10 @@ ENDMACRO
 MACRO GIF_SEGMENT duration, gifid
     SCRIPT_CALL fx_buffer_clear
     SCRIPT_CALL shadow_set_single_buffer
-    SCRIPT_CALLSLOTV fx_playgifs_init, FX_PLAYGIFS_SLOT, gifid
+    SCRIPT_CALLSLOTV fx_playgifs_init, gifid, FX_PLAYGIFS_SLOT
 
     SCRIPT_SEGMENT_START duration
-        SCRIPT_CALLSLOTV fx_playgifs_playanim, FX_PLAYGIFS_SLOT, gifid
+        SCRIPT_CALLSLOTV fx_playgifs_playanim, gifid, FX_PLAYGIFS_SLOT
         SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
     SCRIPT_SEGMENT_END
 
@@ -63,13 +63,26 @@ MACRO BLANK_DISPLAY duration
     SCRIPT_CALL show_vram
 ENDMACRO
 
+MACRO DOTSCOLLER_SEGMENT duration, set_text_fn
+    SCRIPT_CALLSLOT set_text_fn, FX_DOTSCROLLER_SLOT
+    SCRIPT_SEGMENT_START duration
+        SCRIPT_CALL fx_buffer_swap  
+        SCRIPT_CALL fx_buffer_clear    
+        SCRIPT_CALLSLOT fx_dotscroller_update, FX_DOTSCROLLER_SLOT
+        SCRIPT_CALLSLOT fx_mirrorfloor_update, FX_MIRRORFLOOR_SLOT
+        SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+    SCRIPT_SEGMENT_END
+ENDMACRO
+
+
 
 ;------------------------------------------------------------------------
-; Demo script begins
+; DEMOS START
 ;------------------------------------------------------------------------
 
 
 .demo_script_start
+
 
 ; initialise routines
 SCRIPT_CALL fx_copybuffer_init
@@ -77,19 +90,6 @@ SCRIPT_CALLSLOT  initialise_multiply, FX_3DCODE_SLOT
 ; 
 ; not sure if this is necessary here yet but hey ho
 ;SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -114,14 +114,28 @@ ENDIF
 
 
 
+
+
+
+
+;------------------------------------------------------------------------
+; PART 1: SETUP
+;  a) Tuning in the TV
+;  b) Pages from Ceefax
+;  c) Bitshifters hijack
+;------------------------------------------------------------------------
+
+
 ;-----------------------------------------------------------
 ; Screen off/on
 ;-----------------------------------------------------------
+
 BLANK_DISPLAY 2.0
 
 ;-----------------------------------------------------------
 ; Tuning in....
 ;-----------------------------------------------------------
+
 SCRIPT_CALL sfx_noise_on
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
@@ -130,28 +144,20 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
 SCRIPT_CALL fx_clear
 
-
 ;-----------------------------------------------------------
 ; scrolling bars
 ;-----------------------------------------------------------
+
 SCRIPT_SEGMENT_START    2.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear
     SCRIPT_CALLSLOT fx_copperbars_update, FX_COPPERBARS_SLOT
 SCRIPT_SEGMENT_END
 
-
-IF 0
-SCRIPT_SEGMENT_START    2.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_copperbars_update, FX_COPPERBARS_SLOT   
-SCRIPT_SEGMENT_END
-ENDIF
-
 ;----------------------------------------------------------- 
 ; Tuned - show testcard
 ;-----------------------------------------------------------
+
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOT fx_testcard_init, FX_TESTCARD_SLOT
 SCRIPT_SEGMENT_START    5.0
@@ -162,6 +168,7 @@ SCRIPT_SEGMENT_END
 ;-----------------------------------------------------------
 ; Screen off/on
 ;-----------------------------------------------------------
+
 SCRIPT_CALL fx_music_stop   ; kill testcard tone
 BLANK_DISPLAY 2.0
 
@@ -192,221 +199,344 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
 SCRIPT_SEGMENT_END
 
-
-
-
-
-
-
-
-
 ;-----------------------------------------------------------
 ; Next effect suggests that Teletext has gone wrong
 ; and bitshifters are taking over
 ; TODO: show "we interrupt this broadcast..."
 ;-----------------------------------------------------------
 
-
 SCRIPT_CALL fx_music_stop
 
-
 SCRIPT_CALL sfx_noise_on
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    2.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_colournoise_update
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 SCRIPT_CALL sfx_noise_off
+
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_START    0.1
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL sfx_noise_on
+SCRIPT_SEGMENT_START    1.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_colournoise_update
+SCRIPT_SEGMENT_END
+SCRIPT_CALL sfx_noise_off
+
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL sfx_noise_on
+SCRIPT_SEGMENT_START    0.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_colournoise_update
+;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+SCRIPT_CALL sfx_noise_off
+
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_START    0.2
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL sfx_noise_on
+SCRIPT_SEGMENT_START    0.1
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_colournoise_update
+;    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+SCRIPT_CALL sfx_noise_off
+
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALLSLOT fx_logoanim_init, FX_LOGOANIM_SLOT                ; initialises a single screen with the logo
+SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_START    2.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+SCRIPT_SEGMENT_END
+
+
+;-----------------------------------------------------------
+; START DEMO SECTION
+;-----------------------------------------------------------
+
+BLANK_DISPLAY 1.0
+
+SCRIPT_CALL fx_clear
+SCRIPT_SEGMENT_START    1.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; but should have changed from CEEFAX to BITFAX?
+SCRIPT_SEGMENT_END
 
 SCRIPT_CALL fx_music_init_en ; en
 SCRIPT_CALL fx_music_start
 
+SCRIPT_SEGMENT_START    0.8
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; but should have changed from CEEFAX to BITFAX?
+SCRIPT_SEGMENT_END
+
 ;-----------------------------------------------------------
-; Weather breaking
+; GIF SEGUE - Weather breaking
 ;-----------------------------------------------------------
-GIF_SEGMENT 4.0, PLAYGIFS_WEATHER
+
+GIF_SEGMENT 6.3, PLAYGIFS_WEATHER
+; would be cute to add "Weather forecast for Budleigh Salterton..."
+
+;-----------------------------------------------------------
+; some kind of "Bitshifters presents" sequence would be good here
+; KC: Agree - a simple & reusable intro to each fx, maybe 5x5 font?
+; KC: TODO - put logo wibble here from branch - NEED BETTER LOGO
+;-----------------------------------------------------------
+
+IF 0
+SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
+SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
+;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
+SCRIPT_SEGMENT_END
+SCRIPT_CALL shadow_set_double_buffer
+ENDIF
 
 ;-----------------------------------------------------------
 ; look like we're loading/configuring
+; KC: TODO - use Bitshifters animated logo
 ;-----------------------------------------------------------
+
+IF 1
+SCRIPT_CALLSLOTV fx_textscreen_reset_type_delay, 4, FX_CREDITSCROLL_SLOT
+
 SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear        
     SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
     SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_textscreen_type_presents, FX_CREDITSCROLL_SLOT
+;    SCRIPT_CALLSLOTV fx_teletext_drawpage, 5, FX_TELETEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
+ENDIF
 
 SCRIPT_CALL fx_clear
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ;-----------------------------------------------------------
-; some kind of "Bitshifters presents" sequence would be good here
-; KC: Agree - a simple & reusable intro to each fx, maybe 5x5 font?
+; Wibbling logo - NEED MUCH BETTER SPRITE!  TELETEXTR LOGO?
 ;-----------------------------------------------------------
 
-; STARFIELD NEEDED!!! :)
-; Starfield provided! :D
-
+IF 1
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALL fx_buffer_swap              ; stars are self-erasing - optional!
     SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_logowibble_update, FX_LOGOWIBBLE_SLOT
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
+ENDIF
 
 
+
+;------------------------------------------------------------------------
+; PART 2: OLD-SCHOOL 2D
+;  a) Plasma
+;  b) Interference
+;  c) Rotozoomer
+;  d) Particles
+;
+; Additional ideas: linebox, bouncing sprites, wibbling logos etc.
+;------------------------------------------------------------------------
+
+;-----------------------------------------------------------
+; plasma segment
+;-----------------------------------------------------------
+; SM: fairly happy with this, but I just want to add some animation params so its less uniform and more interesting
+
+; dot scroll an intro message
+IF 1
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_pl
+
+SCRIPT_CALL fx_clear
+SCRIPT_CALLSLOT fx_plasma_init, FX_PLASMA_SLOT
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_plasma, FX_PLASMA_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+ENDIF
+
+;-----------------------------------------------------------
+; GIF SEGUE - Blue Blob
+;-----------------------------------------------------------
+
+GIF_SEGMENT 2.0, PLAYGIFS_BLUEBLOB
+
+;-----------------------------------------------------------
+; Interference
+;-----------------------------------------------------------
+; Cant help feeling we should switch to a rave track for this one
+;  and inject this in a high speed pulsing fashion with the dancing man GIF!!
 
 IF 1
-; SM: this effect is knacked for some reason, causes demo to hang, not sure why
-; SM: think its fixed now. not sure what it was tho. suspicious about some filesys code overwriting pages &0e00-&10ff
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_int
+
+SCRIPT_CALL fx_clear
+SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+3, FX_GREENSCREEN_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_bg, 144+1, FX_GREENSCREEN_SLOT
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+GIF_SEGMENT 4.0, PLAYGIFS_DANCER
+
+SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+5, FX_GREENSCREEN_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_bg, 144+4, FX_GREENSCREEN_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+
+; reset green screen
+SCRIPT_CALLSLOT fx_greenscreen_set_default, FX_GREENSCREEN_SLOT
+ENDIF
+
+IF 0        ; don't think this works at this point in the sequence
+GIF_SEGMENT 3.0, PLAYGIFS_DANCER
+RUN_EFFECT 2.0, fx_interference_update, FX_INTERFERENCE_SLOT
+GIF_SEGMENT 2.0, PLAYGIFS_DANCER
+RUN_EFFECT 1.0, fx_interference_update, FX_INTERFERENCE_SLOT
+GIF_SEGMENT 1.0, PLAYGIFS_DANCER
+RUN_EFFECT 0.5, fx_interference_update, FX_INTERFERENCE_SLOT
+GIF_SEGMENT 0.5, PLAYGIFS_DANCER
+ENDIF
+
+;-----------------------------------------------------------
+; Rotozoom effect 
+;-----------------------------------------------------------
+; this is the best effect, just need to animate it, possibly add some different textures
+
+IF 1
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_rot
+
+SCRIPT_CALL fx_clear
+
+SCRIPT_SEGMENT_START    10.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_rotozoom3_animate, FX_ROTOZOOM_SLOT
+    SCRIPT_CALLSLOT fx_rotozoom3, FX_ROTOZOOM_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+ENDIF
+
+;-----------------------------------------------------------
+; GIF SEGUE - Bird
+;-----------------------------------------------------------
+
+GIF_SEGMENT 4.0, PLAYGIFS_BIRD
+
+;-----------------------------------------------------------
+; Particles!
+;-----------------------------------------------------------
+
+IF 1
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      6.0, fx_dotscroller_set_text_part
+
+SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
+SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_bang, FX_PARTICLES_SLOT
+SCRIPT_CALLSLOT fx_particles_bang, FX_PARTICLES_SLOT
+SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT fx_particles_bang, FX_PARTICLES_SLOT
+SCRIPT_CALLSLOT fx_particles_bang, FX_PARTICLES_SLOT
+SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
+
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
+SCRIPT_SEGMENT_END
+ENDIF
+
+
+
+
+;------------------------------------------------------------------------
+; PART 3: OLD-SCHOOL 3D
+;  a) Vector text
+;  b) Vector balls
+;  c) 3D wireframe
+;------------------------------------------------------------------------
+
 ;----------------------------------------------------------
 ; vector text effect
 ;-----------------------------------------------------------
+; SM: this effect is knacked for some reason, causes demo to hang, not sure why
+; SM: think its fixed now. not sure what it was tho. suspicious about some filesys code overwriting pages &0e00-&10ff
 ; SM: I'd like to get a full vector font in so we can show any text string with it
-
+; KC: This doesn't work on my machine at the moment :(
+; Seems ok now
+IF 1
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
-SCRIPT_SEGMENT_START    30.0
+SCRIPT_SEGMENT_START    12.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT    
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
-
-
 ENDIF
 
-
-
-
-
-IF 1
-; SM: gonna make the linebox demo do something more - like animated boxes/fractals etc.
-; KC: I get the line box starting in the middle of the screen when I run through?  Uninitialised start pos?
-
-; test segment
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
-    SCRIPT_CALLSLOT fx_linebox_update, FX_LINEBOX_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
-SCRIPT_SEGMENT_END
-ENDIF
-
-; test segment
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
-    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
-    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
-SCRIPT_SEGMENT_END
-
-IF 1
-;-----------------------------------------------------------
-\\ And now combine with 3D shape
-;-----------------------------------------------------------
-; SM: need to cycle through the various shapes & animate the sequence better
-SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
-SCRIPT_SEGMENT_START    10.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
-    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
-    SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
-SCRIPT_SEGMENT_END
-
-ENDIF
-
-
-; SM: might be good to inject a scroll text in between each segment
-; giving some text on why the next segment is so amazing!
-; eg. "How about some 3D shapes"
-;     "Particles on a BEEB?! Here we go!"
-; etc. 
-
-
-;-----------------------------------------------------------
-; Particles!
-;-----------------------------------------------------------
-
-SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
-SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
-
-
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
-SCRIPT_SEGMENT_END
-
-SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
-
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
-SCRIPT_SEGMENT_END
-
-SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
-
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
-SCRIPT_SEGMENT_END
-
-SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
-
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
-SCRIPT_SEGMENT_END
-
-SCRIPT_CALLSLOT fx_particles_set_fx_spurt, FX_PARTICLES_SLOT
-
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
-SCRIPT_SEGMENT_END
-
-SCRIPT_CALLSLOT fx_particles_set_fx_drip, FX_PARTICLES_SLOT
-
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_particles_update, FX_PARTICLES_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
-SCRIPT_SEGMENT_END
-
-
-GIF_SEGMENT 5.0, PLAYGIFS_BIRD
-
-
-IF 1
 ;-----------------------------------------------------------
 ; Vector balls
 ;-----------------------------------------------------------
@@ -415,6 +545,9 @@ IF 1
 ; possibly setup a spinning rotating circle of them
 ; bit of mirror floor action going on too?
 
+IF 1
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_vb
 
 ; point cube effect
 SCRIPT_CALLSLOT fx_vectorballs_init, FX_VECTORBALLS_SLOT
@@ -427,9 +560,8 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
 
-
 SCRIPT_CALLSLOT fx_vectorballs_set_medium, FX_VECTORBALLS_SLOT
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear     
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
@@ -437,13 +569,191 @@ SCRIPT_SEGMENT_START    10.0
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT fx_vectorballs_set_large, FX_VECTORBALLS_SLOT
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
+ENDIF
 
+;-----------------------------------------------------------
+; 3D Shapes
+;-----------------------------------------------------------
+; SM: need to cycle through the various shapes & animate the sequence better
+
+IF 1
+; dot scroll an intro message
+DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_3d
+
+SCRIPT_CALLSLOT fx_3dshape_init, FX_3DSHAPE_SLOT
+SCRIPT_CALLSLOT fx_3dshape_toggle_culling, FX_3DSHAPE_SLOT      ; start with backfaces visible
+SCRIPT_SEGMENT_START    4.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+SCRIPT_CALLSLOT fx_3dshape_toggle_culling, FX_3DSHAPE_SLOT      ; remove backfaces
+
+SCRIPT_SEGMENT_START    4.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+
+SCRIPT_SEGMENT_START    4.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+
+SCRIPT_SEGMENT_START    4.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+;    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT        ; this is too garish
+;    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALLSLOT load_next_model, FX_3DCODE_SLOT
+
+SCRIPT_SEGMENT_START    7.5
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+;    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT        ; this is too garish
+;    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_3dshape_update, FX_3DSHAPE_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
+ENDIF
+
+
+; SM: we should somehow maybe start winding the demo down now toward the credits?
+; its a bit of a jolt when they come in.
+
+; Perhaps a vertical scrolling art gallery would be cool - some horsenburger masterpieces?
+; A reminder of how cool teletext is.
+; KC: Or save this for the Horsenburger picture disc?
+
+
+
+;------------------------------------------------------------------------
+; PART 4: THE END
+;  a) Credits + Greets
+;  b) Testcard + turn off TV
+;------------------------------------------------------------------------
+
+;-----------------------------------------------------------
+; Credits scroll
+; lasts 35 seconds - same as music (34s)
+;-----------------------------------------------------------
+
+; clear the screen on finish
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+
+SCRIPT_CALL fx_music_init_exception ; exception
+SCRIPT_CALL fx_music_start
+
+SCRIPT_CALL shadow_set_single_buffer
+
+SCRIPT_SEGMENT_START    34.5
+;    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALLSLOT fx_creditscroll_update, FX_CREDITSCROLL_SLOT 
+    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
+;    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+SCRIPT_SEGMENT_END
+
+SCRIPT_CALL shadow_set_double_buffer
+
+SCRIPT_CALL fx_music_stop
+
+;----------------------------------------------------------- 
+; Finish - show testcard
+;-----------------------------------------------------------
+
+SCRIPT_CALL fx_clear
+SCRIPT_CALLSLOT fx_testcard_init, FX_TESTCARD_SLOT
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap  
+    SCRIPT_CALLSLOT fx_testcard, FX_TESTCARD_SLOT
+SCRIPT_SEGMENT_END
+
+; Turn off TV - Screen needs to clear to a single dot in the centre!!
+SCRIPT_CALL fx_music_stop
+SCRIPT_CALL fx_clear
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap  
+SCRIPT_CALLSLOT fx_testcard_dot, FX_TESTCARD_SLOT
+SCRIPT_SEGMENT_END
+
+; clear the screen on finish
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+SCRIPT_CALL fx_buffer_swap
+SCRIPT_CALL fx_buffer_clear
+
+.segment_end
+
+SCRIPT_END
+
+.demo_script_end
+
+
+
+
+
+
+
+
+;------------------------------------------------------------------------
+; UNUSED FX
+;------------------------------------------------------------------------
+
+;----------------------------------------------------------
+; line box effect
+;-----------------------------------------------------------
+; SM: gonna make the linebox demo do something more - like animated boxes/fractals etc.
+; KC: I get the line box starting in the middle of the screen when I run through?  Uninitialised start pos?
+; KC: removing for now as want to get the sequence tighter
+
+; test segment - linebox
+IF 0
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_linebox_update, FX_LINEBOX_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
+SCRIPT_SEGMENT_END
+ENDIF
+
+; test segment - just rasters
+IF 0
+SCRIPT_SEGMENT_START    5.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT    
+SCRIPT_SEGMENT_END
 ENDIF
 
 ;-----------------------------------------------------------
@@ -466,52 +776,9 @@ SCRIPT_CALL fx_buffer_clear
 ENDIF
 
 ;-----------------------------------------------------------
-; Interference
-;-----------------------------------------------------------
-; Cant help feeling we should switch to a rave track for this one
-;  and inject this in a high speed pulsing fashion with the dancing man GIF!!
-;  Agree :) - KC
-
-
-
-GIF_SEGMENT 2.0, PLAYGIFS_BLUEBLOB
-
-
-RUN_EFFECT 5.0, fx_interference_update, FX_INTERFERENCE_SLOT
-
-GIF_SEGMENT 4.0, PLAYGIFS_DANCER
-
-SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
-RUN_EFFECT 5.0, fx_interference_update, FX_INTERFERENCE_SLOT
-
-GIF_SEGMENT 4.0, PLAYGIFS_DANCER
-RUN_EFFECT 2.0, fx_interference_update, FX_INTERFERENCE_SLOT
-GIF_SEGMENT 2.0, PLAYGIFS_DANCER
-RUN_EFFECT 1.0, fx_interference_update, FX_INTERFERENCE_SLOT
-GIF_SEGMENT 1.0, PLAYGIFS_DANCER
-RUN_EFFECT 0.5, fx_interference_update, FX_INTERFERENCE_SLOT
-GIF_SEGMENT 0.5, PLAYGIFS_DANCER
-
-IF 0
-SCRIPT_SEGMENT_START    10.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
-SCRIPT_SEGMENT_END
-
-SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
-
-SCRIPT_SEGMENT_START    10.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALLSLOT fx_interference_update, FX_INTERFERENCE_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
-SCRIPT_SEGMENT_END
-ENDIF
-
-;-----------------------------------------------------------
 ; Dot scroller
 ;-----------------------------------------------------------
-
+IF 0            ; skip this - use as an intro to each section
 SCRIPT_SEGMENT_START    20.0
     SCRIPT_CALL fx_buffer_swap  
     SCRIPT_CALL fx_buffer_clear    
@@ -519,47 +786,20 @@ SCRIPT_SEGMENT_START    20.0
     SCRIPT_CALLSLOT fx_mirrorfloor_update, FX_MIRRORFLOOR_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT      
 SCRIPT_SEGMENT_END
-
-
-
-
-
+ENDIF
 
 ;-----------------------------------------------------------
-; plasma segment
+; Earlier Rotozoomers
 ;-----------------------------------------------------------
-; SM: fairly happy with this, but I just want to add some animation params so its less uniform and more interesting
-SCRIPT_CALL fx_clear
-SCRIPT_CALLSLOT fx_plasma_init, FX_PLASMA_SLOT
-SCRIPT_SEGMENT_START    30.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALLSLOT fx_plasma, FX_PLASMA_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
-SCRIPT_SEGMENT_END
-
-
-;-----------------------------------------------------------
-\\ Test cheapo rotozoom effect 
-;-----------------------------------------------------------
-; this is the best effect, just need to animate it, possibly add some different textures
-
-SCRIPT_CALL fx_clear
-
-;SCRIPT_CALL shadow_set_single_buffer
-
-SCRIPT_SEGMENT_START    60.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALLSLOT fx_rotozoom3, FX_ROTOZOOM_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT    
-SCRIPT_SEGMENT_END
-
-
+IF 0
 ; Might kill this one - technically interesting, but way too slow
+; KC: yes, too slow!  Next time!
 SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_rotozoom1, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT     
 SCRIPT_SEGMENT_END
+ENDIF
 
 IF 0
 ; was just a technical concept really - dump it
@@ -568,83 +808,18 @@ SCRIPT_SEGMENT_START    10.0
     SCRIPT_CALLSLOT fx_rotozoom2, FX_ROTOZOOM_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader2, FX_TELETEXT_SLOT         
 SCRIPT_SEGMENT_END
-
 ENDIF
 
-;SCRIPT_CALL shadow_set_double_buffer
-
-
-.segment1
-.segment2
-.segment3
-
-; SM: we should somehow maybe start winding the demo down now toward the credits?
-; its a bit of a jolt when they come in.
-
-; Perhaps a vertical scrolling art gallery would be cool - some horsenburger masterpieces?
-; A reminder of how cool teletext is.
-
-;-----------------------------------------------------------
-; Credits scroll
-; lasts 35 seconds - same as music (34s)
-;-----------------------------------------------------------
-
-
-
-; clear the screen on finish
-SCRIPT_CALL fx_buffer_swap
-SCRIPT_CALL fx_buffer_clear
-SCRIPT_CALL fx_buffer_swap
-SCRIPT_CALL fx_buffer_clear
-
-
-SCRIPT_CALL fx_music_init_exception ; exception
-SCRIPT_CALL fx_music_start
-
-SCRIPT_CALL shadow_set_single_buffer
-
-SCRIPT_SEGMENT_START    34.5
-;    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALLSLOT fx_creditscroll_update, FX_CREDITSCROLL_SLOT 
-    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
-;    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
-SCRIPT_SEGMENT_END
-
-SCRIPT_CALL shadow_set_double_buffer
-
-
-SCRIPT_CALL fx_music_stop
-; clear the screen on finish
-SCRIPT_CALL fx_buffer_swap
-SCRIPT_CALL fx_buffer_clear
-SCRIPT_CALL fx_buffer_swap
-SCRIPT_CALL fx_buffer_clear
 
 
 
 
-;----------------------------------------------------------- 
-; Finish - show testcard
-;-----------------------------------------------------------
-SCRIPT_CALL fx_clear
-SCRIPT_CALLSLOT fx_testcard_init, FX_TESTCARD_SLOT
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap  
-    SCRIPT_CALLSLOT fx_testcard, FX_TESTCARD_SLOT
-SCRIPT_SEGMENT_END
-
-SCRIPT_CALL fx_music_stop
-.segment_end
-
-SCRIPT_END
-
-.demo_script_end
 
 
 
+;------------------------------------------------------------------------
 ; IDEAS
-
-
+;------------------------------------------------------------------------
 ; Fade off the BBC Computer screen
 ; CEEFAX page
 ; bzz with TESTCARD "BITSHIFTERS TV" & 1Khz tone
@@ -662,3 +837,57 @@ SCRIPT_END
 
 ; RGB overlapping circles sprites
 ; giphy sequences
+
+
+
+;------------------------------------------------------------------------
+; KIERAN NOTES - 5/6/17
+;------------------------------------------------------------------------
+; Concept: Bitshifters hijacked Ceefax with our favourite old-school demo fx
+; Target time: 3:30s
+; Key beats + timings:
+
+; 0. Loading: ~20s
+
+; 1. Setup: ~40s
+;    a. Tuning in the TV
+;    b. Pages from Ceefax
+;    c. Bitshifters hijacked your TV
+
+; 2. Main 2D feature fx: ~60s
+;    a. Plasma
+;    b. Interference
+;    c. Particles
+
+; 3. Main 3D feature fx: ~60s
+;    a. 3D points?
+;    b. Vector balls
+;    c. 3D wireframe
+;    d. Vector text?
+
+; 4. End: ~40s
+;    a. Credits + greets
+;    b. Testcard + turn off
+
+; 5. General Linking fx:
+;    a. Animated GIFs
+;    b. Dotscroller
+;    c. Starfield
+;    d. Rasterbars
+;    e. Mirror
+
+; Need to get to the action within 60s and keep the overall length tight - less is more!
+; Strength is that we can switch rapidly between fx so keep it snappy - we're not hiding any loading!
+; Go from least to most impressive - probably start 2D and end 3D ("bringing Teletext to a new dimension")
+
+; 6. FX polish:
+;    a. Nice colour setups for Interference
+;    b. More colour for particles + make rotation snappier
+;    c. Different angles / configurations for dot scroller
+;    c. Better anim for Bitshifters logo (could be a beat bar!)
+
+; 7. Extra FX if time:
+;    a. Port sinewave scroller
+;    b. Linebox
+;    c. Bouncing 2D sprites
+;    d. Animated dot scroller

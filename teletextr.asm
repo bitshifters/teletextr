@@ -64,7 +64,7 @@ SCRATCH_RAM_ADDR = &0E00
 \ ******************************************************************
 
 ORG &0900
-GUARD &0CFF
+GUARD &0D00
 .utils_start
 INCLUDE "lib/swr.asm"
 INCLUDE "lib/print.asm"     ; feels unnecessary, hardly used, and only for debugging mainly
@@ -312,6 +312,11 @@ FX_DOTSCROLLER_SLOT = 1
 INCLUDE "src/fx/dotscroller.asm"
 
 ;----------------------------------------------------------------------------------------------------------
+; Animated logo
+FX_LOGOANIM_SLOT = 1
+INCLUDE "src/fx/logoanim.asm"
+
+;----------------------------------------------------------------------------------------------------------
 ; Teletext effect
 FX_TELETEXT_SLOT = 1
 INCLUDE "src/fx/teletext.asm"
@@ -376,11 +381,13 @@ INCLUDE "src/fx/playgifs.asm"
 FX_PLASMA_SLOT = 3
 INCLUDE "src/fx/plasma.asm"
 
-
-
 ;----------------------------------------------------------------------------------------------------------
 FX_TESTCARD_SLOT = 3
 INCLUDE "src/fx/testcard.asm"
+
+;----------------------------------------------------------------------------------------------------------
+FX_LOGOWIBBLE_SLOT = 3
+INCLUDE "src/fx/logowibble.asm"
 
 
 .bank3_end
@@ -460,6 +467,8 @@ PRINT " fx_particles size is", (end_fx_particles-start_fx_particles), "bytes"
 PRINT " fx_starfield size is", (end_fx_starfield-start_fx_starfield), "bytes"
 PRINT " fx_creditscroll size is", (end_fx_creditscroll-start_fx_creditscroll), "bytes"
 PRINT " fx_dotscroller size is", (end_fx_dotscroller-start_fx_dotscroller), "bytes"
+PRINT " fx_logowibble size is", (end_fx_logowibble-start_fx_logowibble), "bytes"
+PRINT " fx_logoanim size is", (end_fx_logoanim-start_fx_logoanim), "bytes"
 
 
 PRINT "------------------------------------------------------------"
