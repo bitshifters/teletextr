@@ -3,6 +3,7 @@
 \\ Code module
 \ ******************************************************************
 
+_ENABLE_AUDIO = TRUE				; enables output to sound chip (disable for silent testing/demo loop)
 
 
 VGM_PLAYER_ORG = *
