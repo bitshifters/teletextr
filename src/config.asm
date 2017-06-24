@@ -295,11 +295,17 @@ SCRIPT_SEGMENT_END
 SCRIPT_CALL fx_music_init_en ; en
 SCRIPT_CALL fx_music_start
 
-SCRIPT_SEGMENT_START    0.8
+IF 1
+SCRIPT_CALLSLOTV fx_textscreen_reset_type_delay, 2, FX_CREDITSCROLL_SLOT
+SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+6, FX_GREENSCREEN_SLOT
+SCRIPT_SEGMENT_START    2.5
     SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; but should have changed from CEEFAX to BITFAX?
+    SCRIPT_CALL fx_buffer_clear
+    SCRIPT_CALLSLOT fx_greenscreen_update, FX_GREENSCREEN_SLOT
+    SCRIPT_CALLSLOT fx_textscreen_type_weather, FX_CREDITSCROLL_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
+ENDIF
 
 ;-----------------------------------------------------------
 ; GIF SEGUE - Weather breaking
@@ -309,57 +315,70 @@ GIF_SEGMENT 6.3, PLAYGIFS_WEATHER
 ; would be cute to add "Weather forecast for Budleigh Salterton..."
 
 ;-----------------------------------------------------------
-; some kind of "Bitshifters presents" sequence would be good here
-; KC: Agree - a simple & reusable intro to each fx, maybe 5x5 font?
-; KC: TODO - put logo wibble here from branch - NEED BETTER LOGO
+; "Bitshifters presents" sequence would be good here
 ;-----------------------------------------------------------
 
-IF 0
-SCRIPT_CALL shadow_set_single_buffer        ; this logo relies on updating a single screen
-SCRIPT_CALL fx_logoanim_init                ; initialises a single screen with the logo
+;-----------------------------------------------------------
+; Wibbling logo
+;-----------------------------------------------------------
+
+IF 1
+SCRIPT_CALLSLOTV fx_textscreen_reset_type_delay, 8, FX_CREDITSCROLL_SLOT
+
 SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALLSLOT fx_logoanim_update, FX_LOGOANIM_SLOT            ; just updates top & bottom chars of logo
-;   SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT        ; conflicts with teletext header - maybe place this segment somewhere else?
+    SCRIPT_CALL fx_buffer_swap              ; stars are self-erasing - optional!
+    SCRIPT_CALL fx_buffer_clear    
+    SCRIPT_CALLSLOT fx_logowibble_update, FX_LOGOWIBBLE_SLOT
+    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
+    SCRIPT_CALLSLOT fx_textscreen_type_presents, FX_CREDITSCROLL_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
-SCRIPT_CALL shadow_set_double_buffer
 ENDIF
 
 ;-----------------------------------------------------------
-; look like we're loading/configuring
-; KC: TODO - use Bitshifters animated logo
+; Teletextr logo
+;-----------------------------------------------------------
+
+IF 1
+SCRIPT_SEGMENT_START    3.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, 5, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+ENDIF
+
+;-----------------------------------------------------------
+; Old School
 ;-----------------------------------------------------------
 
 IF 1
 SCRIPT_CALLSLOTV fx_textscreen_reset_type_delay, 4, FX_CREDITSCROLL_SLOT
 
-SCRIPT_SEGMENT_START    5.0
-    SCRIPT_CALL fx_buffer_swap
-    SCRIPT_CALL fx_buffer_clear        
-    SCRIPT_CALLSLOT fx_rasterbars_update, FX_RASTERBARS_SLOT
-    SCRIPT_CALLSLOT fx_rasterbars_write_shadow, FX_RASTERBARS_SLOT
-    SCRIPT_CALLSLOT fx_textscreen_type_presents, FX_CREDITSCROLL_SLOT
-;    SCRIPT_CALLSLOTV fx_teletext_drawpage, 5, FX_TELETEXT_SLOT
-    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
-SCRIPT_SEGMENT_END
-ENDIF
-
-SCRIPT_CALL fx_clear
-
-;-----------------------------------------------------------
-; Wibbling logo - NEED MUCH BETTER SPRITE!  TELETEXTR LOGO?
-;-----------------------------------------------------------
-
-IF 1
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_SEGMENT_START    4.0
     SCRIPT_CALL fx_buffer_swap              ; stars are self-erasing - optional!
     SCRIPT_CALL fx_buffer_clear    
-    SCRIPT_CALLSLOT fx_logowibble_update, FX_LOGOWIBBLE_SLOT
     SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT
+    SCRIPT_CALLSLOT fx_textscreen_type_oldschool, FX_CREDITSCROLL_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
 ENDIF
 
+;-----------------------------------------------------------
+; Nova logo
+;-----------------------------------------------------------
 
+IF 1
+SCRIPT_SEGMENT_START    3.0
+    SCRIPT_CALL fx_buffer_swap
+    SCRIPT_CALL fx_buffer_clear        
+    SCRIPT_CALLSLOTV fx_teletext_drawpage, 6, FX_TELETEXT_SLOT
+    SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
+SCRIPT_SEGMENT_END
+ENDIF
+
+
+SCRIPT_CALL fx_clear
 
 ;------------------------------------------------------------------------
 ; PART 2: OLD-SCHOOL 2D
@@ -382,7 +401,7 @@ DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_pl
 
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOT fx_plasma_init, FX_PLASMA_SLOT
-SCRIPT_SEGMENT_START    10.0
+SCRIPT_SEGMENT_START    8.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALLSLOT fx_plasma, FX_PLASMA_SLOT
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
@@ -403,7 +422,7 @@ GIF_SEGMENT 2.0, PLAYGIFS_BLUEBLOB
 
 IF 1
 ; dot scroll an intro message
-DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_int
+DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_int
 
 SCRIPT_CALL fx_clear
 SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+3, FX_GREENSCREEN_SLOT
@@ -415,9 +434,10 @@ SCRIPT_SEGMENT_START    5.0
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT       
 SCRIPT_SEGMENT_END
 
-GIF_SEGMENT 4.0, PLAYGIFS_DANCER
+GIF_SEGMENT 3.5, PLAYGIFS_DANCER
 
-SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
+; Don't like this blend mode
+;SCRIPT_CALLSLOT fx_interference_set_blend_ora, FX_INTERFERENCE_SLOT
 SCRIPT_CALLSLOTV fx_greenscreen_set_fg, 144+5, FX_GREENSCREEN_SLOT
 SCRIPT_CALLSLOTV fx_greenscreen_set_bg, 144+4, FX_GREENSCREEN_SLOT
 
@@ -465,7 +485,7 @@ ENDIF
 ; GIF SEGUE - Bird
 ;-----------------------------------------------------------
 
-GIF_SEGMENT 4.0, PLAYGIFS_BIRD
+GIF_SEGMENT 3.5, PLAYGIFS_BIRD
 
 ;-----------------------------------------------------------
 ; Particles!
@@ -473,7 +493,7 @@ GIF_SEGMENT 4.0, PLAYGIFS_BIRD
 
 IF 1
 ; dot scroll an intro message
-DOTSCOLLER_SEGMENT      6.0, fx_dotscroller_set_text_part
+DOTSCOLLER_SEGMENT      4.0, fx_dotscroller_set_text_part
 
 SCRIPT_CALLSLOT fx_particles_init, FX_PARTICLES_SLOT
 SCRIPT_CALLSLOT fx_particles_set_fx_spin, FX_PARTICLES_SLOT
@@ -525,18 +545,15 @@ ENDIF
 ; SM: think its fixed now. not sure what it was tho. suspicious about some filesys code overwriting pages &0e00-&10ff
 ; SM: I'd like to get a full vector font in so we can show any text string with it
 ; KC: This doesn't work on my machine at the moment :(
-; Seems ok now
+; Seems ok now - KC - I concur!
 IF 1
 SCRIPT_CALLSLOT fx_vectortext_init, FX_VECTORTEXT_SLOT
-SCRIPT_SEGMENT_START    12.0
+SCRIPT_SEGMENT_START    6.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
 ;    SCRIPT_CALLSLOT fx_starfield_update, FX_STARFIELD_SLOT    
-
     SCRIPT_CALLSLOT fx_vectortext_update, FX_VECTORTEXT_SLOT
 ;    SCRIPT_CALLSLOT fx_background_update, FX_BACKGROUND_SLOT
-
-
     SCRIPT_CALLSLOT fx_teletext_drawheader, FX_TELETEXT_SLOT
 SCRIPT_SEGMENT_END
 ENDIF
@@ -557,7 +574,7 @@ DOTSCOLLER_SEGMENT      5.0, fx_dotscroller_set_text_vb
 SCRIPT_CALLSLOT fx_vectorballs_init, FX_VECTORBALLS_SLOT
 SCRIPT_CALLSLOT fx_vectorballs_set_small, FX_VECTORBALLS_SLOT
 
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    4.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
@@ -565,7 +582,7 @@ SCRIPT_SEGMENT_START    5.0
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT fx_vectorballs_set_medium, FX_VECTORBALLS_SLOT
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    4.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear     
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
@@ -573,7 +590,7 @@ SCRIPT_SEGMENT_START    5.0
 SCRIPT_SEGMENT_END
 
 SCRIPT_CALLSLOT fx_vectorballs_set_large, FX_VECTORBALLS_SLOT
-SCRIPT_SEGMENT_START    5.0
+SCRIPT_SEGMENT_START    4.0
     SCRIPT_CALL fx_buffer_swap
     SCRIPT_CALL fx_buffer_clear    
     SCRIPT_CALLSLOT fx_vectorballs_update, FX_VECTORBALLS_SLOT
