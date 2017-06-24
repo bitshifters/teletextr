@@ -7,29 +7,30 @@ INCBIN "data/pages/testpage.txt.bin"
 PAGE_TEST = 0
 
 .teletext_page1
-INCBIN "data/pages/edittf.txt.bin"
-PAGE_EDITTF = 1
+INCBIN "data/pages/classic_ceefax.txt.bin"
+
 .teletext_page2
-INCBIN "data/pages/ceefax.txt.bin"
-PAGE_CEEFAX = 2
+INCBIN "data/pages/classic_oracle.txt.bin"
+
 .teletext_page3
-INCBIN "data/pages/heman.txt.bin"
-PAGE_HEMAN = 3
+INCBIN "data/pages/classic_millenium.txt.bin"
+
 .teletext_page4
-INCBIN "data/pages/heisenburg.txt.bin"
-PAGE_HEISENBURG = 4
+INCBIN "data/pages/classic_telesoft.txt.bin"
+
+
 .teletext_page5
-INCBIN "data/pages/yorks.bin"
-PAGE_YORKS2 = 5
+INCBIN "data/pages/classic_weather.txt.bin"
+
 .teletext_page6
-INCBIN "data/pages/tvguide.bin"
-PAGE_YORKS3 = 6
+INCBIN "data/pages/heisenburg.txt.bin"
+PAGE_HEISENBURG = 6
 .teletext_page7
-INCBIN "data/pages/owl.bin"
-PAGE_YORKS4 = 7
+INCBIN "data/pages/heman.txt.bin"
+PAGE_HEMAN = 7
 .teletext_page8
-INCBIN "data/pages/channl4.bin"
-PAGE_YORKS5 = 8
+INCBIN "data/pages/edittf.txt.bin"
+PAGE_EDITTF = 8
 
 
 .teletext_page9
@@ -175,15 +176,21 @@ PAGE_SIMON = 13
     rts
 }
 
+
+
 .fx_teletext_showpages
 {
-    lda page+1
+    inc localpage
+    lda localpage
+    lsr a:lsr a:lsr a:lsr a:lsr a
     and #7      ; now cycles through 8 'classic' teletext pages
     clc
     adc #1
     jsr fx_teletext_drawpage
 
     rts
+
+.localpage EQUB 0
 }
 
 .end_fx_teletext
