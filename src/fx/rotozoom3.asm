@@ -227,7 +227,7 @@ ENDIF
 .yloop
 
     ; stash y coord
-    sty &9f
+    sty rz_stash_y
 
 
     ; px0 = sx
@@ -281,7 +281,7 @@ ENDIF
     SUBOFFSET   rz_sx,rz_dy,rz_sx
     ADDOFFSET   rz_sy,rz_dx,rz_sy
 
-    ldy &9f
+    ldy rz_stash_y
     dey
     beq done
     jmp yloop

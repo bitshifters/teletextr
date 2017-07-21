@@ -21,7 +21,7 @@ USE_SHADOW_RAM = TRUE
 ; Allocate vars in ZP
 .zp_start
 ORG 0
-GUARD &8f
+GUARD &9f
 
 
 
