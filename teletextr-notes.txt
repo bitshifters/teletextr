@@ -1,0 +1,635 @@
+MODE 7 DEMO IDEAS
+~~~~~~~~~~~~~~~~~
+
+
+TO-DOS
+~~~~~~
+Tidy up interference + credits scroll modules - done
+Submit PR for interference branch merge to master - done
+
+Tidy up dotscroller code - done
+Find a nice arrangement of dots for dot scroller
+E.g. circular and projection - defer
+Submit PR for dotscroller branch merge to master - done
+
+Music ROM handling bug fix - done
+
+Additional config control
+- Repeat until key press - use generic signal fn
+- Repeat until routine signals end - add generic signal
+
+Animated GIF
+- Put several GIFs into swram bank and switch between in fx module - done
+- Simpler encoding scheme - both compression & playback
+- Demonstrate can play GIF smaller than full screen in a particular screen pos
+- Change screen blit to not be MODE 7 width
+
+- Enable conversion of GIFs smaller than full screen
+- Tidy up video convertor so can check in (ideally add -loop flag)
+- Add option to clip portion of image for GIF
+
+
+
+Put a load of static screens into one swram bank with easy interface
+- Including a load of image->teletext conversion pics - Simon done
+
+
+
+PROTOTYPES
+~~~~~~~~~~
+Animated GIF - done
+- Video codec but for a NxM sprite
+- Can be played back anywhere on screen
+- Loops
+- Is data Exo compressed or not?
+- Is data B&W or colour?
+- Data coming from an animated GIF rather than video - shorter & easier to source
+
+Beat Bars
+- Use bg or fg col as a vu-meter for music whilst another fx plays
+- Use bg or fg col as beat bars with random colours from music
+
+Sprites
+- Lots of bouncing sprites - how many can be rendered?
+- Collision detection with each other for bonus
+- Animated sprites (e.g. rotating star) for bonus
+- Each sprite has it's own colour attribute (inserted as post-process) as bonus
+- Amiga bouncing ball large sprite?  What about colours?  :)
+
+Dots
+- How many dots can we achieve per frame?
+- Simple particle system - pos, speed, gravity/force
++ Bonus effects - lifetime, colour
++ Various particle emitters / attractors?
+- 3D height field
+- 3D animated plane - flag
+
+CRTC
+- Is there any benefit to vertical rupture in MODE 7? - KIND OF
+- How did Firetrack do smooth per-pixel screen wipes? => by drawing pixels, even in MODE 7, no crtc trickery
+- What happens if you change scanlines per character (R9) in MODE 7? => pixels get smaller but you can't draw all the screen - CAN DO SINGLE SCANLINE SCROLL WITH R9 ABUSE
+- MODE 7 hardware scrolling?
+- What happens if you change the palette in MODE 7 - does this have any effect? - NO
+
+
+Hold gfx
+- What can we do with 39x25 pixels in real-time?
++ Presume pixel size is fixed (unless R9 works)
++ Pixels are also not square but tall
+- Could just do some hue bar animations
++ So vertical hue bars with sin wave animation on each row
++ Fade / wipe from one colour to the next, diagonal?
+- Like the sparse coloured dot effect, like an LED wall
++ Is it possible to mask out characters?
++ E.g. impose a scrolltext in black over the plasma?
+
+Sparse sprites
+- What can be done with fixed dot / sprite patterns that can be turned on/off rapidly?
+- E.g. precalc'd dot tunnel, one sprite for each ring of dots
+- Faster to draw dots individually so better if this uses full characters or parts of
++ Could generate scrolling perspective floor tiles
+
+Custom fill routines
+- Vertical fill in a given colour - could we do ray casting? (Wolfenstein) - done v1
+- Horizontal fill - scaled or apparently rotated sprites
+
+
+
+COMMON LIBRARY ROUTINES
+~~~~~~~~~~~~~~~~~~~~~~~
+Sprite plot - done
+Mirror effect - done
+Starfield - done
+
+
+SHORT EFFECTS FOR UBER DEMO
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Interference pattern - done
+(Two large screens of concentric circles EOR'd together)
+Video playback, full screen or rectangle - done
+(Use video data format but anim data uncompressed on loop)
+3D starfield - expensive to calc? - get Simon to do it :)
+Rotate & scale full-screen texture using hold gfx (Sarah did this already) - Simon doing this
+
+
+SCROLLERS
+~~~~~~~~~
+One column sine-wave 16x16 - done 12x12
+Full-char sine-wave 16x16 - done 12x12
+As masked sprites 16x16 (e.g. moving in circular pattern)
+Fixed pixel map - done this but just dots not sparse sprites
+ - Precalculate all pixels that can be turned on/off in nice pattern
+ - Could even generate code to do this one column at a time from an input byte?
+ - Use standard 8x8 font to turn pixels on and off
+ - E.g. circular LED arrangement (inner is bottom, outer is top)
+ - Also a diagonal path across the screen
+One pixel vertical scroll for lines of text, i.e. credits (8x8 font) - done
+
+
+
+Sparse Sprites routine
+~~~~~~~~~~~~~~~~~~~~~~
+Need a routine to generate code that turns a pixel or set of pixels on / off.
+Then extend that to 8 from a byte pattern.
+Can be used for scrollers & all sorts.
+
+Want code to be
+ON:
+	LDA screen address
+	ORA #pixel bit
+	STA screen address
+OFF:
+	LDA screen address
+	AND #inverse of pixel bit
+	STA screen address
+
+How to switch between bits at run-time?
+Or have a table of addresses & bits and run through display or clear routine.
+This is basically the same encoding as the video player: 10-bits address & 6-bits pixels
+
+Fast sparse char pixels on/off routine
+Tunnel of fixed pixels - each ring is a sparse sprite
+Then just turn rings on & off in sequence
+
+Adapt this for interesting scroller
+Each bit is a sparse sprite
+If arrange each bit in order (start -> finish column / top -> bottom row)
+Then just a case of reading char column byte and setting sparse sprite on/off for each bit
+Can do rotoscroller with more than just one pixel
+Different options to general data - programatically or from sprite sheets
+Variation of that is LED scroller but the LEDs move (maybe 2-4 frames) by having the above but 4x
+
+At 45c per byte written can't quite write the whole screen but getting close.
+Thinking about zoom scroller made up of these pixels: 78x16 = 1248 pixels too much
+
+Do rotoscroller - dots first then blocks
+ - Generate sparse sprite blocks for 8 pixels rotated around circle, maybe 30 so 20 degrees step?
+ - Generate rotated font data - nick from billb demo
+ - Estimate 30 x 8 x 4 bytes (HI, LO, CHAR, NULL) = 960 bytes minimum (max = 30 x 8 x 10 = 2400 bytes? for 4x characters per pixel, unlikely)
+ - 240 sparse pixels = min 240 * 45c = 10800c or max 240 * 4 * 45c = 43200, unlikely
+
+Rotozoomer - Simon done
+~~~~~~~~~~
+Simon's rotozoomer challenge: 78x75 pixels (max) = 5850 pixels (max)
+Across 975 characters.  Can read & write this many characters = 4c * 975 + 4c * 975 = 7800c min
+But can't write this many pixels as need to read, OR, write = (4c + 2c + 4c) * 5850 = 58500c min
+Mirror effect is hard coded 3x reads + OR + 1x write per character = 62c per character
+62c * 975 = 60450c :(
+Could maybe, maybe manage 2x reads + 1x write per character for a 38x50 pixel screen but this would be
+B&W (maybe ordered dither grey scale) rather than colour just doing 38x25 :\  Might be a nice effect though?
+
+Credits scroll - done
+~~~~~~~~~~~~~~
+Can we scroll everything up by one scanline by using a lookup table to rotate pixels?
+1x load + 1x look up + 1x write = 12c * 975 
+To fill in missing scanline need another 1x load + 1x look up + 1x ora + 1x write = 16c * 975
+Then write last row of scanline for new chars - seems possible.  :)
+
+Transitions
+~~~~~~~~~~~
+Some nice screen wipes - use fg & bg col to clear to single colour then use pixels to define animated borders?
+Screen fades for picture disk
+ - Alternate scanlines, alternate columns
+ - Rotational line, 360 degrees
+ - Random characters
+
+Random
+~~~~~~
+Use Simon's plasma technique but for voxel height landscape?
+Can proper zoom scroller be done by messing with #scanlines per character row in CRTC?
+
+CRTC set to R9 set to 19 (= 20 lines) per character row.  20x25 = 500 scanlines
+Teletext definition has 6x10 pixels per character that are then interpolated by the chip to 12x20
+This explains the graphics block 3x3 pixels in corners and 3x4 pixels in centre.  For separated graphics
+this is reduced by 1x pixel in each direction, 2x2 or 2x3.  This also explains Julian's image convertor
+being set to 480x500 pixels.  Pixels are not square.
+
+
+Real-time lighting in MODE 7 :)
+Assume a sphere in the centre of the screen
+For every character cell we know whether we are on the surface of the sphere or not
+For each cell we know the approximate normal through the centre of that cell
+Use that normal as a lookup into a lighting table to get an intensity value
+Use that as a lookup into greyscale dither pattern
+This might be better for a MODE 4 or MODE 0 demo as get the grey scale intensity?
+
+Hold gfx colour trick with top & bottom pixel set on one column only gives nice split pixel colour fx
+
+Horizontal fill
+Need a plot routine that takes a fixed sized sprite, say 32x32 pixels, but can draw each row at arbitrary width
+If going to plot each row individually, need to read & write 6x per character cell (not including masking)
+Can fix the plot position so don't have to draw at arbitrary location on screen
+But still need to be able to use the sprite data on any row or column alignment I guess
+What about mip-maps?  Rather than sampling a single texture at varying intervals, what about sampling two
+textures at a fixed interval and blending between them differently?  Don't have much to blend.  :S
+
+E.g. top is 32x32, bottom is 16x16.  Want to plot 29x29 -> need to step top at 32/29~=1.1 pixels
+That's not how mip-maps work.  :)  Could be used for a zoom though maybe?  I.e. plotting 29x29 but stretched
+to 32x32.  In which case not really mips in B&W as can step through same texture just at different rates
+That's not magnifying but pixelating, reducing the apparent resolution of fixed image.
+
+What can we do with a fast horizontal line draw?  Ditto vertical draw?
+ 
+Ray Caster
+~~~~~~~~~~
+
+256 brads for sin table
+cos table is just +64 (&40) offset
+heading is a brad for centre of screen
+each vertical column direction is a brad either side
+fixed point 8.8 for player position and vectors
+ray starts at player position
+for current ray get step in x, step in y from brad
+step along ray by one unit each loop (add step x & step y to ray pos x & ray pos y)
+use ray position as lookup into a map until in a cell that is non-zero
+for height just do simple loop to calculate 40 / distance (num steps)
+clip to max height
+draw vertical line of sky / wall / floor
+player can move one unit forwards or backwards along heading only
+
+addsteptopos
+            ldx #$02       ; do index of 2 so can step over consecutive lo/hi bytes
+loop_stepadd
+            lda stepx,x    ; & y
+            ora #$7f       ; sign extend 8 bit step value to 16 bit
+            bmi negative   
+            lda #$00
+			.negative
+            pha			   ; high byte needs to be either $ff (negative) or $00 (positive)
+            ;clc
+            lda stepx,x    ; & y
+            adc rayposx,x  ; & y
+            sta rayposx,x  ; & y
+            pla
+            adc rayposxh,x ; & y
+            sta rayposxh,x ; & y
+            dex
+            dex
+            bpl loop_stepadd
+
+suffers from fisheye effect as distance is calculated as number of steps along the ray
+need that distance projected onto the heading vector
+distance x cos(angle between them) - we know angle between is our brads as we step columns
+we know this is reflected in central axis so only need 20 (max) scale factors
+we have cos(angle) for each column as s.7 need to multiply distance as 8.8 by this to scale down
+scale goes from &7F (1.0) to &71 (0.89) at end column, so just 4 bits of info.
+
+Just sum up the scale factor N times and take that as new distance.
+
+This doesn't work because the intersection point is just the first point that falls inside a
+filled block, not on the edge of the block.  Would need to do proper DDA step to generate
+intersection points on horizontal and vertical edges, would give us ability to do texture map
+however.
+
+
+Checkerboard zoom
+~~~~~~~~~~~~~~~~~
+
+What are the smallest repeating sprites that represent 2x2 up to NxN at each pixel offset?
+
+1x1 = use these two repeated for x offset and varying y offset
+~~~
+10
+01
+~~
+2x2 pixels = 1x2 characters = 2x6 = 12 bytes
+
+2x2
+~~~
+11|00
+11|00
+00|11
+--+--
+00|11
+~~~~~
+4x4 pixels = 2x2 characters = 4x6 = 24 bytes
+
+3x3
+~~~
+11|10|00
+11|10|00
+11|10|00
+--+--+--
+00|01|11
+00|01|11
+00|01|11
+~~~~~~~~
+6x6 pixels = 3x3 characters = 9x6 = 54 bytes
+
+But still need to mask in repeated sprites at new y offset :\
+
+Each NxN block takes (N x (2N + 2) DIV 3) x 6 bytes
+E.g. 20x20 = 1680 bytes  Seems pointless to store as sprites.
+
+Just need to copy & ORA lines of b&w segments to screen
+
+Homage
+~~~~~~
+Other than Bad Apple, is there another demo that we could immitate / reproduce in MODE 7?
+Ala VCS 2600 demos.
+
+Negative
+~~~~~~~~
+Do some of the effects but in negative - so need to fill the line with solid colour and omit
+pixels.  Should be possible to copy Simon's optimised dot plot routine to remove a dot..
+Can do a fast screen clear to 127/255 for solid coloured background.
+This would look nice on the dot scroller.
+
+Square characters
+~~~~~~~~~~~~~~~~~
+Use CRTC R9 to reduce character row size to 12 would give 2x2 square pixels in 2x colours (fg + bg)
+Would need to increase number of rows from 25 to 40 but cannot change the address range used so
+will need trickery - Vertical rupture would allow us to reuse the same screen buffer for bottom 15 lines.
+Would need to copy 15 x 40 = 600 bytes of data into &7C00 ready to be reused by the raster.
+
+Three Colour Wave
+~~~~~~~~~~~~~~~~~
+aaaaaaaabbbbbbbbcccccccc
+aaaaaaabbbbbbbbccccccccc
+aaaaaaaaabbbbbbbbbbccccc
+
+bg A, fg B, spaces then pixels, swap bg colour using hold
+Need min 5 characters in overlap each character row
+solid block, hold, new col, new bg, new fg
+What happens if hold from beginning and use space vs solid gfx chars?
+solid, hold, new bg, new fg
+
+One Teletexel Scanline
+~~~~~~~~~~~~~~~~~~~~~~
+Use CRTC R9 to reduce character row to just one teletexel height (6/8/6) but use vertical rupture to
+put three of these screens on top of each other creating a full 75 teletexel image.
+With careful timing, copy correct data into &7C00 ahead of the raster so get full, stable image
+
+Single Scanline Scroll
+~~~~~~~~~~~~~~~~~~~~~~
+- DONE!  (Bar a flicker on top line.)
+
+Music Bars
+~~~~~~~~~~
+Use bg or fg col as a vu-meter for music whilst another fx plays
+Use bg or fg col as beat bars with random colours from music
+- Not v good at mo
+
+Sub-sixel Image Conversion
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Find slices of teletext character set that map to pixel (not sixel) combinations on each scanline
+Convert images but using reduced R9 to select a different slice of each character per X scanlines
+Ideally would want to use just 2 scanlines per row but don't have quite enough time to copy this
+data - 2 x 25 rows = 50 scanlines x 128 cycles = 6400c / 8c (LDA+STA) = 800 bytes :(
+Can do this with 2.5 scanlines per row which is possible because of interlace!  R9=(2.5-1)*2=3
+I wonder what happens here?!  Could generate these characters using MODE7 font
+
+Logo Anim
+~~~~~~~~~
+Bitshifters logo 2
+Main chunk of logo on rows 10-14
+b [2-3] up - 0x20, 0x6a
+i [5-6] down - 0x35, 0x20
+t [8-9] up - 0x20, 0x6a
+s
+h [14-15] up - 0x35, 0x20 [17] down - 0x6a
+i [18-19] down - 0x20, 0x6a
+f [20-21] down - 0x35, 0x20
+t [24-25] up - 0x35, 0x20
+e
+r [31-32] down - 0x20, 0x6a
+s
+
+b [2-4]
+i [5-6]
+t [7-10]
+s [11-13]
+h [14-17]
+i [18-19]
+f [20-22]
+t [23-26]
+e [27-30]
+r [31-33]
+s [34-36]
+
+
+Dates
+~~~~~
+Release @ Nova - 23 June
+Exactly 13 weeks (tomorrow :)
+Work-back - when to stop additional FX? When to lock sequence? Then optimise & bug fix!
+Questions - Shadow RAM for double-buffer? New music?
+
+
+TO-DOS
+~~~~~~
+Technical
+- Shadow RAM for double-buffer and avoid copy - may break some FX or require recode - SIMON
+
+Additional FX
+- Logo horizontal wibble (per sixel line) - done
+- Bitshifters B&W logo anim - done
+- Bouncing ball sprites x N
+- Image fades? - save for Horsenburger picture disk?
+- 3D starfield - Simon?
+- Sparse sprite sequence - e.g. dot tunnel
+- Port 12x12 sixel sinewave scroller?
+- Port BeebTracker scroller?
+- Tweak credit scroller to have a floating text (optionally appear by char)
+
+Sequence
+- <too much to even begin>
+
+Art
+- Ask Horsenburger to make Nova logo, demo logo, anything else he fancies!
+- UK map or whole world map in teletext
+
+56:20 start
+Fix engineering test
+Put Ceefax after engineering test
+56:53 demo
+Need
+Bitshifters presents Teletextr - Simon wants to do this as vector font?
+No blank starfield
+No blank raster bars
+Intro to each section - use dot scroller
+Different directions for dot scroller
+We're out of time to write new fx
+New sprites for vector balls
+Colours for interference patterns
+59:18 music finishes
+Demo ends at 01:20 - 5 minutes - too long!
+Save copper bars for credits scroller
+Get code speed up for credits scroller from Bad Apple
+
+Need a "Presented at Nova" screen from Horsenburger
+End on this?
+
+Target 3:30s
+OLC: Bitshifters hijacked Ceefax with our favourite old-school demo fx
+Key beats:
+0. Loading: ~20s
+1. Setup: ~40s
+    a. Tuning in the TV
+    b. Pages from Ceefax
+    c. Bitshifters hijacked your TV
+2. Main 2D fx: ~60s
+    b. Plasma
+    c. Interference
+    d. Rotozoomer
+    e. Particles - segue to 3D?
+4. Linking fx:
+    a. Animated GIFs
+    b. Dotscroller
+    c. Starfield
+    d. Rasterbars
+3. Main 3D fx: ~60s
+    a. 3D wireframe
+    b. Vector text
+    c. Vector balls
+5. End: ~40s
+    a. Credits + greets
+    b. Testcard + turn off
+
+Need to get to the action within 60s
+Strength is that we can switch rapidly between fx so keep it snappy - we're not hiding any loading!
+Go from least to most impressive
+Probably start 2D and end 3D
+
+MUST FIX
+Engineering test page double-height - DONE
+Bithshifters logo glitch - DONE
+Crappy wibbling Bitshifters logo / reorder sequence to include intro texts - DONE
+Glitch in blueblob - DONE from raster POV - still need to remove white blocks?
+Move P100 along one char at least - DONE
+Glitch in rotozoom - told SIMON
+Raster bar FX OOT for 3D shapes - removed for now just green screen
+Let main tune finish (bit early) - DONE
+Proper credits text - DONE
+Credits scroll raster - DONE-ish (still stalls on audio frame?)
+
+SHOULD FIX
+Weather GIF anim longer & add "forecast for Budleigh"
+Add Nova logo somewhere - DONE
+Let particles disappear before switching to next fx
+
+SPRINKLES
+Additional pages from Ceefax inc. Budleigh / Nova refs - DONE
+Additional angles + colours for dotscroller - DONE
+Explody particles for extra colour - DONE looks a bit meh
+Add bg or fg colours to credit scroll
+Add colour to vectorballs - DONE
+Change FX on new music bar
+
+ULTRA COMBO
+Additional FX for credit scroll
+Additional shapes for vector balls
+Sinus scroller
+Sprite BOBs
+Cycle through all FX super quick in last couple of seconds of demo as finale, finish on viper? - DONE
+Hit Cobra! on last note and leave spinning without audio... - -DONE
+
+Spec
+BBC Master
+2MHz 6502
+128K RAM
+SAA5050
+Teletext chip
+
+Bitshifters Thanks
+Nick Jameson
+Horsenburger
+edit.tf
+beebasm
+
+Kieran Greetz
+rawles
+puppeh
+rc55
+Matt Godbolt
+RTW
+
+Bitshifters Greetz
+Inverse Phase
+crtc
+DESiRE
+Ate Bit
+Stardot Crew
+Teletext Posse
+Everyone at the party
+
+Music
+Credits music - Exception by jrlepage
+Intro music - reggie by Svetlana
+Main music - en vard fyra javel by AbbeAbyss
+
+Bugs
+~~~~
+- Missing double height on one of the intro screens
+- Rotozoom glitch
+- Check timing on music / end of sequence
+- Credit scroll dropping frames
+- Tidy up credit text to make it readable
+- Add README to disc
+- Add TITLE to disc
+
+
+OLD
+~~~
+MODE 7 IDEAS
+~~~~~~~~~~~~
+For music disk demo
+
+Bresenham line drawing, optimised for MODE 7 pixels
+  - Animated 2D lines, spirograph
+  - Animated 3D objects, morph between objects
+
+Pixel plotting - what about colour?
+  - Star field (sideways, perspective, rotating etc.)
+  - Particle system (fireworks, water etc.)
+
+Scanline fill
+  - Solid vectors, or pseudo vector
+  - Vertical Twister
+
+Video playback
+  - B&W frame deltas
+
+Full-screen masking
+  - Interference patterns
+
+Vertical Rupture
+  - Does it work?
+  - What could this enable in MODE 7?!
+
+Other scrollers
+  - Not sideways (diagonal?)
+  - Sinewave character scroller
+  - Large font
+
+MODE 7 large masked font character scroller
+Simulate copper bar effects by setting background colour on column 0
+Do a reflected mirror effect by grabbing lines of teletexels and merging them together
+  - Generate code to do this - could wibble the reflection by altering lines that are grabbed under sine
+Starfield?
+Could each character have a different colour associated with it?
+
+Offline sprite generation
+  - Write exporter to turn a standard PNG into MODE 7 sprite data, optionally including mask, for all 6x offset
+    combinations.
+  - For extra points export code with sprite + mask data embedded (so LDA #abs rather than LDA data,X)
+
+Mapped scroller
+  - Need two functions that define path for top and bottom of scroll text position on screen, does not have to be
+    straight lines or aligned with anything, e.g. sine wave top & bottom, angled into screen, circular etc.
+  - Decide how many "columns" we are going to have, e.g. 40, then step along top & bottom paths 40 times - this
+    gives us (x,y) co-ordinates for a convex polygon that defines the extents of a column
+  - Decide how many "rows" we are going to have, e.g. 8, divide up the polygon into 8 cells - these correspond to
+    8 bits in a frame buffer that is displayed in these cells
+  - Each cell is also a convex polygon - we can determine which MODE 7 pixels are inside this polygon then identify
+    the minimum set of characters required to draw these polygons.
+  - Generate code that renders a "column" on the screen by loading screen addresses, OR'ing or AND'ing appropriate
+    pixels and writing back for each cell in order.
+  - Should end up with 40x functions that map a byte of pixels to the screen in whatever pattern is determined by
+    path fns.
+
+Leave 4 bytes at start of line: bg colour, bg fill, fg colour, sep graphics (turn this on/off for nice effects)
+Gives us a 36x25 character buffer = 72x75 pixel buffer
+
+

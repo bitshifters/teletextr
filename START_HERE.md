@@ -7,7 +7,7 @@ driven by a script, with VGM music, written in beebasm.
 | | |
 |---|---|
 | GitHub | https://github.com/bitshifters/teletextr (public, Bitshifters org) |
-| Local path | D:\beeb\mine\teletextr (moved from OneDrive\BEEB\Repos\teletextr on 2026-11-22) |
+| Local path | D:\bitshifters\teletextr (moved from OneDrive\BEEB\Repos\teletextr on 2026-11-22) |
 | Branch | `bugfix-rotozoom` (one commit past `master`: "Fixed rotozoom glitch", 2017-07-21, pushed) |
 | Other branches | `master`, `wip/2026-11-tidy`, `feature-musicbars`, `feature-raycaster`, `investigation-*` (mirrorfloor, mode750, rtw-bresenham), `kieran-*` (colour-balls, crescendo, intro-timing, type-intros: their origin branches are gone) |
 | Last commit | 2017-07-21: Fixed rotozoom glitch |
